@@ -20,7 +20,7 @@ slider = s;
 
 let rows = [];
 try {
-  const [result] = await db.execute('SELECT * FROM post WHERE id_category = "8" ORDER BY date desc limit 3');
+  const [result] = await db.execute('SELECT * FROM posts WHERE kategori = "Berita" ORDER BY tanggal asc limit 3');
   rows = result;
 } catch (e) {
   console.error("DB error:", e);
@@ -252,7 +252,6 @@ try {
         
 </style>
 
-
 <MainLayout title="DPMPTSP Kota Surabaya">
 <!-- ================= NAVBAR ================= -->
 <nav class="bg-dpmBlue text-white sticky top-0 z-50 shadow">
@@ -273,101 +272,67 @@ try {
 </nav>
 
 <!-- ================= HERO ================= -->
- <section class="relative h-screen overflow-hidden">
-
-  <!-- BG -->
-  <img src="https://dpm-ptsp.surabaya.go.id/carousel/5.png"
-       class="absolute inset-0 w-full h-full object-cover scale-105 transition duration-[5000ms] ease-out"
-       id="bg">
-
-  <div class="absolute inset-0 bg-black/60"></div>
-
-  <div class="relative z-10 container mx-auto px-6 h-full flex items-center">
-
-    <div class="grid md:grid-cols-2 gap-10 w-full items-center">
-
-      <!-- TEXT -->
-      <div class="text-white max-w-xl space-y-4">
-
-        <!-- GARIS KUNING -->
-        <div class="w-12 h-1 bg-yellow-400 fadeUp"></div>
-
-        <h2 class="text-sm tracking-[3px] fadeUp delay-1">
-          LOKASI <span class="text-yellow-400 font-bold"> </span>
-        </h2>
-
-        <h1 class="text-5xl font-bold leading-tight fadeUp delay-2">
-          Pelayanan Publik
+<section class="relative overflow-hidden bg-blue-600">
+  <div class="container mx-auto px-4 py-16 md:py-24">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <!-- Hero Text -->
+      <div class="text-white animate-fadeInUp animate__animated animate__fadeInUp">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">
+          Investasi & Perizinan Terpadu
         </h1>
-
-        <p class="text-xl opacity-90 fadeUp delay-3">
-          di Kota Surabaya
+        <p class="text-xl mb-8 opacity-90">
+          Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kota Surabaya
         </p>
-
-        <a href="#"
-           class="inline-block mt-4 border border-white px-6 py-3 rounded-lg fadeUp delay-4 hover:bg-white hover:text-black transition">
-          Baca →
-        </a>
-
-      </div>
-
-      <!-- RIGHT SIDE -->
-      <div class="relative pl-10">
-
-        <!-- GARIS VERTIKAL -->
-        <div class="absolute left-3 top-0 bottom-0 w-[2px] bg-white/30"></div>
-
-        <div class="space-y-6">
-
-        <div class="item flex items-center gap-4"> <img src="https://epmal.surabaya.go.id/simpedal/assets2/TAKON-SOBAT.png" class="w-16 h-16 rounded-full object-cover border-2 border-white"> <span class="text-white font-medium">TAKON SOBAT</span> </div> <div class="item flex items-center gap-4"> <img src="https://epmal.surabaya.go.id/simpedal/assets2/lapis_lupis_baru.png" class="w-16 h-16 rounded-full object-cover border-2 border-white"> <span class="text-white font-medium">LAPIS LUPIS</span> </div>
-
-       <div class="item flex items-center gap-4"> <img src="https://epmal.surabaya.go.id/simpedal/assets2/Wani Ngurus Izin.jpeg" class="w-16 h-16 rounded-full object-cover border-2 border-white"> <span class="text-white font-medium">WANI NGURUS IZIN</span> </div>
-
+        <div class="flex flex-wrap gap-4">
+          <a href="#" class="bg-yellow-400 text-blue-800 font-bold px-6 py-3 rounded-lg hover:bg-yellow-300 transition duration-300 transform hover:scale-105">
+            Mulai Berinvestasi <i class="fas fa-arrow-right ml-2"></i>
+          </a>
+          <a href="#" class="bg-white text-blue-600 font-bold px-6 py-3 rounded-lg hover:bg-gray-100 transition duration-300">
+            Lihat Layanan <i class="fas fa-list ml-2"></i>
+          </a>
         </div>
-
       </div>
 
+      <!-- Carousel -->
+       <div class="relative slide-in">
+
+  <div id="hero-carousel" class="relative overflow-hidden rounded-2xl shadow-2xl">
+
+    <div class="carousel-item bg-blue-800 p-8 rounded-2xl text-white">
+      <h3 class="text-2xl font-bold mb-4">Klinik Investasi Surabaya</h3>
+      <p class="mb-6">Konsultasi perizinan usaha di Kota Surabaya dengan tim ahli kami.</p>
+      <a href="#" class="inline-flex items-center text-yellow-400 font-medium">
+        Selengkapnya <i class="fas fa-chevron-right ml-2"></i>
+      </a>
+    </div>
+
+    <div class="carousel-item bg-blue-800 p-8 rounded-2xl text-white hidden">
+      <h3 class="text-2xl font-bold mb-4">Layanan Cepat & Transparan</h3>
+      <p class="mb-6">Proses perizinan lebih mudah untuk warga Surabaya.</p>
+      <a href="#" class="inline-flex items-center text-yellow-400 font-medium">
+        Selengkapnya <i class="fas fa-chevron-right ml-2"></i>
+      </a>
     </div>
 
   </div>
+
+  <!-- DOTS (WAJIB) -->
+  <div class="flex justify-center mt-6 space-x-2">
+    <button class="hero-dot w-3 h-3 rounded-full bg-white"></button>
+    <button class="hero-dot w-3 h-3 rounded-full bg-white opacity-50"></button>
+  </div>
+
+</div>
+
+
+
+    </div>
+  </div>
+
+  <!-- Decorative Circles -->
+  <div class="absolute top-0 right-0 w-64 h-64 bg-yellow-400 rounded-full opacity-10 -translate-y-32 translate-x-32"></div>
+  <div class="absolute bottom-0 left-0 w-96 h-96 bg-blue-600 rounded-full opacity-10 -translate-x-64 translate-y-64"></div>
 </section>
-
-<style>
-.item {
-  opacity: 0.6;
-  cursor: pointer;
-  transition: all .3s ease;
-}
-
-.item.active {
-  opacity: 1;
-  transform: translateX(10px);
-}
-
-.item:hover {
-  opacity: 1;
-}
-
-/* efek garis kiri */
-.item.active::before {
-  content: "";
-  width: 3px;
-  height: 40px;
-  background: #facc15;
-  position: absolute;
-  left: -15px;
-}
-
-/* animasi text */
-.fadeChange {
-  animation: fadeChange .5s ease;
-}
-
-@keyframes fadeChange {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-</style>
 
 <script is:inline>
 const slides = document.querySelectorAll('#hero-carousel .carousel-item');
@@ -681,17 +646,17 @@ showSlide(current);
       {rows.map(post => (
         <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 card-hover flex flex-col h-full">
           <div class="relative h-80 overflow-hidden">
-              <img src={`https://dpm-ptsp.surabaya.go.id/fileberita/${post.picture}`} alt={post.judul} class="absolute inset-0 w-full h-96 object-cover hover:scale-105 transition-transform duration-500" style="object-position: center 30%;">
+              <img src={post.gambar} alt={post.judul} class="absolute inset-0 w-full h-96 object-cover hover:scale-105 transition-transform duration-500" style="object-position: center 30%;">
               <!-- Logo/Header Overlay -->
           </div>
           <div class="p-5 flex-grow">
               <h3 class="text-lg font-bold text-blue-800 mb-2 line-clamp-2">{post.judul}</h3>
-              <p class="text-gray-600 text-sm mb-4">{post.content}</p>
+              <p class="text-gray-600 text-sm mb-4">{post.konten}</p>
               <div class="flex items-center justify-between pt-3 border-t border-gray-100 mt-auto">
                   <div class="text-sm text-gray-500">
-                      <i class="far fa-calendar-alt mr-1"></i> {new Date(post.date).toLocaleDateString("id-ID")}
+                      <i class="far fa-calendar-alt mr-1"></i> {new Date(post.tanggal).toLocaleDateString("id-ID")}
                   </div>
-                   <a href={`/media/${slugify(post.content)}`}
+                   <a href={`/media/${slugify(post.judul)}`}
                       class="text-blue-600 font-semibold text-sm hover:text-blue-800 flex items-center">
                       Baca Selengkapnya <i class="fas fa-arrow-right ml-1 text-xs"></i>
                   </a>
@@ -886,49 +851,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
   showHero(0);
 });
-</script>
-<script>
-const items = document.querySelectorAll(".item");
-const bg = document.getElementById("bg");
-
-const title = document.querySelector("h1");
-const subtitle = document.querySelector("p");
-
-let index = 0;
-
-/* FUNCTION UPDATE */
-function updateHero(el) {
-  // active
-  items.forEach(i => i.classList.remove("active"));
-  el.classList.add("active");
-
-  // ganti bg
-  bg.src = el.dataset.bg;
-
-  // animasi text
-  title.classList.remove("fadeChange");
-  subtitle.classList.remove("fadeChange");
-
-  void title.offsetWidth; // reset anim
-
-  title.textContent = el.dataset.title;
-  subtitle.textContent = el.dataset.sub;
-
-  title.classList.add("fadeChange");
-  subtitle.classList.add("fadeChange");
-}
-
-/* CLICK */
-items.forEach((el, i) => {
-  el.addEventListener("click", () => {
-    index = i;
-    updateHero(el);
-  });
-});
-
-/* AUTO SLIDE */
-setInterval(() => {
-  index = (index + 1) % items.length;
-  updateHero(items[index]);
-}, 5000);
 </script>

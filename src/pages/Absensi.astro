@@ -1,0 +1,154 @@
+---
+import MainLayout from "../layouts/MainLayoutabsen.astro";
+---
+
+<MainLayout title="Absensi Kamera">
+
+<div class="max-w-4xl mx-auto mt-10">
+
+    <div class="bg-white rounded-xl shadow-lg p-6">
+
+        <h1 class="text-3xl font-bold text-blue-700 mb-6">
+            📸 Absensi Kamera
+        </h1>
+
+        <div class="grid md:grid-cols-2 gap-8">
+
+            <!-- Kamera -->
+            <div>
+
+                <video
+                    id="video"
+                    autoplay
+                    playsinline
+                    class="rounded-xl border-4 border-blue-100 w-full shadow">
+                </video>
+
+                <canvas id="canvas" hidden></canvas>
+
+            </div>
+
+            <!-- Form -->
+            <div>
+
+                <div class="mb-4">
+
+                    <label class="block font-semibold mb-2">
+                        NIK / NIP
+                    </label>
+
+                    <input
+                        id="nip"
+                        class="border rounded-lg w-full p-3 focus:ring-2 focus:ring-blue-500"
+                        placeholder="Masukkan NIK / NIP">
+
+                </div>
+
+                <button
+                    id="btnAbsen"
+                    class="w-full bg-blue-600 hover:bg-blue-700 transition text-white rounded-lg py-3 font-semibold">
+
+                    <i class="fas fa-camera me-2"></i>
+                    Ambil Foto
+
+                </button>
+
+                <div id="hasil" class="mt-5"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script is:inline>
+
+const video=document.getElementById("video");
+
+navigator.mediaDevices.getUserMedia({
+    video:true
+})
+.then(stream=>{
+    video.srcObject=stream;
+});
+
+document.getElementById("btnAbsen").onclick=async()=>{
+
+    const canvas=document.getElementById("canvas");
+
+    canvas.width=video.videoWidth;
+    canvas.height=video.videoHeight;
+
+    canvas.getContext("2d")
+          .drawImage(video,0,0);
+
+    const image=canvas.toDataURL("image/jpeg",0.9);
+
+    const nip=document.getElementById("nip").value;
+
+    if(nip==""){
+
+        alert("Masukkan NIK / NIP terlebih dahulu.");
+
+        return;
+
+    }
+
+    const res=await fetch("/api/absen",{
+
+        method:"POST",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+
+            nip,
+            image
+
+        })
+
+    });
+
+    const hasil=await res.json();
+
+    document.getElementById("hasil").innerHTML=`
+
+        <div class="bg-green-50 border border-green-300 rounded-xl p-4">
+
+            <div class="flex items-start">
+
+                <i class="fas fa-circle-check text-green-600 text-3xl mr-3"></i>
+
+                <div>
+
+                    <div class="font-bold text-green-700">
+
+                        Pegawai dengan NIK/NIP
+                        <span class="text-blue-700">${nip}</span>
+                        telah menggunakan aplikasi kamera.
+
+                    </div>
+
+                    <div class="text-gray-600 mt-2">
+
+                        ✅ ${hasil.message}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+};
+
+</script>
+
+</MainLayout>

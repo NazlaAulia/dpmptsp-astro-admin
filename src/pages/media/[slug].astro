@@ -2,24 +2,100 @@
 export const prerender = false;
 
 import MainLayout from "../../layouts/MainLayout.astro";
-import { db } from "../../lib/db.js"; 
+import { db } from "../../lib/db.js";
 import { slugify } from "../../utils/slugify";
 
-const { slug } = Astro.params;
+const rawSlug = Astro.params.slug;
+
+// WAJIB: decode slug dari URL
+const slug = decodeURIComponent(rawSlug)
+  .toString()
+  .toLowerCase()
+  .trim();
 
 // ambil semua post
-const [rows] = await db.execute("SELECT * FROM posts");
-
-// cari yang slug-nya cocok
-const post = rows.find(
-  (row) => slugify(row.judul) === slug
+const [rows] = await db.execute(
+  "SELECT * FROM post WHERE title IS NOT NULL"
 );
 
+// cari post yang cocok
+const post = rows.find(row => {
+  const rowSlug = slugify(row.title)
+    .toLowerCase()
+    .trim();
+
+  return rowSlug === slug;
+});
+
+let artikel = [];
+try {
+  const [result] = await db.execute(`
+    SELECT * FROM category_berita
+  `);
+  artikel = result;
+} catch (e) {
+  console.error("DB error Kategori:", e);
+}
+
+const [beritaRows] = await db.execute(
+  "SELECT * FROM post WHERE id_category IN (1,8) ORDER BY date DESC LIMIT 5"
+);
+
+const [artikelRows] = await db.execute(
+  "SELECT * FROM post WHERE id_category IN (2,3) ORDER BY date DESC LIMIT 5"
+);
+
+
+
 if (!post) {
+  console.log("SLUG URL :", slug);
+  rows.forEach(r => {
+    console.log("DB SLUG :", slugify(r.title));
+  });
+
   throw new Error("Data tidak ditemukan");
 }
 
+let categories = [];
+try {
+  const [result] = await db.execute(
+    "SELECT id_category, title FROM category_berita"
+  );
+  categories = result;
+} catch (e) {
+  console.error("DB error Kategori:", e);
+}
+
+let namaKategori = 'Tanpa Kategori';
+
+if (post?.id_category) {
+  const kategori = categories.find(
+    c => String(c.id_category) === String(post.id_category)
+  );
+  if (kategori) {
+    namaKategori = kategori.title;
+  }
+}
+
+
+let beritaLainnya = [];
+try {
+  const [result] = await db.execute('SELECT * FROM post order BY date DESC LIMIT 1000');
+  beritaLainnya = result;
+} catch (e) {
+  console.error("DB error:", e);
+}
+const beritaList = beritaLainnya.filter(
+  b => [1, 8].includes(b.id_category)
+).slice(0, 5);
+
+const artikelList = beritaLainnya.filter(
+  b => [2, 3].includes(b.id_category)
+).slice(0, 5);
+
+
 ---
+
 
  <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
@@ -118,13 +194,13 @@ if (!post) {
             overflow: hidden;
         }
     </style>
-<MainLayout title={post.judul}>
+<MainLayout title={post.title}>
 
   <!-- HERO -->
   <section class="relative overflow-hidden bg-gradient-to-r from-blue-800 to-blue-900 py-14">
     <div class="container mx-auto px-4 text-center text-white">
       <h1 class="text-3xl md:text-4xl font-bold mb-4 animate-fadeInUp">
-        Detail Berita
+        Detail Media
       </h1>
       <p class="text-lg opacity-90 max-w-3xl mx-auto">
         Informasi lengkap seputar kegiatan dan perkembangan terbaru DPMPTSP Surabaya
@@ -151,11 +227,11 @@ if (!post) {
             <span class="bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-semibold">
               <i class="fas fa-newspaper mr-1"></i> Berita
             </span>
-            <span class="text-sm text-gray-500"><i class="far fa-calendar-alt mr-1"></i> {new Date(post.tanggal).toLocaleDateString("id-ID")}</span>
+            <span class="text-sm text-gray-500"><i class="far fa-calendar-alt mr-1"></i> {new Date(post.date).toLocaleDateString("id-ID")}</span>
           </div>
 
           <h1 class="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
-            {post.judul}
+            {post.title}
           </h1>
                             
           <div class="flex flex-wrap items-center gap-4 text-gray-600">
@@ -175,84 +251,153 @@ if (!post) {
         </div>
 
         <!-- Gambar -->
-        {post.gambar && (
+        {post.picture && (
           <div class="px-6 mt-6">
             <img
-              src={post.gambar}
-              alt={post.judul}
+              src={`https://dpm-ptsp.surabaya.go.id/fileberita/${post.picture}`}
+              alt={post.title}
               class="w-full h-64 md:h-96 object-cover rounded-xl hover:scale-105 transition"
             />
           </div>
         )}
 
-        <!-- Isi -->
-        <div
-          class="p-6 md:p-8 prose prose-lg max-w-none first-letter text-justify text-gray-700"
-          set:html={post.konten}
-        />
-        
-        <!-- Tags -->
-        <div class="mt-8 pt-6 border-t border-gray-100">
-            <div class="flex items-center space-x-2">
-                <span class="font-semibold text-gray-700">Tags:</span>
-                <div class="flex flex-wrap gap-2">
-                    <span class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm cursor-pointer transition-colors">
-                      #{post.kategori}
-                    </span>
-                </div>
-            </div>
-        </div>
+       <div class="p-6 md:p-8 prose prose-lg max-w-none first-letter text-justify text-gray-700">
+  <div set:html={post.ref_content} />
+
+  <div class="mt-8 pt-6 border-t border-gray-100 not-prose">
+    <div class="flex items-center gap-2 flex-wrap">
+      <span class="font-semibold text-gray-700">Tags:</span>
+      <span class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">
+        #{namaKategori}
+      </span>
+    </div>
+  </div>
+</div>
+
 
       </article>
 
       <!-- SIDEBAR -->
       <aside class="space-y-6">
 
-        <!-- Berita Terkait (Dummy dulu) -->
-        <div class="bg-white rounded-2xl shadow-custom p-6">
-          <h2 class="text-xl font-bold mb-4 border-b pb-2">
-            Berita Terkait
-          </h2>
+        <!-- Berita Terkait -->
+<div class="bg-white rounded-2xl shadow-custom p-6">
+  <h2 class="text-xl font-bold mb-4 border-b pb-2">
+    Media Terkait
+  </h2>
+  <input
+  type="text"
+  id="search-related"
+  placeholder="Cari judul..."
+  class="w-full mb-4 px-4 py-2 text-sm border rounded-xl
+         focus:outline-none focus:ring-2 focus:ring-blue-600"
+/>
 
-          <a href={`/media/${post.id}`} class="flex gap-4 mb-4 group">
-            <img src={post.gambar} class="w-20 h-20 rounded-lg object-cover">
-            <div>
-              <span class="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded">
-                {post.kategori}
-              </span>
-              <h3 class="font-semibold text-sm line-clamp-2 group-hover:text-blue-700">
-                {post.judul}
-              </h3>
-              <p class="text-xs text-gray-500 mt-1">
-                <i class="far fa-calendar-alt mr-1"></i> {new Date(post.tanggal).toLocaleDateString("id-ID")}
-              </p>
-            </div>
-          </a>
+<div class="flex gap-2 mb-5 bg-slate-100 p-1 rounded-xl w-fit">
+  <button
+    class="tab-btn px-4 py-2 text-sm font-medium rounded-lg
+           bg-blue-600 text-white shadow"
+    data-category="berita"
+  >
+    Berita
+  </button>
 
-          <a href="/berita"
-            class="block text-center bg-blue-700 text-white py-3 rounded-lg hover:bg-blue-800 transition">
-            Lihat Semua Berita
-          </a>
-        </div>
+  <button
+    class="tab-btn px-4 py-2 text-sm font-medium rounded-lg
+           text-slate-600 hover:text-slate-900"
+    data-category="artikel"
+  >
+    Artikel
+  </button>
+</div>
+
+
+  <!-- LIST -->
+  <div id="related-list">
+
+  <!-- BERITA -->
+  {beritaList.map(b => (
+    <a
+      href={`/media/${slugify(b.title)}`}
+      class="related-item flex gap-4 mb-4"
+      data-type="berita"
+    >
+      <img
+        src={`https://dpm-ptsp.surabaya.go.id/fileberita/${b.picture}`}
+        class="w-20 h-20 rounded-xl object-cover"
+      />
+      <div>
+        <span class="text-[11px] bg-blue-50 text-blue-700 px-2 py-1 rounded">
+          Berita
+        </span>
+        <h3 class="font-semibold text-sm line-clamp-2">
+          {b.title}
+        </h3>
+        <p class="text-xs text-slate-500">
+          {new Date(b.date).toLocaleDateString("id-ID")}
+        </p>
+      </div>
+    </a>
+  ))}
+
+  <!-- ARTIKEL -->
+  {artikelList.map(b => (
+    <a
+      href={`/media/${slugify(b.title)}`}
+      class="related-item hidden flex gap-4 mb-4"
+      data-type="artikel"
+    >
+      <img
+        src={`https://dpm-ptsp.surabaya.go.id/fileberita/${b.picture}`}
+        class="w-20 h-20 rounded-xl object-cover"
+      />
+      <div>
+        <span class="text-[11px] bg-emerald-50 text-emerald-700 px-2 py-1 rounded">
+          Artikel
+        </span>
+        <h3 class="font-semibold text-sm line-clamp-2">
+          {b.title}
+        </h3>
+        <p class="text-xs text-slate-500">
+          {new Date(b.date).toLocaleDateString("id-ID")}
+        </p>
+      </div>
+    </a>
+  ))}
+
+</div>
+
+
+
+  <a href="/berita"
+    class="block text-center bg-blue-700 text-white py-3 rounded-lg hover:bg-blue-800 transition">
+    Lihat Semua Berita
+  </a>
+</div>
+
 
         <!-- Quick Links -->
         <div class="bg-gradient-to-r from-blue-700 to-blue-900 rounded-2xl shadow-custom p-6 text-white card-hover">
             <h2 class="text-xl font-bold mb-6">Layanan Cepat</h2>
             <div class="space-y-4">
                 <a href="/Aplikasi#ijinusaha-sec" class="flex items-center justify-between p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
+                    <span class="font-medium">Call Center Surabaya</span>
+                    <i class="fas fa-arrow-right text-yellow-300"></i>
+                </a> 
+                <a href="/Aplikasi#ijinusaha-sec" class="flex items-center justify-between p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
+                    <span class="font-medium">TAKON SOBAT</span>
+                    <i class="fas fa-arrow-right text-yellow-300"></i>
+                </a> 
+                <a href="/Aplikasi#ijinusaha-sec" class="flex items-center justify-between p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
+                    <span class="font-medium">LAPIS LUPIS</span>
+                    <i class="fas fa-arrow-right text-yellow-300"></i>
+                </a> 
+                <a href="/Aplikasi#ijinusaha-sec" class="flex items-center justify-between p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
                     <span class="font-medium">Perizinan Online</span>
                     <i class="fas fa-arrow-right text-yellow-300"></i>
                 </a>
                 <a href="/Aplikasi#pengaduan-sec" class="flex items-center justify-between p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
                     <span class="font-medium">Pengaduan Layanan</span>
-                    <i class="fas fa-arrow-right text-yellow-300"></i>
-                </a>
-                <a href="kontak.html" class="flex items-center justify-between p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
-                    <span class="font-medium">Konsultasi Investasi</span>
-                    <i class="fas fa-arrow-right text-yellow-300"></i>
-                </a>
-                <a href="tentangkm.html#kontak-sec" class="flex items-center justify-between p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
-                    <span class="font-medium">FAQ & Bantuan</span>
                     <i class="fas fa-arrow-right text-yellow-300"></i>
                 </a>
             </div>
@@ -286,7 +431,7 @@ if (!post) {
           <!-- Copy Link -->
           <div class="mt-6 pt-4 border-t border-gray-100">
               <div class="flex">
-                  <input type="text" id="article-link" value={`/media/${post.id}`} 
+                  <input type="text" id="article-link" value={`/media/${slug}`} 
                                        readonly class="flex-grow px-3 py-2 text-sm border border-gray-300 rounded-l-lg focus:outline-none">
                   <button id="copy-link" class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-r-lg transition-colors">
                       <i class="fas fa-copy"></i>
@@ -299,5 +444,81 @@ if (!post) {
       </aside>
     </div>
   </section>
+<script>
+  const tabs = document.querySelectorAll(".tab-btn");
+  const items = document.querySelectorAll(".related-item");
+
+  const setActive = (type) => {
+    tabs.forEach(t => {
+      const active = t.dataset.category === type;
+      t.className =
+        "tab-btn px-4 py-2 text-sm font-medium rounded-lg transition " +
+        (active
+          ? "bg-blue-600 text-white shadow"
+          : "text-slate-600 hover:text-slate-900");
+    });
+
+    items.forEach(item => {
+      item.classList.toggle(
+        "hidden",
+        item.dataset.type !== type
+      );
+    });
+  };
+
+  setActive("berita");
+
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      setActive(tab.dataset.category);
+    });
+  });
+</script>
+<script>
+  const tabs = document.querySelectorAll(".tab-btn");
+  const items = document.querySelectorAll(".related-item");
+  const searchInput = document.getElementById("search-related");
+
+  let activeType = "berita";
+
+  function renderList() {
+    const keyword = searchInput.value.toLowerCase().trim();
+
+    items.forEach(item => {
+      const title = item.querySelector("h3")?.innerText.toLowerCase() || "";
+      const matchType = item.dataset.type === activeType;
+      const matchText = title.includes(keyword);
+
+      item.classList.toggle("hidden", !(matchType && matchText));
+    });
+  }
+
+  function setActive(type) {
+    activeType = type;
+
+    tabs.forEach(t => {
+      const active = t.dataset.category === type;
+      t.className =
+        "tab-btn px-4 py-2 text-sm font-medium rounded-lg transition " +
+        (active
+          ? "bg-blue-600 text-white shadow"
+          : "text-slate-600 hover:text-slate-900");
+    });
+
+    renderList();
+  }
+
+  // init
+  setActive("berita");
+
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      setActive(tab.dataset.category);
+    });
+  });
+
+  searchInput.addEventListener("input", renderList);
+</script>
+
 
 </MainLayout>

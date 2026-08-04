@@ -1,0 +1,216 @@
+---
+import MainLayout from "../layouts/MainLayoutgratifikasi.astro";
+const pegawai = [
+{ nip:"197612252006041013", nama:"Ir. LASIDI, ST., M.T.", status:"Lapor", waktu:"07:48" },
+{ nip:"197209241996021002", nama:"HEFLI SYARIFUDDIN MADJID, SE., M.Si.", status:"Lapor", waktu:"08:03" },
+{ nip:"197002051998032008", nama:"HERDAYANA WISTIANINGRUM, S.Sos.", status:"Lapor", waktu:"08:12" },
+{ nip:"198502182010011008", nama:"YOHANES FRANKLIN, SH., M.H.", status:"Lapor", waktu:"07:56" },
+{ nip:"197607212001122003", nama:"INDAH MAYASARI, A.Md., S.T.", status:"Lapor", waktu:"08:18" },
+{ nip:"200107202025041006", nama:"MUHAMMAD LAMKHIL BASHOR, S.Kom.", status:"Lapor", waktu:"08:21" },
+{ nip:"197611152007012015", nama:"NOVITA THERESYANA ERAWATI, S.M.", status:"Lapor", waktu:"08:05" },
+{ nip:"197610052007011009", nama:"DWI HARIHADI, S.A.P.", status:"Lapor", waktu:"07:58" },
+{ nip:"198205092014121001", nama:"SUBANDI", status:"Lapor", waktu:"08:09" },
+{ nip:"198007012024212008", nama:"YULI RAHMAWATI, SE.", status:"Lapor", waktu:"08:24" },
+{ nip:"198509052024211007", nama:"ZAHWANUR FARIKH, SE.", status:"Lapor", waktu:"08:14" },
+{ nip:"199104242024211035", nama:"ADVIN MARIYONO, S.ST.", status:"Lapor", waktu:"08:31" },
+{ nip:"199407102024212038", nama:"ARUM KUSUMA WARDHANI, S.Psi.", status:"Lapor", waktu:"07:53" },
+{ nip:"199511172024211011", nama:"RIO SAPUTRA, S.Kom.", status:"Lapor", waktu:"08:11" },
+{ nip:"197303052025211003", nama:"JUNAEDI", status:"Lapor", waktu:"08:06" },
+{ nip:"197809042010012008", nama:"WINDY PUSPITA SARI, SE., M.M.", status:"Lapor", waktu:"08:19" },
+{ nip:"196912132007012012", nama:"ASLIPAH", status:"Lapor", waktu:"08:16" },
+{ nip:"197202082008011019", nama:"PIERY PATRIA HUDA", status:"Lapor", waktu:"08:26" },
+{ nip:"197706181997031003", nama:"AGUNG PRIBADI SINATRIO, SE.", status:"Lapor", waktu:"08:07" },
+{ nip:"197901172001121002", nama:"TAUFIQ ERVANTRI, SE.", status:"Lapor", waktu:"08:13" },
+
+{ nip:"198002262009022004", nama:"NUR ULFATUR ROIHA, S.Kom., M.T.", status:"Lapor", waktu:"08:10" },
+
+{ nip:"199504032022041001", nama:"AGUNG SATRIO, S.M.", status:"Lapor", waktu:"08:22" },
+{ nip:"197805302009012001", nama:"SITI RAPE'A, S.A.P.", status:"Lapor", waktu:"07:59" },
+{ nip:"198506212012122004", nama:"FITRI CHANDRAWATI", status:"Lapor", waktu:"08:15" },
+{ nip:"199206022025211005", nama:"BRAYEN PRASTIKA DWIPUTRA, S.M.", status:"Lapor", waktu:"08:17" },
+{ nip:"198806192024211005", nama:"ADI YUSTIAWAN, S.Tr.Kom.", status:"Lapor", waktu:"08:29" },
+{ nip:"199304282025211013", nama:"ARIF FIRMANSYAH, S.E.", status:"Lapor", waktu:"08:04" },
+{ nip:"199108012024211023", nama:"HARISTYA EKA FARMA, S.Kom.", status:"Lapor", waktu:"08:27" },
+{ nip:"197710132006042012", nama:"ULVIA ZULVIA, S.T.", status:"Lapor", waktu:"08:01" },
+{ nip:"197309022008012003", nama:"CHOTIJAH, A.Md., S.A.P.", status:"Lapor", waktu:"08:33" },
+{ nip:"197307192007012005", nama:"WIJANG WIDYATI, A.Md., S.A.P.", status:"Lapor", waktu:"08:08" },
+{ nip:"199705192020122005", nama:"RIA DWI RAFITA SARI, S.E.", status:"Lapor", waktu:"08:20" },
+{ nip:"197503242008012008", nama:"BINA SETYANINGSIH", status:"Lapor", waktu:"08:02" },
+{ nip:"197009202009011001", nama:"FERY HERDIANTO", status:"Lapor", waktu:"07:54" },
+{ nip:"199507142024211020", nama:"MOCH. ROSUL ZEIN, S.Kom.", status:"Lapor", waktu:"08:23" },
+{ nip:"198905162024211016", nama:"TRIYUDHA RIA WIJAYANTO, S.Kom.", status:"Lapor", waktu:"08:25" },
+{ nip:"199403172024211021", nama:"ROBBY SURYAGARA, S.Kom.", status:"Lapor", waktu:"08:30" },
+{ nip:"199406282024211021", nama:"LAYL AHMAD SURYANA, S.Kom.", status:"Lapor", waktu:"08:28" },
+{ nip:"198702052024211014", nama:"HARNANG FEBRI SAPUTRO, S.Kom.", status:"Lapor", waktu:"08:34" },
+
+{ nip:"198903222025211083", nama:"FIRMAN SANTOSO", status:"Lapor", waktu:"08:32" },
+{ nip:"199605232025211100", nama:"MOCHAMMAD KUSAINI", status:"Lapor", waktu:"08:00" },
+{ nip:"198408302025211084", nama:"LA ARI, S.EI.", status:"Lapor", waktu:"08:36" },
+{ nip:"199305172025212109", nama:"MITORY DITYA RANTIKA ELENTINA, S.Psi.", status:"Lapor", waktu:"08:39" },
+{ nip:"198909202025211123", nama:"SEPTIYAN FIRDAUS GIGIH ARMADANI, S.Sos.", status:"Lapor", waktu:"08:37" },
+{ nip:"197503062025211047", nama:"SARNI", status:"Lapor", waktu:"08:40" },
+{ nip:"197207272025211048", nama:"AZHAR MS", status:"Lapor", waktu:"08:41" },
+{ nip:"198905172025212102", nama:"NURINA PRIHANTINI, S.Ak.", status:"Lapor", waktu:"08:35" },
+{ nip:"199007312025212108", nama:"YULIDA CATUR PRATIWI, S.Si.", status:"Lapor", waktu:"08:42" },
+
+{ nip:"199503232025211092", nama:"A.R BAGAS DANANG HADITIO, S.Kom", status:"Lapor", waktu:"08:17" },
+{ nip:"197406172025211033", nama:"ANANG ARIFIN, S.Pd.", status:"Lapor", waktu:"08:43" },
+{ nip:"199009292025211095", nama:"ANTOK SLAMET PRASETYO, S.E.", status:"Lapor", waktu:"08:05" },
+{ nip:"199403202025211095", nama:"ANTON BUDI SATRIA, S.E.", status:"Lapor", waktu:"08:12" },
+{ nip:"199606182025211104", nama:"BAGASKARA ANDHITA DEWA NORAGA, S.E.", status:"Lapor", waktu:"08:26" },
+{ nip:"199505092025211095", nama:"GALAN PRADANA, S.AB.", status:"Lapor", waktu:"07:57" },
+{ nip:"199008162025212076", nama:"KURNIA HIJRIYAH AGUSTIN, S.E.", status:"Lapor", waktu:"08:31" },
+{ nip:"199402232025211041", nama:"MADA BIMANTORO, S.E.", status:"Lapor", waktu:"08:09" },
+{ nip:"199602192025212070", nama:"NENO SAFITRI, S.H.", status:"Lapor", waktu:"08:18" },
+{ nip:"199208312025212107", nama:"MEGA FADHILAH, A.Md.", status:"Lapor", waktu:"08:44" },
+{ nip:"198807062025211145", nama:"ARDI SYAM PERMANA PUTRA", status:"Lapor", waktu:"08:01" },
+{ nip:"199504112025212114", nama:"AULIA NISA SETYANI", status:"Lapor", waktu:"08:38" },
+{ nip:"199103222025212076", nama:"CINDHY LOVIA LOURINA", status:"Lapor", waktu:"08:15" },
+{ nip:"198608302025212048", nama:"CINTAMI DITA INSANI", status:"Lapor", waktu:"08:22" },
+{ nip:"198610112025211107", nama:"DAVID SETIAWAN", status:"Lapor", waktu:"08:34" },
+{ nip:"199304132025212109", nama:"DEWI ESTY CAHYANTI", status:"Lapor", waktu:"08:07" },
+{ nip:"198912212025211085", nama:"EDO RIZALDI FIRMANSYAH", status:"Lapor", waktu:"08:46" },
+{ nip:"197908142025211087", nama:"FARIKHIN", status:"Lapor", waktu:"08:11" },
+{ nip:"198707072025212153", nama:"HENI PUSPITA", status:"Lapor", waktu:"08:28" },
+{ nip:"198805292025212074", nama:"HERVY KURNIANINGTIYAS", status:"Lapor", waktu:"08:24" },
+{ nip:"199209272025212105", nama:"INDAH YUSNIA FAJARINI", status:"Lapor", waktu:"08:03" },
+{ nip:"199511152025212111", nama:"KARTIKA NOVIARIANI WIDJANARKO", status:"Lapor", waktu:"08:36" },
+{ nip:"199606132025211089", nama:"MOCH ARIES AFFANDY SURYA KUSUMA", status:"Lapor", waktu:"08:14" },
+{ nip:"198603012025211124", nama:"MOCHAMMAD IRWAN ARDIANSYAH", status:"Lapor", waktu:"08:29" },
+{ nip:"198212192025211078", nama:"MUHAMMAD ROZIQIN", status:"Lapor", waktu:"08:19" },
+{ nip:"198612262025211105", nama:"NIXO BILAL", status:"Lapor", waktu:"08:48" },
+{ nip:"198208212025212048", nama:"ONE AGUS MARDIANA", status:"Lapor", waktu:"08:17" },
+{ nip:"198805142025212101", nama:"RHOMA SUCI ANGGASARI", status:"Lapor", waktu:"08:32" },
+{ nip:"198911142025211099", nama:"STEFANUS RIZKY MAHENDRA", status:"Lapor", waktu:"08:21" },
+{ nip:"198908022025212104", nama:"SURAIDA HETE AISYABELLA", status:"Lapor", waktu:"08:40" },
+{ nip:"198711272025211130", nama:"ADITYA HENDRA BUDI PERMANA, S.E.", status:"Lapor", waktu:"08:06" },
+{ nip:"199008242025211091", nama:"ALI RAHMAN, S.T.", status:"Lapor", waktu:"08:13" },
+{ nip:"199308172025211160", nama:"ANDHIKA AUGUST SUMITRO, S.Pd.", status:"Lapor", waktu:"08:27" },
+{ nip:"198912242025212109", nama:"DEVI ANGGRAENI, STP", status:"Lapor", waktu:"08:41" },
+{ nip:"198912132025212071", nama:"DEYLA ERINTA, S.Psi.", status:"Lapor", waktu:"08:16" },
+{ nip:"199007112025211093", nama:"EKA JULIANTO, S.E.", status:"Lapor", waktu:"08:24" },
+{ nip:"199507032025211086", nama:"MUHAMMAD ALIF ALFIANSYAH, S.M.", status:"Lapor", waktu:"08:35" },
+{ nip:"198102232025212024", nama:"NUR WARDAH SIAHAAN, S.E.", status:"Lapor", waktu:"08:02" },
+{ nip:"198605292025211107", nama:"RAMLAN JURMANSYAH, S.T.", status:"Lapor", waktu:"08:31" },
+{ nip:"199109122025212125", nama:"RISA CENDIKA MAHARANI, S.E.", status:"Lapor", waktu:"08:18" },
+{ nip:"199009302025211099", nama:"SETIYO BERMALDI, S.Kom.", status:"Lapor", waktu:"08:45" },
+{ nip:"199505032025211066", nama:"TRI SAPTA NUGROHO SLAMET HARIANTO, S.E.", status:"Lapor", waktu:"08:10" },
+{ nip:"199310302025211101", nama:"WILDAN ARIFIN, S.Pi.", status:"Lapor", waktu:"08:38" },
+{ nip:"199605022025211105", nama:"WILDAN MEYDY KURNIAWAN, S.Sos.", status:"Lapor", waktu:"08:20" },
+{ nip:"198212212025211052", nama:"ADI WARMAN", status:"Lapor", waktu:"08:47" },
+{ nip:"199002012025211129", nama:"MOHAMMAD DAHWAN", status:"Lapor", waktu:"08:14" },
+{ nip:"198504102025211118", nama:"RUDIYANTO", status:"Lapor", waktu:"08:28" },
+{ nip:"198710272025211090", nama:"SUHERI", status:"Lapor", waktu:"08:33" }
+];
+
+const total = pegawai.length;
+const lapor = pegawai.filter(p => p.status === "Lapor").length;
+const belum = pegawai.filter(p => p.status === "Belum Lapor").length;
+const verif = pegawai.filter(p => p.status === "Terverifikasi").length;
+---
+
+
+
+<MainLayout title="Monitoring Gratifikasi">
+
+<div class="max-w-7xl mx-auto p-6">
+
+    <!-- HEADER -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-blue-700">
+            📊 Monitoring Gratifikasi Pegawai
+        </h1>
+        <p class="text-gray-500">
+            Rekapitulasi seluruh pegawai 
+        </p>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="grid md:grid-cols-4 gap-4 mb-8">
+
+        <div class="bg-blue-600 text-white rounded-xl p-5">
+            <div class="text-3xl font-bold">{total}</div>
+            <div>Total Pegawai</div>
+        </div>
+
+        <div class="bg-yellow-500 text-white rounded-xl p-5">
+            <div class="text-3xl font-bold">{belum}</div>
+            <div>Belum Lapor</div>
+        </div>
+
+        <div class="bg-green-600 text-white rounded-xl p-5">
+            <div class="text-3xl font-bold">{lapor}</div>
+            <div>Sudah Lapor</div>
+        </div>
+
+        <div class="bg-purple-600 text-white rounded-xl p-5">
+            <div class="text-3xl font-bold">{verif}</div>
+            <div>Terverifikasi</div>
+        </div>
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="bg-white rounded-xl shadow overflow-hidden">
+
+        <table class="w-full">
+
+            <thead class="bg-slate-800 text-white">
+                <tr>
+                    <th class="p-3 text-left">No</th>
+                    <th class="p-3 text-left">NIP</th>
+                    <th class="p-3 text-left">Nama Pegawai</th>
+                    <th class="p-3 text-center">Status</th>
+                    <th class="p-3 text-center">Waktu Lapor</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {pegawai.map((p, i) => (
+
+                    <tr class="border-b hover:bg-gray-50">
+
+                        <td class="p-3">{i + 1}</td>
+                        <td class="p-3">{p.nip}</td>
+                        <td class="p-3 font-medium">{p.nama}</td>
+
+                        <td class="p-3 text-center">
+
+                            {p.status === "Belum Lapor" && (
+                                <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm">
+                                    ❌ Belum Lapor
+                                </span>
+                            )}
+
+                            {p.status === "Lapor" && (
+                                <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm">
+                                    ⏳ Lapor
+                                </span>
+                            )}
+
+                            {p.status === "Terverifikasi" && (
+                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
+                                    ✅ Terverifikasi
+                                </span>
+                            )}
+
+                        </td>
+
+                        <td class="p-3 text-center text-gray-600">
+                            {p.waktu}
+                        </td>
+
+                    </tr>
+
+                ))}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</MainLayout>

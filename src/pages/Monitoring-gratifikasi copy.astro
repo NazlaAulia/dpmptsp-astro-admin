@@ -1,0 +1,167 @@
+---
+import MainLayout from "../layouts/MainLayoutgratifikasi.astro";
+
+/* =========================
+   2025 FULL DATA
+========================= */
+const rekap2025 = [
+  { bulan:"Jan", total:96, lapor:90, belum:5, verif:1 },
+  { bulan:"Feb", total:96, lapor:92, belum:3, verif:1 },
+  { bulan:"Mar", total:96, lapor:93, belum:2, verif:1 },
+  { bulan:"Apr", total:96, lapor:94, belum:1, verif:1 },
+  { bulan:"Mei", total:96, lapor:95, belum:0, verif:1 },
+  { bulan:"Jun", total:96, lapor:95, belum:0, verif:1 },
+  { bulan:"Jul", total:96, lapor:94, belum:1, verif:1 },
+  { bulan:"Agu", total:96, lapor:95, belum:0, verif:1 },
+  { bulan:"Sep", total:96, lapor:93, belum:2, verif:1 },
+  { bulan:"Okt", total:96, lapor:94, belum:1, verif:1 },
+  { bulan:"Nov", total:96, lapor:95, belum:0, verif:1 },
+  { bulan:"Des", total:96, lapor:94, belum:1, verif:1 }
+];
+
+/* =========================
+   2026 DATA (sampai JUNI 27 update)
+========================= */
+const rekap2026 = [
+  { bulan:"Jan", total:98, lapor:94, belum:3, verif:1 },
+  { bulan:"Feb", total:98, lapor:95, belum:2, verif:1 },
+  { bulan:"Mar", total:98, lapor:96, belum:1, verif:1 },
+  { bulan:"Apr", total:98, lapor:96, belum:1, verif:1 },
+  { bulan:"Mei", total:98, lapor:97, belum:0, verif:1 },
+  { bulan:"Jun", total:98, lapor:97, belum:0, verif:1 }
+];
+
+const totalPegawai = 98;
+---
+
+<MainLayout title="Monitoring Gratifikasi 2025–2026">
+
+<div class="max-w-7xl mx-auto px-6 py-8">
+
+    <!-- HEADER -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-slate-800">
+            📊 Monitoring Gratifikasi Pegawai
+        </h1>
+        <p class="text-slate-500">
+            Update terakhir: 27 Juni 2026
+        </p>
+    </div>
+
+    <!-- TAB -->
+    <div class="flex gap-2 mb-6">
+
+        <button onclick="showYear('2025')"
+            class="tab px-5 py-2 rounded-lg bg-blue-600 text-white">
+            2025 (Full Year)
+        </button>
+
+        <button onclick="showYear('2026')"
+            class="tab px-5 py-2 rounded-lg bg-slate-200">
+            2026 (Jan–Jun)
+        </button>
+
+    </div>
+
+    <!-- ================= 2025 ================= -->
+    <div id="year-2025">
+
+        <div class="bg-white rounded-xl shadow overflow-hidden">
+
+            <div class="p-4 font-semibold text-blue-700">
+                📅 Rekap Tahun 2025 (Full Year)
+            </div>
+
+            <table class="w-full text-sm">
+
+                <thead class="bg-slate-100">
+                    <tr>
+                        <th class="p-3 text-left">Bulan</th>
+                        <th class="p-3 text-center">Total</th>
+                        <th class="p-3 text-green-600">Lapor</th>
+                        <th class="p-3 text-yellow-600">Belum</th>
+                        <th class="p-3 text-purple-600">Verif</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {rekap2025.map(r=>(
+                        <tr class="border-b hover:bg-slate-50">
+                            <td class="p-3 font-medium">{r.bulan}</td>
+                            <td class="text-center">{r.total}</td>
+                            <td class="text-center text-green-600 font-bold">{r.lapor}</td>
+                            <td class="text-center text-yellow-600 font-bold">{r.belum}</td>
+                            <td class="text-center text-purple-600 font-bold">{r.verif}</td>
+                        </tr>
+                    ))}
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <!-- ================= 2026 ================= -->
+    <div id="year-2026" class="hidden">
+
+        <div class="bg-white rounded-xl shadow overflow-hidden">
+
+            <div class="p-4 font-semibold text-blue-700">
+                📅 Rekap Tahun 2026 (Jan–Jun | Update 27 Juni)
+            </div>
+
+            <table class="w-full text-sm">
+
+                <thead class="bg-slate-100">
+                    <tr>
+                        <th class="p-3 text-left">Bulan</th>
+                        <th class="p-3 text-center">Total</th>
+                        <th class="p-3 text-green-600">Lapor</th>
+                        <th class="p-3 text-yellow-600">Belum</th>
+                        <th class="p-3 text-purple-600">Verif</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {rekap2026.map(r=>(
+                        <tr class="border-b hover:bg-slate-50">
+                            <td class="p-3 font-medium">{r.bulan}</td>
+                            <td class="text-center">{r.total}</td>
+                            <td class="text-center text-green-600 font-bold">{r.lapor}</td>
+                            <td class="text-center text-yellow-600 font-bold">{r.belum}</td>
+                            <td class="text-center text-purple-600 font-bold">{r.verif}</td>
+                        </tr>
+                    ))}
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- TAB SCRIPT -->
+<script is:inline>
+
+function showYear(year){
+
+    document.getElementById("year-2025").classList.add("hidden");
+    document.getElementById("year-2026").classList.add("hidden");
+
+    document.getElementById("year-"+year).classList.remove("hidden");
+
+    document.querySelectorAll(".tab").forEach(t=>{
+        t.classList.remove("bg-blue-600","text-white");
+        t.classList.add("bg-slate-200");
+    });
+
+    event.target.classList.add("bg-blue-600","text-white");
+    event.target.classList.remove("bg-slate-200");
+}
+
+</script>
+
+</MainLayout>

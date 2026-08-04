@@ -1,0 +1,89 @@
+---
+import "../styles/global.css";
+
+const {
+  title = "Sistem Pengendalian Gratifikasi Digital",
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>{title}</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+</head>
+
+<body class="bg-slate-100">
+
+<!-- HEADER -->
+<header class="sticky top-0 z-50 bg-gradient-to-r from-sky-900 via-blue-800 to-cyan-700 shadow-lg">
+
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="flex justify-between items-center py-4">
+
+            <!-- LEFT -->
+            <div class="flex items-center gap-4">
+
+                <img
+                    src="https://github.com/arbagasdanangh/pps/raw/main/logo.png"
+                    class="h-14 w-auto bg-white rounded-xl p-1"
+                    alt="Logo"
+                />
+
+                <div>
+                    <h1 class="text-2xl font-bold text-white">
+                        {title}
+                    </h1>
+                    <p class="text-cyan-100">
+                        DPMPTSP Kota Surabaya
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- RIGHT CLOCK -->
+            <div class="text-right">
+                <div id="clock" class="text-3xl font-bold text-white"></div>
+                <div id="date" class="text-cyan-100 text-sm"></div>
+            </div>
+
+        </div>
+    </div>
+
+</header>
+
+<!-- CONTENT -->
+<main class="min-h-screen">
+    <slot />
+</main>
+
+<!-- CLOCK SCRIPT -->
+<script is:inline>
+function updateClock() {
+    const now = new Date();
+
+    document.getElementById("clock").textContent =
+        now.toLocaleTimeString("id-ID");
+
+    document.getElementById("date").textContent =
+        now.toLocaleDateString("id-ID", {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        });
+}
+
+updateClock();
+setInterval(updateClock, 1000);
+</script>
+
+</body>
+</html>

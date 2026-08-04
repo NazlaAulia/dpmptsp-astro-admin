@@ -9,24 +9,57 @@ const {
   description = "Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kota Surabaya",
 } = Astro.props;
 
-let tentang = [];
+let tentangdp = [];
 const [t] = await db.execute(
   "SELECT * FROM tentang_dpmptsp ORDER BY urutan ASC"
 );
-tentang = t;
+tentangdp = t;
 
 let slider = [];
 const [s] = await db.execute(
   "SELECT * FROM tentang_slider ORDER BY urutan ASC"
 );
 slider = s;
+
+
+let tabs = [];
+let dbError = false;
+
+try {
+  const [rows] = await db.query(`
+   SELECT t.*
+FROM TentangKamisWebV5 t
+JOIN (
+  SELECT MIN(Id_Konten) AS Id_Konten
+  FROM TentangKamisWebV5
+  GROUP BY Nama_Konten
+) x ON t.Id_Konten = x.Id_Konten
+ORDER BY t.Id_Konten ASC
+  `);
+  tabs = rows || [];
+} catch (e) {
+  console.error("DB ERROR:", e);
+  dbError = true;
+}
+const ICON_MAP = {
+  sambutan: "fas fa-microphone",
+  visi_misi: "fas fa-bullseye",
+  budaya_pelayanan: "fas fa-handshake",
+  motto_pelayanan: "fas fa-quote-right",
+  maklumat_pelayanan: "fas fa-scroll",
+  kompensasi_layanan: "fas fa-hand-holding-usd",
+  ikm: "far fa-smile",
+  zona_integritas: "fas fa-shield-alt",
+  struktur_organisasi: "fas fa-sitemap",
+};
+
 ---
 
 <MainLayout title="DPMPTSP Kota Surabaya">
 
     <!-- Content -->
     <main class="min-h-screen bg-gray-50">
-    <!-- Hero Section -->
+   
         <section class="relative overflow-hidden gradient-flow bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600">
             <div class="absolute inset-0 z-0">
                 <div class="absolute top-0 right-0 w-64 h-64 bg-yellow-400 rounded-full opacity-10 -translate-y-32 translate-x-32 animate-pulse-soft"></div>
@@ -55,9 +88,9 @@ slider = s;
             <div class="container mx-auto px-4">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                     <div class="animate-fadeInUp">
-                        <h2 class="text-3xl font-bold text-blue-800 mb-6">{tentang.find(t => t.tipe === 'judul')?.konten}</h2>
+                        <h2 class="text-3xl font-bold text-blue-800 mb-6">{tentangdp.find(t => t.tipe === 'judul')?.konten}</h2>
                     
-            {tentang
+            {tentangdp
             .filter(t => t.tipe === 'paragraf')
             .map(p => (
                 <p class="text-gray-700 text-justify mb-6" set:html={p.konten} />
@@ -164,541 +197,141 @@ slider = s;
                 </div>
             </div>
         </section>
-    
+
+
         <!-- Tab Navigation Section -->
-    <section id="stdjenis-sec" class="py-20 bg-gradient-to-b from-gray-50 to-white">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-16 animate-scale-in">
-                <h2 class="text-4xl font-bold text-blue-800 mb-6 animate-text-shadow">
-                    Visi Misi Sambutan Tim Organisasi
-                </h2>
-                <p class="text-gray-600 max-w-2xl mx-auto text-lg animate-fade-up">
-                    Informasi lengkap tentang organisasi, visi misi, dan pelayanan DPM-PTSP Surabaya
-                </p>
+<section class="py-20 bg-gradient-to-b from-gray-50 to-white">
+  <div class="container mx-auto px-4">
+
+    <!-- HEADER -->
+    <div class="text-center mb-16">
+      <h2 class="text-4xl font-bold text-blue-800 mb-6">
+        Visi Misi Sambutan Tim Organisasi
+      </h2>
+      <p class="text-gray-600 max-w-2xl mx-auto text-lg">
+        Informasi lengkap tentang organisasi, visi misi, dan pelayanan
+        DPMPTSP Kota Surabaya
+      </p>
+    </div>
+
+    {dbError && (
+      <p class="text-center text-red-600 font-semibold">
+        ⚠️ Gagal memuat data
+      </p>
+    )}
+
+    {!dbError && tabs.length > 0 && (
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+
+        <!-- ================= SIDEBAR ================= -->
+        <aside class="bg-white rounded-2xl shadow-custom p-6 sticky top-24 h-fit">
+
+          <div class="flex items-center mb-6">
+            <div class="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center mr-3">
+              <i class="fas fa-bars"></i>
             </div>
-            
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 animate-fade-in-scale">
-                <!-- Sidebar Navigasi -->
-                <div class="lg:col-span-1">
-                    <div class="bg-white rounded-2xl shadow-custom p-6 sticky top-24 card-lift">
-                        <div class="flex items-center mb-6">
-                            <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center mr-3">
-                                <i class="fas fa-bars text-white animate-pulse-soft"></i>
-                            </div>
-                            <h3 class="text-lg font-bold text-blue-800">Menu Informasi</h3>
-                        </div>
-                        <div class="space-y-2 overflow-y-auto max-h-[500px] tab-nav stagger-children">
-                            <button class="tab-btn w-full text-left px-4 py-3 rounded-lg bg-blue-600 text-white font-medium transition duration-300 ripple" data-tab="sambutan">
-                                <i class="fas fa-microphone-alt mr-3 animate-wave"></i> Sambutan
-                            </button>
-                            <button class="tab-btn w-full text-left px-4 py-3 rounded-lg bg-gray-100 hover:bg-blue-50 text-gray-700 font-medium transition duration-300 ripple" data-tab="visi-misi">
-                                <i class="fas fa-bullseye mr-3"></i> Visi dan Misi
-                            </button>
-                            <button class="tab-btn w-full text-left px-4 py-3 rounded-lg bg-gray-100 hover:bg-blue-50 text-gray-700 font-medium transition duration-300 ripple" data-tab="budaya">
-                                <i class="fas fa-hands-helping mr-3"></i> Budaya Pelayanan
-                            </button>
-                            <button class="tab-btn w-full text-left px-4 py-3 rounded-lg bg-gray-100 hover:bg-blue-50 text-gray-700 font-medium transition duration-300 ripple" data-tab="motto-layanan">
-                                <i class="fas fa-quote-right mr-3"></i> Motto Pelayanan
-                            </button>
-                            <button class="tab-btn w-full text-left px-4 py-3 rounded-lg bg-gray-100 hover:bg-blue-50 text-gray-700 font-medium transition duration-300 ripple" data-tab="maklumat">
-                                <i class="fas fa-scroll mr-3"></i> Maklumat Pelayanan
-                            </button>
-                            <button class="tab-btn w-full text-left px-4 py-3 rounded-lg bg-gray-100 hover:bg-blue-50 text-gray-700 font-medium transition duration-300 ripple" data-tab="kompensasi">
-                                <i class="fas fa-hand-holding-usd mr-3"></i> Kompensasi Layanan
-                            </button>
-                            <button class="tab-btn w-full text-left px-4 py-3 rounded-lg bg-gray-100 hover:bg-blue-50 text-gray-700 font-medium transition duration-300 ripple" data-tab="ikm">
-                                <i class="fas fa-smile mr-3"></i> Indeks Kepuasan Masyarakat
-                            </button>
-                            <button class="tab-btn w-full text-left px-4 py-3 rounded-lg bg-gray-100 hover:bg-blue-50 text-gray-700 font-medium transition duration-300 ripple" data-tab="zona-integritas">
-                                <i class="fas fa-shield-alt mr-3"></i> Zona Integritas
-                            </button>
-                            <button class="tab-btn w-full text-left px-4 py-3 rounded-lg bg-gray-100 hover:bg-blue-50 text-gray-700 font-medium transition duration-300 ripple" data-tab="struktur">
-                                <i class="fas fa-sitemap mr-3"></i> Struktur Organisasi
-                            </button>
-                            <button class="tab-btn w-full text-left px-4 py-3 rounded-lg bg-gray-100 hover:bg-blue-50 text-gray-700 font-medium transition duration-300 ripple" data-tab="piagam-penghargaan">
-                                <i class="fas fa-award mr-3"></i> Piagam Penghargaan
-                            </button>
-                        </div>
-                    </div>
+            <h3 class="text-lg font-bold text-blue-800">
+              Menu Informasi
+            </h3>
+          </div>
+
+          <div class="space-y-2 max-h-[500px] overflow-y-auto">
+            {tabs.map((t, i) => (
+              <button
+                class={`tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-300
+                  ${i === 0
+                    ? "bg-blue-600 text-white shadow-lg"
+                    : "bg-gray-100 text-gray-700 hover:bg-blue-50 hover:translate-x-1 hover:shadow"
+                  }`}
+                data-tab={t.tags}
+              >
+                <div
+                  class={`w-9 h-9 rounded-full flex items-center justify-center text-sm
+                    ${i === 0
+                      ? "bg-white text-blue-600"
+                      : "bg-blue-100 text-blue-600"
+                    }`}
+                >
+                 <i class={ICON_MAP[t.tags] || "fas fa-circle"}></i>
+
                 </div>
-                
-                <!-- Konten Utama -->
-                <div class="lg:col-span-3">
-                    <!-- Sambutan Tab -->
-                    <div id="sambutan" class="tab-content block">
-                        <div class="bg-white rounded-2xl shadow-custom p-8 card-lift animate-blur-in">
-                            <div class="flex items-center mb-8">
-                                <div class="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center mr-4 animate-pulse-soft">
-                                    <i class="fas fa-microphone-alt text-white text-2xl animate-icon-bounce"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-3xl font-bold text-blue-800">Sambutan</h3>
-                                    <p class="text-gray-600">Kepala Dinas DPM-PTSP Kota Surabaya</p>
-                                </div>
-                            </div>
-                            <div class="bg-gradient-to-r from-blue-50 to-yellow-50 p-8 rounded-2xl mb-8 border-l-4 border-blue-600 animate-fade-up">
-                                <div class="flex items-start">
-                                    <div class="mr-4 mt-1">
-                                        <i class="fas fa-quote-left text-yellow-500 text-3xl opacity-50 animate-wave"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-gray-700 text-lg leading-relaxed italic">
-                                            Assalammu'alaikum Warahmatullahi Wabarakatuh, Puji syukur kami panjatkan kehadirat Allah SWT, dengan berkat rahmat-Nya Dinas DPM-PTSP dapat semakin lebih berperan dalam perkembangan investasi di Kota Surabaya. Saya berharap, dengan adanya website DPMPTSP ini para investor ataupun pelaku usaha yang sudah berusaha di Kota Surabaya dapat memperoleh informasi yang tepat tentang proses berusaha di Kota Surabaya. Kami akan berusaha agar website ini terus berproses untuk menjadi lebih baik dan kami akan terus mengembangkannya agar dapat lebih optimal dalam menyampaikan informasi investasi di Kota Surabaya kepada masyarakat. Wassalamu'alaikum Warahmatullahi Wabarakatuh
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex items-center justify-end animate-fade-up delay-2">
-                                <div class="text-right">
-                                    <p class="font-bold text-blue-800 text-lg">Kepala Dinas DPM-PTSP</p>
-                                    <p class="text-gray-600">Kota Surabaya</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Visi Misi Tab -->
-                    <div id="visi-misi" class="tab-content hidden">
-                        <div class="bg-white rounded-2xl shadow-custom p-8 card-lift animate-blur-in">
-                            <div class="flex items-center mb-8">
-                                <div class="w-14 h-14 bg-yellow-400 rounded-full flex items-center justify-center mr-4 animate-pulse-soft">
-                                    <i class="fas fa-bullseye text-blue-800 text-2xl animate-icon-bounce"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-3xl font-bold text-blue-800">Visi dan Misi</h3>
-                                    <p class="text-gray-600">Panduan Strategis Organisasi</p>
-                                </div>
-                            </div>
-                            
-                            <!-- Gambar dengan zoom -->
-                            <div class="flex justify-center items-center bg-gray-50 rounded-2xl p-6 animate-scale-in">
-                                <div class="zoom-container relative overflow-hidden rounded-xl ripple" onclick="openImageZoom('gambar/visi misi.jpg', 'Visi dan Misi DPM-PTSP Surabaya')">
-                                    <img 
-                                        src="gambar/visi misi.jpg"
-                                        alt="Visi dan Misi Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kota Surabaya" 
-                                        class="max-w-96 h-auto rounded-xl shadow-lg border-4 border-white transition-transform duration-300 hover:scale-105"
-                                    >
-                                    <!-- Icon zoom -->
-                                    <div class="absolute top-4 right-4 bg-blue-600 text-white p-2 rounded-full shadow-lg animate-bounce-soft">
-                                        <i class="fas fa-search-plus text-sm"></i>
-                                    </div>
-                                    <!-- Overlay effect -->
-                                    <div class="absolute inset-0 bg-gradient-to-t from-blue-900/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
-                                        <span class="text-white font-medium">Klik untuk memperbesar</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Optional: Keterangan di bawah gambar -->
-                            <div class="mt-6 text-center animate-fade-up">
-                                <div class="inline-flex items-center space-x-2 bg-blue-50 px-4 py-2 rounded-full">
-                                    <i class="fas fa-info-circle text-blue-600 animate-pulse-soft"></i>
-                                    <p class="text-gray-700">Visi Misi Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kota Surabaya</p>
-                                </div>
-                                <p class="text-sm text-gray-500 mt-2 animate-wave">Klik gambar untuk memperbesar tampilan</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Budaya Pelayanan Tab -->
-                    <div id="budaya" class="tab-content hidden">
-                        <div class="bg-white rounded-2xl shadow-custom p-8 card-lift animate-blur-in">
-                            <div class="flex items-center mb-8">
-                                <div class="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center mr-4 animate-pulse-soft">
-                                    <i class="fas fa-hands-helping text-white text-2xl animate-icon-bounce"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-3xl font-bold text-blue-800">Budaya Pelayanan</h3>
-                                    <p class="text-gray-600">Etika dan Prinsip Pelayanan Publik</p>
-                                </div>
-                            </div>
-                            
-                            <!-- Gambar dengan zoom -->
-                            <div class="flex justify-center items-center bg-gray-50 rounded-2xl p-6 animate-scale-in">
-                                <div class="zoom-container relative overflow-hidden rounded-xl ripple" onclick="openImageZoom('gambar/budayapelayanan.jpeg', 'Budaya Pelayanan DPM-PTSP Surabaya')">
-                                    <img 
-                                        src="gambar/budayapelayanan.jpeg"
-                                        alt="Budaya Pelayanan Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kota Surabaya" 
-                                        class="max-w-96 h-auto rounded-xl shadow-lg border-4 border-white transition-transform duration-300 hover:scale-105"
-                                    >
-                                    <!-- Icon zoom -->
-                                    <div class="absolute top-4 right-4 bg-blue-600 text-white p-2 rounded-full shadow-lg animate-bounce-soft">
-                                        <i class="fas fa-search-plus text-sm"></i>
-                                    </div>
-                                    <!-- Overlay effect -->
-                                    <div class="absolute inset-0 bg-gradient-to-t from-blue-900/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
-                                        <span class="text-white font-medium">Klik untuk memperbesar</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Optional: Keterangan di bawah gambar -->
-                            <div class="mt-6 text-center animate-fade-up">
-                                <div class="inline-flex items-center space-x-2 bg-blue-50 px-4 py-2 rounded-full">
-                                    <i class="fas fa-info-circle text-blue-600 animate-pulse-soft"></i>
-                                    <p class="text-gray-700">Budaya Pelayanan Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kota Surabaya</p>
-                                </div>
-                                <p class="text-sm text-gray-500 mt-2 animate-wave">Klik gambar untuk memperbesar tampilan</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Motto Pelayanan Tab -->
-                    <div id="motto-layanan" class="tab-content hidden">
-                        <div class="bg-white rounded-2xl shadow-custom p-8 card-lift animate-blur-in">
-                            <div class="flex items-center mb-8">
-                                <div class="w-14 h-14 bg-yellow-400 rounded-full flex items-center justify-center mr-4 animate-pulse-soft">
-                                    <i class="fas fa-quote-right text-blue-800 text-2xl animate-icon-bounce"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-3xl font-bold text-blue-800">Motto Pelayanan</h3>
-                                    <p class="text-gray-600">Prinsip Dasar Pelayanan Kami</p>
-                                </div>
-                            </div>
-                            
-                            <!-- Gambar dengan zoom -->
-                            <div class="flex justify-center items-center bg-gray-50 rounded-2xl p-6 animate-scale-in">
-                                <div class="zoom-container relative overflow-hidden rounded-xl ripple" onclick="openImageZoom('gambar/motto.png', 'Motto Pelayanan DPM-PTSP Surabaya')">
-                                    <img 
-                                        src="gambar/motto.png"
-                                        alt="Motto Pelayanan Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kota Surabaya" 
-                                        class="max-w-96 h-auto rounded-xl shadow-lg border-4 border-white transition-transform duration-300 hover:scale-105"
-                                    >
-                                    <!-- Icon zoom -->
-                                    <div class="absolute top-4 right-4 bg-blue-600 text-white p-2 rounded-full shadow-lg animate-bounce-soft">
-                                        <i class="fas fa-search-plus text-sm"></i>
-                                    </div>
-                                    <!-- Overlay effect -->
-                                    <div class="absolute inset-0 bg-gradient-to-t from-blue-900/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
-                                        <span class="text-white font-medium">Klik untuk memperbesar</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Optional: Keterangan di bawah gambar -->
-                            <div class="mt-6 text-center animate-fade-up">
-                                <div class="inline-flex items-center space-x-2 bg-blue-50 px-4 py-2 rounded-full">
-                                    <i class="fas fa-info-circle text-blue-600 animate-pulse-soft"></i>
-                                    <p class="text-gray-700">Motto Pelayanan Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kota Surabaya</p>
-                                </div>
-                                <p class="text-sm text-gray-500 mt-2 animate-wave">Klik gambar untuk memperbesar tampilan</p>
-                            </div>
-                        </div>
-                    </div>
 
+                <span>{t.Nama_Konten}</span>
+              </button>
+            ))}
+          </div>
+        </aside>
 
-                    <!-- Maklumat Pelayanan Tab -->
-                    <div id="maklumat" class="tab-content hidden">
-                        <div class="bg-white rounded-2xl shadow-custom p-8 card-lift animate-blur-in">
-                            <div class="flex items-center mb-8">
-                                <div class="w-14 h-14 bg-yellow-400 rounded-full flex items-center justify-center mr-4 animate-pulse-soft">
-                                    <i class="fas fa-quote-right text-blue-800 text-2xl animate-icon-bounce"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-3xl font-bold text-blue-800">Maklumat Pelayanan</h3>
-                                    <p class="text-gray-600">Prinsip Dasar Pelayanan Kami</p>
-                                </div>
-                            </div>
-                            
-                            <!-- Gambar dengan zoom -->
-                            <div class="flex justify-center items-center bg-gray-50 rounded-2xl p-6 animate-scale-in">
-                                <div class="zoom-container relative overflow-hidden rounded-xl ripple" onclick="openImageZoom('gambar/maklumat_pelayanan.jpeg', 'Maklumat Pelayanan DPM-PTSP Surabaya')">
-                                    <img 
-                                        src="gambar/maklumat_pelayanan.jpeg"
-                                        alt="Maklumat Pelayanan Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kota Surabaya" 
-                                        class="max-w-96 h-auto rounded-xl shadow-lg border-4 border-white transition-transform duration-300 hover:scale-105"
-                                    >
-                                    <!-- Icon zoom -->
-                                    <div class="absolute top-4 right-4 bg-blue-600 text-white p-2 rounded-full shadow-lg animate-bounce-soft">
-                                        <i class="fas fa-search-plus text-sm"></i>
-                                    </div>
-                                    <!-- Overlay effect -->
-                                    <div class="absolute inset-0 bg-gradient-to-t from-blue-900/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
-                                        <span class="text-white font-medium">Klik untuk memperbesar</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Optional: Keterangan di bawah gambar -->
-                            <div class="mt-6 text-center animate-fade-up">
-                                <div class="inline-flex items-center space-x-2 bg-blue-50 px-4 py-2 rounded-full">
-                                    <i class="fas fa-info-circle text-blue-600 animate-pulse-soft"></i>
-                                    <p class="text-gray-700">Maklumat Pelayanan Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kota Surabaya</p>
-                                </div>
-                                <p class="text-sm text-gray-500 mt-2 animate-wave">Klik gambar untuk memperbesar tampilan</p>
-                            </div>
-                        </div>
-                    </div>
+        <!-- ================= CONTENT ================= -->
+        <div class="lg:col-span-3 space-y-6">
 
+          {tabs.map((t, i) => (
+            <div
+              id={t.tags}
+              class={`tab-content ${i === 0 ? "block" : "hidden"}`}
+            >
+              <div class="bg-white rounded-2xl shadow-custom p-8">
 
-                    <!--Kompensasi Pelayanan Tab -->
-                    <div id="kompensasi" class="tab-content hidden">
-                        <div class="bg-white rounded-2xl shadow-custom p-8 card-lift animate-blur-in">
-                            <div class="flex items-center mb-8">
-                                <div class="w-14 h-14 bg-yellow-400 rounded-full flex items-center justify-center mr-4 animate-pulse-soft">
-                                    <i class="fas fa-quote-right text-blue-800 text-2xl animate-icon-bounce"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-3xl font-bold text-blue-800">Kompensasi Pelayanan</h3>
-                                    <p class="text-gray-600">Prinsip Dasar Pelayanan Kami</p>
-                                </div>
-                            </div>
-                            
-                            <!-- Gambar dengan zoom -->
-                            <div class="flex justify-center items-center bg-gray-50 rounded-2xl p-6 animate-scale-in">
-                                <div class="zoom-container relative overflow-hidden rounded-xl ripple" onclick="openImageZoom('gambar/kompensasi.jpeg', 'Kompensasi Pelayanan DPM-PTSP Surabaya')">
-                                    <img 
-                                        src="gambar/kompensasi.jpeg"
-                                        alt="Kompensasi Pelayanan Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kota Surabaya" 
-                                        class="max-w-96 h-auto rounded-xl shadow-lg border-4 border-white transition-transform duration-300 hover:scale-105"
-                                    >
-                                    <!-- Icon zoom -->
-                                    <div class="absolute top-4 right-4 bg-blue-600 text-white p-2 rounded-full shadow-lg animate-bounce-soft">
-                                        <i class="fas fa-search-plus text-sm"></i>
-                                    </div>
-                                    <!-- Overlay effect -->
-                                    <div class="absolute inset-0 bg-gradient-to-t from-blue-900/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
-                                        <span class="text-white font-medium">Klik untuk memperbesar</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Optional: Keterangan di bawah gambar -->
-                            <div class="mt-6 text-center animate-fade-up">
-                                <div class="inline-flex items-center space-x-2 bg-blue-50 px-4 py-2 rounded-full">
-                                    <i class="fas fa-info-circle text-blue-600 animate-pulse-soft"></i>
-                                    <p class="text-gray-700">Kompensasi Pelayanan Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kota Surabaya</p>
-                                </div>
-                                <p class="text-sm text-gray-500 mt-2 animate-wave">Klik gambar untuk memperbesar tampilan</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Default message for other tabs -->
-                    <div id="default-tab" class="tab-content hidden">
-                        <div class="bg-white rounded-2xl shadow-custom p-8 card-lift">
-                            <div class="text-center py-12 animate-fade-in-scale">
-                                <div class="w-24 h-24 bg-gradient-to-r from-blue-100 to-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse-soft">
-                                    <i class="fas fa-info-circle text-blue-600 text-3xl animate-icon-bounce"></i>
-                                </div>
-                                <h3 class="text-2xl font-bold text-blue-800 mb-4">Informasi Detail Tersedia</h3>
-                                <p class="text-gray-700 max-w-md mx-auto">Informasi lengkap akan ditampilkan di sini ketika menu dipilih. Konten ini merupakan placeholder untuk menampilkan informasi organisasi DPM-PTSP Surabaya.</p>
-                                <div class="mt-6">
-                                    <div class="spinner mx-auto"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <!-- HEADER KONTEN -->
+                <div class="flex items-center mb-8">
+                  <div
+                    class={`w-14 h-14 rounded-full flex items-center justify-center mr-4 shadow-lg
+                      ${t.Warna === "yellow"
+                        ? "bg-yellow-400 text-blue-800"
+                        : t.Warna === "green"
+                        ? "bg-green-500 text-white"
+                        : "bg-blue-600 text-white"
+                      }`}
+                  >
+                    <i class={`${t.Icon || "fas fa-info"} text-xl`}></i>
+                  </div>
 
-
-                     <!--Struktur Organisasi Tab -->
-                    <div id="struktur" class="tab-content hidden">
-                        <div class="bg-white rounded-2xl shadow-custom p-8 card-lift animate-blur-in">
-                            <div class="flex items-center mb-8">
-                                <div class="w-14 h-14 bg-yellow-400 rounded-full flex items-center justify-center mr-4 animate-pulse-soft">
-                                    <i class="fas fa-quote-right text-blue-800 text-2xl animate-icon-bounce"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-3xl font-bold text-blue-800">Struktur Organisasi</h3>
-                                    <p class="text-gray-600">Struktur Organisasi DPM-PTSP Surabaya</p>
-                                </div>
-                            </div>
-                            
-                            <!-- Gambar dengan zoom -->
-                            <div class="flex justify-center items-center bg-gray-50 rounded-2xl p-6 animate-scale-in">
-                                <div class="zoom-container relative overflow-hidden rounded-xl ripple" onclick="openImageZoom('gambar/so.jpeg', 'Struktur Organisasi DPM-PTSP Surabaya')">
-                                    <img 
-                                        src="gambar/so.jpeg"
-                                        alt="Kompensasi Pelayanan Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kota Surabaya" 
-                                        class="max-w-96 h-auto rounded-xl shadow-lg border-4 border-white transition-transform duration-300 hover:scale-105"
-                                    >
-                                    <!-- Icon zoom -->
-                                    <div class="absolute top-4 right-4 bg-blue-600 text-white p-2 rounded-full shadow-lg animate-bounce-soft">
-                                        <i class="fas fa-search-plus text-sm"></i>
-                                    </div>
-                                    <!-- Overlay effect -->
-                                    <div class="absolute inset-0 bg-gradient-to-t from-blue-900/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
-                                        <span class="text-white font-medium">Klik untuk memperbesar</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Optional: Keterangan di bawah gambar -->
-                            <div class="mt-6 text-center animate-fade-up">
-                                <div class="inline-flex items-center space-x-2 bg-blue-50 px-4 py-2 rounded-full">
-                                    <i class="fas fa-info-circle text-blue-600 animate-pulse-soft"></i>
-                                    <p class="text-gray-700"> Struktur Organisasi Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kota Surabaya</p>
-                                </div>
-                                <p class="text-sm text-gray-500 mt-2 animate-wave">Klik gambar untuk memperbesar tampilan</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    
-                     <!--Kompensasi Pelayanan Tab -->
-                    <div id="piagam-penghargaan" class="tab-content hidden">
-                        <div class="bg-white rounded-2xl shadow-custom p-8 card-lift animate-blur-in">
-                            <div class="flex items-center mb-8">
-                                <div class="w-14 h-14 bg-yellow-400 rounded-full flex items-center justify-center mr-4 animate-pulse-soft">
-                                    <i class="fas fa-quote-right text-blue-800 text-2xl animate-icon-bounce"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-3xl font-bold text-blue-800">Piagam Penghargaan</h3>
-                                    <p class="text-gray-600">Piagam Penghargaan DPM-PTSP Surabaya</p>
-                                </div>
-                            </div>
-                            
-                            <!-- Gambar dengan zoom -->
-                            <div class="flex justify-center items-center bg-gray-50 rounded-2xl p-6 animate-scale-in">
-                                <div class="zoom-container relative overflow-hidden rounded-xl ripple" onclick="openImageZoom('gambar/penghargaan_2025.jpeg', 'Piagam Penghargaan DPM-PTSP Surabaya')">
-                                    <img 
-                                        src="gambar/penghargaan_2025.jpeg"
-                                        alt="Kompensasi Pelayanan Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kota Surabaya" 
-                                        class="max-w-96 h-auto rounded-xl shadow-lg border-4 border-white transition-transform duration-300 hover:scale-105"
-                                    >
-                                    <!-- Icon zoom -->
-                                    <div class="absolute top-4 right-4 bg-blue-600 text-white p-2 rounded-full shadow-lg animate-bounce-soft">
-                                        <i class="fas fa-search-plus text-sm"></i>
-                                    </div>
-                                    <!-- Overlay effect -->
-                                    <div class="absolute inset-0 bg-gradient-to-t from-blue-900/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
-                                        <span class="text-white font-medium">Klik untuk memperbesar</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Optional: Keterangan di bawah gambar -->
-                            <div class="mt-6 text-center animate-fade-up">
-                                <div class="inline-flex items-center space-x-2 bg-blue-50 px-4 py-2 rounded-full">
-                                    <i class="fas fa-info-circle text-blue-600 animate-pulse-soft"></i>
-                                    <p class="text-gray-700">Piagam Penghargaan Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kota Surabaya</p>
-                                </div>
-                                <p class="text-sm text-gray-500 mt-2 animate-wave">Klik gambar untuk memperbesar tampilan</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Default message for other tabs -->
-                    <div id="default-tab" class="tab-content hidden">
-                        <div class="bg-white rounded-2xl shadow-custom p-8 card-lift">
-                            <div class="text-center py-12 animate-fade-in-scale">
-                                <div class="w-24 h-24 bg-gradient-to-r from-blue-100 to-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse-soft">
-                                    <i class="fas fa-info-circle text-blue-600 text-3xl animate-icon-bounce"></i>
-                                </div>
-                                <h3 class="text-2xl font-bold text-blue-800 mb-4">Informasi Detail Tersedia</h3>
-                                <p class="text-gray-700 max-w-md mx-auto">Informasi lengkap akan ditampilkan di sini ketika menu dipilih. Konten ini merupakan placeholder untuk menampilkan informasi organisasi DPM-PTSP Surabaya.</p>
-                                <div class="mt-6">
-                                    <div class="spinner mx-auto"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Default message for other tabs -->
-                    <div id="default-tab" class="tab-content hidden">
-                        <div class="bg-white rounded-2xl shadow-custom p-8 card-lift">
-                            <div class="text-center py-12 animate-fade-in-scale">
-                                <div class="w-24 h-24 bg-gradient-to-r from-blue-100 to-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse-soft">
-                                    <i class="fas fa-info-circle text-blue-600 text-3xl animate-icon-bounce"></i>
-                                </div>
-                                <h3 class="text-2xl font-bold text-blue-800 mb-4">Informasi Detail Tersedia</h3>
-                                <p class="text-gray-700 max-w-md mx-auto">Informasi lengkap akan ditampilkan di sini ketika menu dipilih. Konten ini merupakan placeholder untuk menampilkan informasi organisasi DPM-PTSP Surabaya.</p>
-                                <div class="mt-6">
-                                    <div class="spinner mx-auto"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- IKM Tab -->
-                    <div id="ikm" class="tab-content hidden">
-                        <div class="bg-white rounded-2xl shadow-custom p-8 card-lift animate-blur-in">
-                            <div class="flex items-center mb-8">
-                                <div class="w-14 h-14 bg-green-500 rounded-full flex items-center justify-center mr-4 animate-pulse-soft">
-                                    <i class="fas fa-smile text-white text-2xl animate-icon-bounce"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-3xl font-bold text-blue-800">Indeks Kepuasan Masyarakat</h3>
-                                    <p class="text-gray-600">Tingkat Kepuasan Pelayanan Publik</p>
-                                </div>
-                            </div>
-                            
-                            <div class="bg-gradient-to-r from-green-50 to-blue-50 p-8 rounded-2xl animate-scale-in">
-                                <div class="text-center mb-8">
-                                    <div class="inline-flex items-center justify-center w-40 h-40 bg-gradient-to-r from-green-500 to-blue-500 rounded-full mb-6 animate-pulse-soft relative">
-                                        <span class="text-5xl font-bold text-white">85%</span>
-                                        <div class="absolute inset-0 rounded-full border-8 border-green-200 animate-spin-slow"></div>
-                                    </div>
-                                    <h4 class="text-2xl font-bold text-green-800 mb-2">Tingkat Kepuasan Masyarakat</h4>
-                                    <p class="text-gray-700">Berdasarkan survei triwulan IV 2024</p>
-                                </div>
-                                
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 stagger-children">
-                                    <div class="bg-white p-6 rounded-xl shadow-sm card-lift animate-width-expand">
-                                        <div class="flex items-center mb-4">
-                                            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                                                <i class="fas fa-list-check text-blue-600"></i>
-                                            </div>
-                                            <h5 class="font-bold text-blue-800">Prosedur Pelayanan</h5>
-                                        </div>
-                                        <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
-                                            <div class="bg-green-600 h-3 rounded-full animate-width-expand" style="width: 88%"></div>
-                                        </div>
-                                        <div class="flex justify-between items-center">
-                                            <p class="text-sm text-gray-600">88% Puas</p>
-                                            <span class="text-green-600 font-bold">✓</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="bg-white p-6 rounded-xl shadow-sm card-lift animate-width-expand">
-                                        <div class="flex items-center mb-4">
-                                            <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center mr-3">
-                                                <i class="fas fa-clock text-yellow-600"></i>
-                                            </div>
-                                            <h5 class="font-bold text-blue-800">Waktu Pelayanan</h5>
-                                        </div>
-                                        <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
-                                            <div class="bg-green-600 h-3 rounded-full animate-width-expand" style="width: 82%"></div>
-                                        </div>
-                                        <div class="flex justify-between items-center">
-                                            <p class="text-sm text-gray-600">82% Puas</p>
-                                            <span class="text-green-600 font-bold">✓</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="bg-white p-6 rounded-xl shadow-sm card-lift animate-width-expand">
-                                        <div class="flex items-center mb-4">
-                                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                                                <i class="fas fa-user-check text-green-600"></i>
-                                            </div>
-                                            <h5 class="font-bold text-blue-800">Sikap Petugas</h5>
-                                        </div>
-                                        <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
-                                            <div class="bg-green-600 h-3 rounded-full animate-width-expand" style="width: 90%"></div>
-                                        </div>
-                                        <div class="flex justify-between items-center">
-                                            <p class="text-sm text-gray-600">90% Puas</p>
-                                            <span class="text-green-600 font-bold">✓</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="mt-8 p-6 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl border-l-4 border-green-500 animate-fade-up">
-                                    <div class="flex items-center">
-                                        <i class="fas fa-chart-line text-green-600 text-2xl mr-4 animate-pulse-soft"></i>
-                                        <div>
-                                            <p class="font-medium text-blue-800">📈 Tren Positif</p>
-                                            <p class="text-gray-700 text-sm">Kepuasan masyarakat meningkat 5% dibandingkan tahun sebelumnya</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                  <div>
+                    <h3 class="text-3xl font-bold text-blue-800">
+                      {t.Judul_Konten}
+                    </h3>
+                    {t.Keterangan && (
+                      <p class="text-gray-600">{t.Keterangan}</p>
+                    )}
+                  </div>
                 </div>
+
+                <!-- ISI -->
+                {t.Isi_Konten && (
+                  <div class="bg-gradient-to-r from-blue-50 to-yellow-50 p-8 rounded-2xl border-l-4 border-blue-600">
+                    <div
+                      class="prose max-w-none text-gray-700"
+                      set:html={t.Isi_Konten}
+                    />
+                  </div>
+                )}
+
+                <!-- IMAGE -->
+                {t.Foto_Konten && (
+                  <div class="flex justify-center mt-10">
+                    <div class="relative overflow-hidden rounded-xl cursor-zoom-in group">
+                      <img
+                        src={`https://dpm-ptsp.surabaya.go.id/tentangfile/${t.Foto_Konten}`}
+                        alt={t.Judul_Konten}
+                        class="max-w-96 rounded-xl shadow-lg border-4 border-white transition duration-300 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div class="absolute top-4 right-4 bg-blue-600 text-white p-2 rounded-full shadow">
+                        <i class="fas fa-search-plus"></i>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+              </div>
             </div>
+          ))}
+
         </div>
-    </section>
+      </div>
+    )}
+  </div>
+</section>
 
         <!-- FAQ Section dengan animasi baru -->
         <section id="kontak-sec" class="py-20 bg-gradient-to-b from-white to-blue-50">

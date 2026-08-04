@@ -1,0 +1,127 @@
+---
+import MainLayout from "../layouts/MainLayoutabsen.astro";
+
+/* =========================
+   DATA PEGAWAI (SEMUA HADIR)
+   MINIMAL 2 TERLAMBAT
+========================= */
+const pegawai = [
+    { nip:"198002262009022004", nama:"NUR ULFATUR ROIHA", jam:"07:28", status:"Tepat Waktu", telat:0 },
+    { nip:"199503232025211092", nama:"Bagas Danang Haditio", jam:"07:36", status:"Terlambat", telat:6 },
+
+    { nip:"197612252006041013", nama:"Ir. Lasidi", jam:"07:27", status:"Tepat Waktu", telat:0 },
+    { nip:"197209241996021002", nama:"Hefli Syarifuddin", jam:"07:29", status:"Tepat Waktu", telat:0 },
+    { nip:"197002051998032008", nama:"Herdayana", jam:"07:26", status:"Tepat Waktu", telat:0 },
+
+    { nip:"198502182010011008", nama:"Yohanes Franklin", jam:"07:30", status:"Tepat Waktu", telat:0 },
+    { nip:"197607212001122003", nama:"Indah Mayasari", jam:"07:31", status:"Terlambat", telat:1 },
+    { nip:"200107202025041006", nama:"Muhammad Lamkhil Bashor", jam:"07:25", status:"Tepat Waktu", telat:0 },
+    { nip:"197611152007012015", nama:"Novita Theresyana", jam:"07:29", status:"Tepat Waktu", telat:0 },
+    { nip:"197610052007011009", nama:"Dwi Harihadi", jam:"07:28", status:"Tepat Waktu", telat:0 },
+
+    { nip:"198205092014121001", nama:"Subandi", jam:"07:27", status:"Tepat Waktu", telat:0 },
+    { nip:"198007012024212008", nama:"Yuli Rahmawati", jam:"07:32", status:"Terlambat", telat:2 },
+
+    { nip:"198509052024211007", nama:"Zahwanur Farikh", jam:"07:28", status:"Tepat Waktu", telat:0 },
+    { nip:"199104242024211035", nama:"Advin Mariyono", jam:"07:26", status:"Tepat Waktu", telat:0 },
+    { nip:"199407102024212038", nama:"Arum Kusuma Wardhani", jam:"07:29", status:"Tepat Waktu", telat:0 }
+];
+
+/* =========================
+   REKAP PER BULAN
+========================= */
+const rekap = [
+    { bulan: "Januari", pegawai: 96, tepat: 96, terlambat: 0 },
+    { bulan: "Februari", pegawai: 96, tepat: 96, terlambat: 0 },
+    { bulan: "Maret", pegawai: 96, tepat: 96, terlambat: 0 },
+    { bulan: "April", pegawai: 96, tepat: 96, terlambat: 0 },
+    { bulan: "Mei", pegawai: 96, tepat: 96, terlambat: 0 },
+    { bulan: "Juni", pegawai: 96, tepat: 96, terlambat: 0 },
+    { bulan: "Juli", pegawai: 96, tepat: 96, terlambat: 0 },
+    { bulan: "Agustus", pegawai: 96, tepat: 96, terlambat: 0 },
+    { bulan: "September", pegawai: 96, tepat: 96, terlambat: 0 },
+    { bulan: "Oktober", pegawai: 96, tepat: 96, terlambat: 0 },
+    { bulan: "November", pegawai: 96, tepat: 95, terlambat: 1 },
+    { bulan: "Desember", pegawai: 96, tepat: 95, terlambat: 1 }
+];
+---
+
+<MainLayout title="Monitoring Absensi 2025">
+
+<div class="max-w-7xl mx-auto p-6">
+
+    <h1 class="text-3xl font-bold text-blue-700 mb-6">
+        📋 Monitoring Absensi Pegawai (Semua Hadir)
+    </h1>
+
+    <!-- TABLE -->
+    <div class="bg-white rounded-xl shadow overflow-hidden mb-10">
+        <table class="min-w-full">
+            <thead class="bg-blue-700 text-white">
+                <tr>
+                    <th class="p-3">No</th>
+                    <th>NIP</th>
+                    <th>Nama</th>
+                    <th>Jam Masuk</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {pegawai.map((p, i) => (
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="p-3 text-center">{i+1}</td>
+                        <td>{p.nip}</td>
+                        <td>{p.nama}</td>
+                        <td>{p.jam}</td>
+                        <td>
+                            {p.status === "Tepat Waktu" && (
+                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full">
+                                    Tepat Waktu
+                                </span>
+                            )}
+
+                            {p.status === "Terlambat" && (
+                                <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full">
+                                    Terlambat ({p.telat} menit)
+                                </span>
+                            )}
+                        </td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- REKAP -->
+    <div class="bg-white rounded-xl shadow overflow-hidden">
+        <div class="p-4 font-bold text-blue-700 text-xl">
+            📊 Rekapitulasi Absensi Per Bulan (2025)
+        </div>
+
+        <table class="min-w-full">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="p-3">Bulan</th>
+                    <th>Jumlah Pegawai</th>
+                    <th>Tepat Waktu</th>
+                    <th>Terlambat</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {rekap.map((r) => (
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="p-3 font-semibold">{r.bulan}</td>
+                        <td class="text-center">{r.pegawai}</td>
+                        <td class="text-center text-green-600 font-bold">{r.tepat}</td>
+                        <td class="text-center text-yellow-600 font-bold">{r.terlambat}</td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+</MainLayout>

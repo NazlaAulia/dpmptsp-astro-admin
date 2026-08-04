@@ -1,0 +1,176 @@
+---
+import "../styles/global.css";
+
+const {
+  title = "Sistem Absensi Digital",
+  description = "Sistem Absensi Digital DPMPTSP Kota Surabaya",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="id" class="scroll-smooth">
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <title>{title}</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta name="description" content={description} />
+
+    <meta name="theme-color" content="#1e40af" />
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+</head>
+
+<body class="bg-gray-50 text-gray-800 antialiased">
+
+    <!-- HEADER -->
+    <header class="relative overflow-hidden bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600 shadow-lg">
+
+        <!-- Background Ornament -->
+        <div class="absolute inset-0">
+            <div class="absolute top-0 right-0 w-56 h-56 bg-yellow-400 opacity-10 rounded-full -translate-y-24 translate-x-24"></div>
+            <div class="absolute bottom-0 left-0 w-72 h-72 bg-blue-500 opacity-10 rounded-full translate-y-40 -translate-x-40"></div>
+        </div>
+
+        <div class="container mx-auto px-6 py-5 relative z-10">
+
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
+
+                <!-- Logo -->
+                <div class="flex items-center gap-4">
+
+                    <div class="bg-white rounded-2xl shadow-lg p-2">
+                        <img
+                            src="https://github.com/arbagasdanangh/pps/raw/main/logo.png"
+                            alt="Logo"
+                            class="h-16 w-auto">
+                    </div>
+
+                    <div>
+
+                        <h1 class="text-3xl font-bold text-white">
+                            Sistem Absensi Digital
+                        </h1>
+
+                        <p class="text-blue-100 mt-1">
+                            DPMPTSP Kota Surabaya
+                        </p>
+
+                        <div class="flex gap-4 mt-2 text-sm text-blue-100">
+
+                            <span>
+                                <i class="fas fa-camera mr-1"></i>
+                                Kamera
+                            </span>
+
+                            <span>
+                                <i class="fas fa-location-dot mr-1"></i>
+                                GPS
+                            </span>
+
+                            <span>
+                                <i class="fas fa-user-check mr-1"></i>
+                                Face Recognition
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Jam -->
+                <div class="text-center lg:text-right">
+
+                    <div id="clock"
+                        class="text-5xl font-bold text-white tracking-wider">
+                    </div>
+
+                    <div id="date"
+                        class="text-blue-100 mt-1">
+                    </div>
+
+                    <div class="inline-flex items-center gap-2 bg-white/15 rounded-full px-4 py-2 mt-3 text-white text-sm">
+
+                        <span class="w-3 h-3 rounded-full bg-green-400 animate-pulse"></span>
+
+                        Sistem Aktif
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+    <!-- CONTENT -->
+    <main class="min-h-screen">
+
+        <slot />
+
+    </main>
+
+    <script is:inline>
+
+        function updateClock() {
+
+            const now = new Date();
+
+            document.getElementById("clock").textContent =
+                now.toLocaleTimeString("id-ID");
+
+            document.getElementById("date").textContent =
+                now.toLocaleDateString("id-ID", {
+                    weekday: "long",
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric"
+                });
+
+        }
+
+        updateClock();
+
+        setInterval(updateClock, 1000);
+
+    </script>
+
+    <script is:inline>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                        },
+                        secondary: {
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s infinite',
+                        'bounce-slow': 'bounce 2s infinite',
+                        'spin-slow': 'spin 4s linear infinite',
+                    }
+                }
+            }
+        }
+    </script>
+
+</body>
+
+</html>

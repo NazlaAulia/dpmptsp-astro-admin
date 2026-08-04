@@ -1,0 +1,167 @@
+---
+import MainLayout from "../layouts/MainLayoutgratifikasi.astro";
+---
+
+<MainLayout title="Pengendalian Gratifikasi">
+
+<div class="max-w-3xl mx-auto mt-10 px-4">
+
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+
+        <!-- HEADER -->
+        <div class="bg-gradient-to-r from-blue-600 to-cyan-600 text-white p-6">
+            <h1 class="text-2xl font-bold">📋 Pengendalian gratifikasi pegawai / aparatur</h1>
+            <p class="text-blue-100 text-sm">Jawab satu per satu pertanyaan</p>
+
+            <!-- PROGRESS -->
+            <div class="mt-4 bg-white/20 h-2 rounded-full">
+                <div id="progress" class="bg-white h-2 rounded-full transition-all"></div>
+            </div>
+        </div>
+
+        <!-- BODY -->
+        <div class="p-6">
+
+            <!-- IDENTITAS -->
+            <div class="grid gap-4 mb-6">
+                <input id="nip" class="border p-3 rounded-lg" placeholder="NIK / NIP" />
+                <input id="unit" class="border p-3 rounded-lg" placeholder="Unit Kerja" />
+            </div>
+
+            <!-- SOAL -->
+            <div class="border rounded-xl p-6 bg-blue-50">
+
+                <div class="text-sm text-gray-500 mb-2">
+                    Pertanyaan <span id="stepNow">1</span> dari 15
+                </div>
+
+                <div id="question" class="font-semibold text-gray-800 mb-4"></div>
+
+                <textarea
+                    id="answer"
+                    class="w-full border rounded-lg p-3"
+                    rows="4"
+                    placeholder="Jawaban Anda..."
+                ></textarea>
+
+            </div>
+
+            <!-- NAV -->
+            <div class="flex justify-between mt-6">
+
+                <button id="prevBtn"
+                    class="px-4 py-2 bg-gray-200 rounded-lg">
+                    ⬅ Prev
+                </button>
+
+                <button id="nextBtn"
+                    class="px-4 py-2 bg-blue-600 text-white rounded-lg">
+                    Next ➡
+                </button>
+
+            </div>
+
+            <!-- HASIL -->
+            <div id="hasil" class="mt-6"></div>
+
+        </div>
+
+    </div>
+</div>
+
+<script is:inline>
+
+const questions = [
+"Apakah Saudara pernah menerima pemberian dari pengguna layanan setelah pelayanan selesai diberikan?",
+"Apa bentuk pemberian yang pernah diterima?",
+"Apakah pemberian tersebut diterima langsung atau perantara?",
+"Apa alasan pemberi memberikan hadiah tersebut?",
+"Apakah Saudara mengetahui itu termasuk gratifikasi?",
+"Apakah Saudara mengetahui kewajiban melapor?",
+"Jika menerima, apakah melaporkan ke UPG?",
+"Apa alasan tidak melapor?",
+"Apakah mekanisme pelaporan mudah diakses?",
+"Apakah pernah menolak pemberian?",
+"Apakah memengaruhi objektivitas?",
+"Apakah pernah sosialisasi gratifikasi?",
+"Seberapa paham aturan gratifikasi?",
+"Apa langkah pencegahan?",
+"Apakah ada budaya menolak gratifikasi?"
+];
+
+let step = 0;
+const answers = Array(questions.length).fill("");
+
+const questionEl = document.getElementById("question");
+const answerEl = document.getElementById("answer");
+const stepNow = document.getElementById("stepNow");
+const progress = document.getElementById("progress");
+
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+
+function render() {
+
+    questionEl.textContent = questions[step];
+    answerEl.value = answers[step] || "";
+
+    stepNow.textContent = step + 1;
+
+    progress.style.width =
+        ((step + 1) / questions.length) * 100 + "%";
+
+    prevBtn.disabled = step === 0;
+    nextBtn.textContent =
+        step === questions.length - 1 ? "Submit" : "Next ➡";
+}
+
+prevBtn.onclick = () => {
+    answers[step] = answerEl.value;
+    if (step > 0) step--;
+    render();
+};
+
+nextBtn.onclick = async () => {
+
+    answers[step] = answerEl.value;
+
+    const nip = document.getElementById("nip").value.trim();
+    const unit = document.getElementById("unit").value.trim();
+
+    if (!nip || !unit) {
+        alert("NIP & Unit wajib diisi");
+        return;
+    }
+
+    if (step < questions.length - 1) {
+        step++;
+        render();
+        return;
+    }
+
+    // SUBMIT FINAL
+    const res = await fetch("/api/gratifikasi", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            nip,
+            unit,
+            jawaban: answers
+        })
+    });
+
+    const data = await res.json();
+
+    document.getElementById("hasil").innerHTML = `
+        <div class="bg-green-50 border border-green-200 p-4 rounded-xl">
+            <b>✅ Berhasil disimpan</b>
+            <pre class="text-xs mt-2">${JSON.stringify(data, null, 2)}</pre>
+        </div>
+    `;
+};
+
+render();
+
+</script>
+
+</MainLayout>
