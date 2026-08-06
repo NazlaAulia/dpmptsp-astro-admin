@@ -1,0 +1,39 @@
+---
+import Navbar from "../../components/admin/Navbar.astro";
+import Sidebar from "../../components/admin/Sidebar.astro";
+import ArtikelTable from "../../components/admin/ArtikelTable.astro";
+---
+
+<style>
+.wrapper{
+    display:flex;
+}
+
+.content{
+    flex:1;
+    background:#f5f7fb;
+    min-height:100vh;
+}
+
+.isi{
+    padding:30px;
+}
+</style>
+
+<div class="wrapper">
+
+    <Sidebar />
+
+    <div class="content">
+
+        <Navbar />
+
+        <div class="isi">
+
+            <ArtikelTable />
+
+        </div>
+
+    </div>
+
+</div>

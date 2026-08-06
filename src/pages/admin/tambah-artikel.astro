@@ -1,0 +1,187 @@
+---
+import Navbar from "../../components/admin/Navbar.astro";
+import Sidebar from "../../components/admin/Sidebar.astro";
+---
+
+<style>
+.wrapper{
+    display:flex;
+}
+
+.content{
+    flex:1;
+    background:#f5f7fb;
+    min-height:100vh;
+}
+
+.isi{
+    padding:30px;
+}
+
+.box{
+    background:white;
+    border-radius:12px;
+    padding:30px;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+
+h2{
+    margin-bottom:25px;
+    color:#1e293b;
+}
+
+.form-group{
+    margin-bottom:20px;
+}
+
+label{
+    display:block;
+    margin-bottom:8px;
+    font-weight:600;
+    color:#334155;
+}
+
+input,
+select,
+textarea{
+    width:100%;
+    padding:12px;
+    border:1px solid #cbd5e1;
+    border-radius:8px;
+    font-size:14px;
+    box-sizing:border-box;
+    outline:none;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+    border-color:#2563eb;
+}
+
+textarea{
+    height:180px;
+    resize:vertical;
+}
+
+.button-group{
+    display:flex;
+    gap:10px;
+    margin-top:30px;
+}
+
+.btn-simpan{
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:12px 22px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:600;
+}
+
+.btn-simpan:hover{
+    background:#1d4ed8;
+}
+
+.btn-batal{
+    background:#e2e8f0;
+    color:#334155;
+    padding:12px 22px;
+    border-radius:8px;
+    text-decoration:none;
+    font-size:14px;
+    font-weight:600;
+}
+
+.btn-batal:hover{
+    background:#cbd5e1;
+}
+</style>
+
+<div class="wrapper">
+
+    <Sidebar />
+
+    <div class="content">
+
+        <Navbar />
+
+        <div class="isi">
+
+            <div class="box">
+
+                <h2>Tambah Artikel / Berita</h2>
+
+                <form>
+
+                    <div class="form-group">
+                        <label>Judul Artikel</label>
+                        <input
+                            type="text"
+                            placeholder="Masukkan judul artikel"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label>Kategori</label>
+
+                        <select>
+                            <option>Berita Baru</option>
+                            <option>Pengumuman</option>
+                            <option>Kegiatan</option>
+                            <option>Informasi</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Isi Artikel</label>
+
+                        <textarea
+                            placeholder="Masukkan isi artikel..."
+                        ></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Upload Gambar</label>
+
+                        <input type="file">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Status Berita</label>
+
+                        <select>
+                            <option>Aktif</option>
+                            <option>Nonaktif</option>
+                        </select>
+                    </div>
+
+                    <div class="button-group">
+
+                        <button
+                            type="submit"
+                            class="btn-simpan"
+                        >
+                            Simpan
+                        </button>
+
+                        <a
+                            href="/admin/artikel"
+                            class="btn-batal"
+                        >
+                            Batal
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

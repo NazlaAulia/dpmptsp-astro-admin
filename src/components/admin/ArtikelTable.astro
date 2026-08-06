@@ -1,0 +1,244 @@
+<style>
+.box {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.header-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #1e293b;
+    margin-bottom: 15px;
+}
+
+.btn-tambah {
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 13px;
+    display: inline-block;
+    text-decoration: none;
+    margin-bottom: 20px;
+}
+
+.btn-tambah:hover {
+    background: #e2e8f0;
+}
+
+.table-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #475569;
+}
+
+.entries select, .search-box input {
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 13px;
+}
+
+.search-box input {
+    width: 240px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+th, td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    text-align: left;
+    font-size: 13px;
+    color: #334155;
+    vertical-align: top;
+}
+
+.judul-cell {
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 4px;
+}
+
+.status-text {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.isi-preview {
+    color: #64748b;
+    max-width: 250px;
+    line-height: 1.4;
+}
+
+img.thumbnail {
+    width: 120px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.badge {
+    background: #e0f2fe;
+    color: #0369a1;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.aksi a {
+    display: block;
+    margin-bottom: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 13px;
+}
+
+.aksi .edit { color: #2563eb; }
+.aksi .hapus { color: #dc2626; }
+
+.pagination-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    font-size: 13px;
+    color: #64748b;
+}
+
+.pages {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pages button {
+    width: 38px;
+    height: 38px;
+    border: 1px solid #dbe3ef;
+    background: #f8fafc;
+    color: #64748b;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.pages button:hover {
+    background: #e2e8f0;
+}
+
+.pages button.active {
+    background: #2563eb;
+    color: white;
+    border: 1px solid #2563eb;
+}
+</style>
+
+<div class="box">
+    <div class="header-title">Daftar Posting Website</div>
+
+    <div>
+        <a href="/admin/tambah-artikel" class="btn-tambah">Tambah Artikel/Berita</a>
+    </div>
+
+    <div class="table-controls">
+        <div class="entries">
+            Tampilkan 
+            <select>
+                <option>10</option>
+                <option>25</option>
+                <option>50</option>
+            </select> entri
+        </div>
+        <div class="search-box">
+            Cari: <input type="text" placeholder="">
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Judul</th>
+                <th>Isi</th>
+                <th>Kategori</th>
+                <th>Tanggal</th>
+                <th>Gambar</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>781</td>
+                <td>
+                    <div class="judul-cell">DPMPTSP Surabaya Hadiri Kunjungan Kerja Kementerian Investasi dan Hilirisasi/BKPM RI, Perkuat Koordinasi Percepatan Investasi di Jawa Timur</div>
+                    <div class="status-text">Status Berita : Aktif</div>
+                </td>
+                <td>
+                    <div class="isi-preview">DPMPTSP Surabaya Hadiri Kunjungan Kerja Kementeria...</div>
+                </td>
+                <td><span class="badge">Berita Baru</span></td>
+                <td>04-08-2026</td>
+                <td><img src="https://placehold.co/120x70" class="thumbnail"></td>
+                <td class="aksi">
+                    <a href="#" class="edit">Edit</a>
+                    <a href="#" class="hapus">Hapus</a>
+                </td>
+            </tr>
+            <tr>
+                <td>780</td>
+                <td>
+                    <div class="judul-cell">DPMPTSP Surabaya Ikuti Banking Profiling IPRO Jatim 2026, Perkuat Kesiapan Proyek Menuju EJIF 2026</div>
+                    <div class="status-text">Status Berita : Aktif</div>
+                </td>
+                <td>
+                    <div class="isi-preview">DPMPTSP Surabaya Ikuti Banking Profiling IPRO Jati...</div>
+                </td>
+                <td><span class="badge">Berita Baru</span></td>
+                <td>04-08-2026</td>
+                <td><img src="https://placehold.co/120x70" class="thumbnail"></td>
+                <td class="aksi">
+                    <a href="#" class="edit">Edit</a>
+                    <a href="#" class="hapus">Hapus</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="pagination-footer">
+    <div>Showing 1 to 2 of 30 entries</div>
+
+    <div class="pages">
+        <button>&lt;</button>
+        <button class="active">1</button>
+        <button>2</button>
+        <button>3</button>
+        <button>4</button>
+        <button>&gt;</button>
+    </div>
+</div>
+</div>
