@@ -1,6 +1,16 @@
 ---
+export const prerender = false;
+
 import Sidebar from "../../components/admin/Sidebar.astro";
 import Navbar from "../../components/admin/Navbar.astro";
+
+const isLoggedIn = Astro.cookies.get("admin-auth")?.value === "true";
+const authHeader = Astro.request.headers.get("cookie") || "";
+const hasAuthCookie = authHeader.includes("admin-auth=true") || isLoggedIn;
+
+if (!hasAuthCookie) {
+  return Astro.redirect("/admin/login");
+}
 ---
 
 <div class="admin">
