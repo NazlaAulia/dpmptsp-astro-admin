@@ -1,49 +1,49 @@
 ---
+import Sidebar from "../../components/admin/Sidebar.astro";
+import Navbar from "../../components/admin/Navbar.astro";
 import AdminShell from "../../components/admin/AdminShell.astro";
 
-const stats = [
-  { label: "Artikel", value: "24", caption: "+4 minggu ini", tint: "blue" },
-  { label: "Carousel", value: "6", caption: "Aktif saat ini", tint: "purple" },
-  { label: "Konten", value: "18", caption: "Siap publikasi", tint: "green" },
-  { label: "Notifikasi", value: "9", caption: "Belum dibaca", tint: "amber" },
-];
-
+// Sample data
 const chartData = [
   { label: "Jan", value: 45 },
-  { label: "Feb", value: 60 },
-  { label: "Mar", value: 55 },
-  { label: "Apr", value: 72 },
-  { label: "Mei", value: 82 },
-  { label: "Jun", value: 74 },
-  { label: "Jul", value: 90 },
-  { label: "Agu", value: 100 },
+  { label: "Feb", value: 52 },
+  { label: "Mar", value: 48 },
+  { label: "Apr", value: 61 },
+  { label: "Mei", value: 55 },
 ];
 
 const quickActions = [
-  { title: "Tambah artikel", href: "/admin/tambah-artikel", caption: "Publikasikan berita dan update terbaru" },
-  { title: "Kelola carousel", href: "/admin/carousel", caption: "Atur banner utama dengan lebih menarik" },
-  { title: "Lihat pemberitahuan", href: "/admin/pemberitahuan", caption: "Pantau aktivitas dan permintaan penting" },
+  { href: "/admin/artikel", title: "Tambah Artikel", caption: "Buat artikel baru" },
+  { href: "/admin/kinerja", title: "Lihat Kinerja", caption: "Analisis konten" },
+  { href: "/admin/layanan", title: "Kelola Layanan", caption: "Update layanan" },
 ];
 
 const activity = [
-  { title: "Artikel terbaru diterbitkan", detail: "Berita tentang layanan online berhasil dipublikasikan" },
-  { title: "Carousel diperbarui", detail: "Banner utama disesuaikan untuk kampanye bulan ini" },
-  { title: "Permintaan review masuk", detail: "2 item menunggu verifikasi admin" },
+  { title: "Artikel diterbitkan", detail: "2 artikel baru dipublikasikan hari ini" },
+  { title: "Komentar baru", detail: "5 komentar menunggu moderasi" },
+  { title: "Backup sistem", detail: "Backup otomatis selesai dengan sukses" },
 ];
 ---
 
-<AdminShell title="Dashboard Admin" subtitle="Ringkasan performa, konten, dan aktivitas operasional DPM-PTSP dalam satu tampilan.">
-  <div class="stats-grid">
-    {stats.map((item) => (
-      <article class={`stat-card ${item.tint}`}>
-        <div>
-          <p class="stat-label">{item.label}</p>
-          <h2>{item.value}</h2>
+<div class="admin">
+  <Sidebar />
+
+  <div class="main">
+    <Navbar />
+
+    <div class="content">
+      <h1>Dashboard Admin</h1>
+
+      <!-- Kartu Statistik -->
+      <div class="cards">
+        <div class="card">
+          <div class="card-header-info">
+            <h3>Artikel</h3>
+            <span class="badge-blue">Total</span>
+          </div>
+          <p>20</p>
         </div>
-        <span class="stat-pill">{item.caption}</span>
-      </article>
-    ))}
-  </div>
+      </div>
 
   <div class="main-grid">
     <section class="panel">
@@ -103,7 +103,7 @@ const activity = [
         </article>
       ))}
     </div>
-  </section>
+  </div>
 </AdminShell>
 
 <style>

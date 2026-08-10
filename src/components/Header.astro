@@ -1,7 +1,10 @@
+---
+const pathname = Astro.url.pathname;
+---
 
  <header class="sticky top-0 z-50 bg-[#F7F7F7] animate-slide-in-left">
   <div class="container mx-auto px-4 sm:px-6 md:px-8">
-    
+
     <!-- ✅ WRAPPER FIX -->
     <div class="flex items-center justify-between py-3 md:py-4 relative">
 
@@ -27,17 +30,31 @@
       <nav class="hidden lg:block absolute left-1/2 transform -translate-x-1/2">
         <ul class="flex items-center space-x-8 stagger-children">
 
-          <li><a href="/"
-            class="font-semibold text-gray-700 hover:text-yellow-400 transition duration-300 hover-scale-shadow">
-            Beranda
-          </a></li>
+<li>
+  <a
+    href="/"
+    class={`font-semibold transition duration-300 hover-scale-shadow ${
+      pathname === "/"
+        ? "text-[#0900C3]"
+        : "text-gray-700 hover:text-yellow-400"
+    }`}
+  >
+    Beranda
+  </a>
+</li>
 
           <!-- Tentang Kami Dropdown -->
           <li class="relative group">
-            <a href="/Tentang"
-              class="text-[#0900C3] font-semibold hover:text-yellow-400 transition duration-300 flex items-center whitespace-nowrap animate-pulse-soft">
-              Tentang Kami <i class="fas fa-chevron-down ml-1 text-xs"></i>
-            </a>
+<a
+  href="/Tentang"
+  class={`font-semibold transition duration-300 flex items-center whitespace-nowrap animate-pulse-soft ${
+    pathname.startsWith("/Tentang")
+      ? "text-[#0900C3]"
+      : "text-gray-700 hover:text-yellow-400"
+  }`}
+>
+  Tentang Kami <i class="fas fa-chevron-down ml-1 text-xs"></i>
+</a>
             <div class="absolute left-0 mt-2 w-64 bg-white rounded-b-lg translate-y-5 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 animate-drop-in">
               <a href="/Tentang" class="block font-medium text-gray-700 px-4 py-3 hover:bg-[#FFD41D]">Gambaran DPM-PTSP</a>
               <a href="/Tentang#stdjenis-sec" class="block font-medium text-gray-700 px-4 py-3 hover:bg-[#FFD41D]">Visi dan Misi</a>
@@ -48,10 +65,16 @@
 
           <!-- Investasi Dropdown -->
           <li class="relative group">
-            <a href="/Investasi"
-              class="text-gray-700 font-semibold hover:text-yellow-400 transition duration-300 flex items-center">
-              Investasi <i class="fas fa-chevron-down ml-1 text-xs"></i>
-            </a>
+<a
+  href="/Investasi"
+  class={`font-semibold transition duration-300 flex items-center ${
+    pathname.startsWith("/Investasi")
+      ? "text-[#0900C3]"
+      : "text-gray-700 hover:text-yellow-400"
+  }`}
+>
+  Investasi <i class="fas fa-chevron-down ml-1 text-xs"></i>
+</a>
             <div class="absolute left-0 mt-2 w-64 bg-white rounded-b-lg translate-y-5 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 animate-drop-in">
               <a href="/Investasi#Peta" class="block text-gray-700 font-medium px-4 py-3 hover:bg-[#FFD41D]">Mulai Usaha</a>
               <a href="/Investasi#Panduan" class="block text-gray-700 font-medium px-4 py-3 hover:bg-[#FFD41D]">Link Terkait</a>
@@ -61,10 +84,16 @@
 
           <!-- Aplikasi Dropdown -->
           <li class="relative group">
-            <a href="/Aplikasi"
-              class="text-gray-700 font-semibold hover:text-yellow-400 transition duration-300 flex items-center">
-              Aplikasi <i class="fas fa-chevron-down ml-1 text-xs"></i>
-            </a>
+<a
+  href="/Aplikasi"
+  class={`font-semibold transition duration-300 flex items-center ${
+    pathname.startsWith("/Aplikasi")
+      ? "text-[#0900C3]"
+      : "text-gray-700 hover:text-yellow-400"
+  }`}
+>
+  Aplikasi <i class="fas fa-chevron-down ml-1 text-xs"></i>
+</a>
             <div class="absolute left-0 mt-2 w-64 bg-white rounded-b-lg translate-y-5 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 animate-drop-in">
               <a href="/Aplikasi#ijinusaha-sec" class="block font-medium text-gray-700 px-4 py-3 hover:bg-[#FFD41D]">Aplikasi Ijin Usaha</a>
               <a href="/Aplikasi#pengaduan-sec" class="block font-medium text-gray-700 px-4 py-3 hover:bg-[#FFD41D]">Aplikasi Pengaduan</a>
@@ -77,10 +106,16 @@
 
           <!-- Pelayanan Dropdown -->
           <li class="relative group">
-            <a href="/Pelayanan"
-              class="text-gray-700 font-semibold hover:text-yellow-400 transition duration-300 flex items-center">
-              Pelayanan <i class="fas fa-chevron-down ml-1 text-xs"></i>
-            </a>
+<a
+  href="/Pelayanan"
+  class={`font-semibold transition duration-300 flex items-center ${
+    pathname.startsWith("/Pelayanan")
+      ? "text-[#0900C3]"
+      : "text-gray-700 hover:text-yellow-400"
+  }`}
+>
+  Pelayanan <i class="fas fa-chevron-down ml-1 text-xs"></i>
+</a>
             <div class="absolute left-0 mt-2 w-64 bg-white rounded-b-lg translate-y-5 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 animate-drop-in">
               <a href="/Pelayanan#stdjenis-sec" class="block px-4 py-3 hover:bg-[#FFD41D]">Standar Pelayanan</a>
               <a href="/Pelayanan#info-sec" class="block px-4 py-3 hover:bg-[#FFD41D]">Keterbukaan Informasi</a>
@@ -91,9 +126,15 @@
 
           <!-- INFORMASI (nested tetap) -->
           <li class="relative group">
-            <div class="text-gray-700 font-semibold flex items-center cursor-pointer">
-              Informasi <i class="fas fa-chevron-down ml-1 text-xs"></i>
-            </div>
+<div
+  class={`font-semibold flex items-center cursor-pointer ${
+    pathname.startsWith("/lokasi") || pathname.startsWith("/beritalist")
+      ? "text-[#0900C3]"
+      : "text-gray-700"
+  }`}
+>
+  Informasi <i class="fas fa-chevron-down ml-1 text-xs"></i>
+</div>
 
             <div class="absolute left-0 mt-2 w-64 bg-white rounded-b-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 translate-y-5">
 

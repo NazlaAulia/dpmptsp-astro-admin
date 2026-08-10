@@ -1,0 +1,13 @@
+---
+export const prerender = false;
+
+const isLoggedIn = Astro.cookies.get("admin-auth")?.value === "true";
+const authHeader = Astro.request.headers.get("cookie") || "";
+const hasAuthCookie = authHeader.includes("admin-auth=true") || isLoggedIn;
+
+if (!hasAuthCookie) {
+  return Astro.redirect("/admin/login");
+}
+
+return Astro.redirect("/admin/dashboard");
+---
