@@ -1,0 +1,60 @@
+---
+import AdminShell from "../../components/admin/AdminShell.astro";
+
+const layanan = [
+  { title: "Layanan online", status: "Aktif", detail: "Pengaduan dan informasi dapat diakses publik." },
+  { title: "Layanan fisik", status: "Normal", detail: "Pelayanan langsung menjaga kualitas respons." },
+  { title: "Monitoring antrian", status: "Tersedia", detail: "Data antrean dapat dipantau pada dashboard admin." },
+];
+---
+
+<AdminShell title="Tempat Layanan" subtitle="Pantau layanan yang tersedia dan status operasional harian." actionLabel="Tambah Konten" actionHref="/admin/konten">
+  <div class="list-card">
+    {layanan.map((item) => (
+      <article class="item">
+        <div>
+          <h3>{item.title}</h3>
+          <p>{item.detail}</p>
+        </div>
+        <span>{item.status}</span>
+      </article>
+    ))}
+  </div>
+</AdminShell>
+
+<style>
+.list-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+}
+
+.item h3 {
+  margin: 0 0 4px;
+}
+
+.item p {
+  margin: 0;
+  color: #64748b;
+}
+
+.item span {
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 700;
+  font-size: 0.82rem;
+}
+</style>

@@ -1,0 +1,57 @@
+---
+import AdminShell from "../../components/admin/AdminShell.astro";
+
+const highlights = [
+  { title: "Target bulan ini", value: "94%", description: "Pencapaian kinerja investasi meningkat dibanding bulan lalu." },
+  { title: "Layanan aktif", value: "12", description: "Unit layanan yang sedang berjalan dan terpantau." },
+  { title: "Review menunggu", value: "3", description: "Dokumen atau data yang memerlukan verifikasi admin." },
+];
+---
+
+<AdminShell title="Kinerja Investasi" subtitle="Pantau pencapaian, layanan aktif, dan dokumen review dalam satu tampilan." actionLabel="Tambah Konten" actionHref="/admin/konten">
+  <div class="card-grid">
+    {highlights.map((item) => (
+      <article class="info-card">
+        <p class="label">{item.title}</p>
+        <h2>{item.value}</h2>
+        <p class="desc">{item.description}</p>
+      </article>
+    ))}
+  </div>
+</AdminShell>
+
+<style>
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.info-card {
+  padding: 18px;
+  border-radius: 18px;
+  background: white;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+}
+
+.label {
+  margin: 0 0 6px;
+  color: #64748b;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+}
+
+.info-card h2 {
+  margin: 0;
+  font-size: 1.6rem;
+  color: #0f172a;
+}
+
+.desc {
+  margin: 8px 0 0;
+  color: #64748b;
+  font-size: 0.92rem;
+}
+</style>

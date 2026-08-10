@@ -1,20 +1,26 @@
 ---
-// Navbar komponen untuk admin DPM-PTSP
+const now = new Date();
+const formattedDate = now.toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+});
 ---
 
 <div class="navbar">
-    <h3>Admin</h3>
-    
+    <div>
+        <p class="welcome">Selamat datang</p>
+        <h3>Admin DPMPTSP</h3>
+    </div>
+
     <div class="nav-right">
-        <!-- Kalender / Tanggal -->
         <div class="nav-date">
             <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
             </svg>
-            <span>August 5, 2026</span>
+            <span>{formattedDate}</span>
         </div>
-        
-        <!-- Tombol Notifikasi -->
+
         <div class="notification-wrapper">
             <button class="notification-btn" title="Pemberitahuan">
                 <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -28,20 +34,30 @@
 
 <style>
 .navbar {
-    height: 70px;
-    background: white;
+    height: 74px;
+    background: rgba(255, 255, 255, 0.95);
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 30px;
     border-bottom: 1px solid #e2e8f0;
+    backdrop-filter: blur(14px);
 }
 
 .navbar h3 {
-    font-size: 18px;
-    color: #1e293b;
+    font-size: 1rem;
+    color: #0f172a;
     margin: 0;
+    font-weight: 800;
+}
+
+.welcome {
+    margin: 0 0 2px;
+    font-size: 0.76rem;
     font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #64748b;
 }
 
 .nav-right {
@@ -58,9 +74,9 @@
     color: #475569;
     background: #f8fafc;
     padding: 8px 14px;
-    border-radius: 8px;
+    border-radius: 999px;
     border: 1px solid #e2e8f0;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .notification-wrapper {
@@ -68,23 +84,22 @@
 }
 
 .notification-btn {
-    width: 40px;
-    height: 40px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
+    width: 42px;
+    height: 42px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 999px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: #475569;
+    color: #1d4ed8;
     transition: all 0.2s ease;
 }
 
 .notification-btn:hover {
-    background: #f1f5f9;
-    color: #1e3a8a;
-    border-color: #cbd5e1;
+    background: #dbeafe;
+    transform: translateY(-1px);
 }
 
 .nav-icon {
@@ -101,5 +116,16 @@
     background: #ef4444;
     border-radius: 50%;
     border: 2px solid white;
+}
+
+@media (max-width: 900px) {
+    .navbar {
+        padding: 0 18px;
+        height: auto;
+        padding-top: 14px;
+        padding-bottom: 14px;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
 }
 </style>

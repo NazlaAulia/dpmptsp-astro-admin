@@ -1,0 +1,46 @@
+---
+import AdminShell from "../../components/admin/AdminShell.astro";
+
+const items = [
+  { title: "Artikel unggulan", value: "8" },
+  { title: "Dokumen publik", value: "14" },
+  { title: "Berita hari ini", value: "2" },
+];
+---
+
+<AdminShell title="Konten" subtitle="Kelola dokumen dan informasi yang tampil di publik." actionLabel="Tambah Artikel" actionHref="/admin/tambah-artikel">
+  <div class="card-grid">
+    {items.map((item) => (
+      <article class="info-card">
+        <h3>{item.title}</h3>
+        <p>{item.value}</p>
+      </article>
+    ))}
+  </div>
+</AdminShell>
+
+<style>
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.info-card {
+  background: white;
+  padding: 18px;
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+}
+
+.info-card h3 {
+  margin: 0 0 8px;
+}
+
+.info-card p {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #2563eb;
+}
+</style>

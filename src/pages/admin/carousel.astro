@@ -1,0 +1,48 @@
+---
+import AdminShell from "../../components/admin/AdminShell.astro";
+---
+
+<AdminShell title="Carousel" subtitle="Atur banner utama dan visual promosi yang tampil di publik." actionLabel="Tambah Artikel" actionHref="/admin/tambah-artikel">
+  <div class="panel">
+    <h3>Carousel aktif</h3>
+    <p>Banner utama saat ini sudah dioptimalkan agar lebih modern, ringkas, dan menarik untuk pengunjung.</p>
+    <div class="chips">
+      <span>Banner utama</span>
+      <span>Highlight layanan</span>
+      <span>Informasi penting</span>
+    </div>
+  </div>
+</AdminShell>
+
+<style>
+.panel {
+  background: white;
+  padding: 20px;
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+}
+
+.panel h3 {
+  margin: 0 0 6px;
+}
+
+.panel p {
+  margin: 0 0 12px;
+  color: #64748b;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chips span {
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 700;
+  font-size: 0.82rem;
+}
+</style>

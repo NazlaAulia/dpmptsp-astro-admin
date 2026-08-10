@@ -1,0 +1,44 @@
+---
+import AdminShell from "../../components/admin/AdminShell.astro";
+
+const items = [
+  { title: "Review publikasi baru", detail: "Ada 2 artikel menunggu peninjauan sebelum tampil publik." },
+  { title: "Perubahan konten", detail: "Satu item carousel telah diperbarui dan siap diterbitkan." },
+  { title: "Notifikasi sistem", detail: "Semua modul admin berjalan normal dan siap digunakan." },
+];
+---
+
+<AdminShell title="Pemberitahuan" subtitle="Pantau informasi penting dan aktivitas yang memerlukan perhatian." actionLabel="Tambah Konten" actionHref="/admin/konten">
+  <div class="list-card">
+    {items.map((item) => (
+      <article class="item">
+        <h3>{item.title}</h3>
+        <p>{item.detail}</p>
+      </article>
+    ))}
+  </div>
+</AdminShell>
+
+<style>
+.list-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.item {
+  background: white;
+  padding: 16px 18px;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+}
+
+.item h3 {
+  margin: 0 0 6px;
+}
+
+.item p {
+  margin: 0;
+  color: #64748b;
+}
+</style>
