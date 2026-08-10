@@ -42,16 +42,17 @@ ORDER BY t.Id_Konten ASC
   dbError = true;
 }
 const ICON_MAP = {
-  "Sambutan": "fas fa-microphone",
-  "Visi Misi": "fas fa-bullseye",
-  "Budaya Pelayanan": "fas fa-handshake",
-  "Motto Pelayanan": "fas fa-quote-right",
-  "Maklumat Pelayanan": "fas fa-scroll",
-  "Kompensasi layanan": "fas fa-hand-holding-usd",
-  "Indeks Kepuasan Masyarakat": "far fa-smile",
-  "Zona Integritas": "fas fa-shield-alt",
-  "Struktur Organisasi": "fas fa-sitemap"
+  sambutan: "fas fa-microphone",
+  visi_misi: "fas fa-bullseye",
+  budaya_pelayanan: "fas fa-handshake",
+  motto_pelayanan: "fas fa-quote-right",
+  maklumat_pelayanan: "fas fa-scroll",
+  kompensasi_layanan: "fas fa-hand-holding-usd",
+  ikm: "far fa-smile",
+  zona_integritas: "fas fa-shield-alt",
+  struktur_organisasi: "fas fa-sitemap",
 };
+
 ---
 
 <MainLayout title="DPMPTSP Kota Surabaya">
@@ -235,30 +236,30 @@ const ICON_MAP = {
           </div>
 
           <div class="space-y-2 max-h-[500px] overflow-y-auto">
-  {tabs.map((t, i) => (
-    <button
-      class={`tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-300
-        ${i === 0
-          ? "bg-blue-600 text-white shadow-lg"
-          : "bg-gray-100 text-gray-700 hover:bg-blue-50 hover:translate-x-1 hover:shadow"
-        }`}
-      data-tab={t.tags}
-    >
-      <!-- Bagian Icon diperbaiki agar merender icon dengan rapi -->
-      <div
-        class={`w-9 h-9 rounded-full flex items-center justify-center text-sm shrink-0
-          ${i === 0
-            ? "bg-white text-blue-600"
-            : "bg-blue-100 text-blue-600"
-          }`}
-      >
-        <i class={t.Icon || ICON_MAP[t.tags] || "fas fa-info-circle"}></i>
-      </div>
+            {tabs.map((t, i) => (
+              <button
+                class={`tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-300
+                  ${i === 0
+                    ? "bg-blue-600 text-white shadow-lg"
+                    : "bg-gray-100 text-gray-700 hover:bg-blue-50 hover:translate-x-1 hover:shadow"
+                  }`}
+                data-tab={t.tags}
+              >
+                <div
+                  class={`w-9 h-9 rounded-full flex items-center justify-center text-sm
+                    ${i === 0
+                      ? "bg-white text-blue-600"
+                      : "bg-blue-100 text-blue-600"
+                    }`}
+                >
+                 <i class={ICON_MAP[t.tags] || "fas fa-circle"}></i>
 
-      <span class="text-left">{t.Nama_Konten}</span>
-    </button>
-  ))}
-</div>
+                </div>
+
+                <span>{t.Nama_Konten}</span>
+              </button>
+            ))}
+          </div>
         </aside>
 
         <!-- ================= CONTENT ================= -->
@@ -630,4 +631,3 @@ document.querySelectorAll('.accordion-button').forEach(button => {
 });
 
 </script>
-<!-- halo -->
