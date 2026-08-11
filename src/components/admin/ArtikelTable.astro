@@ -1,3 +1,24 @@
+---
+export const prerender = false;
+
+import { db } from "../../lib/db";
+
+
+const [artikel] = await db.query(`
+SELECT 
+post.*,
+category_berita.title AS kategori
+FROM post
+LEFT JOIN category_berita 
+ON post.id_category = category_berita.id_category
+ORDER BY post.id_post DESC
+LIMIT 10
+`);
+
+
+const dataArtikel = artikel as any[];
+
+---
 <style>
 .box {
     background: white;
@@ -191,42 +212,72 @@ img.thumbnail {
                 <th>Aksi</th>
             </tr>
         </thead>
-        <tbody>
-            <tr>
-                <td>781</td>
-                <td>
-                    <div class="judul-cell">DPMPTSP Surabaya Hadiri Kunjungan Kerja Kementerian Investasi dan Hilirisasi/BKPM RI, Perkuat Koordinasi Percepatan Investasi di Jawa Timur</div>
-                    <div class="status-text">Status Berita : Aktif</div>
-                </td>
-                <td>
-                    <div class="isi-preview">DPMPTSP Surabaya Hadiri Kunjungan Kerja Kementeria...</div>
-                </td>
-                <td><span class="badge">Berita Baru</span></td>
-                <td>04-08-2026</td>
-                <td><img src="https://placehold.co/120x70" class="thumbnail"></td>
-                <td class="aksi">
-                    <a href="#" class="edit">Edit</a>
-                    <a href="#" class="hapus">Hapus</a>
-                </td>
-            </tr>
-            <tr>
-                <td>780</td>
-                <td>
-                    <div class="judul-cell">DPMPTSP Surabaya Ikuti Banking Profiling IPRO Jatim 2026, Perkuat Kesiapan Proyek Menuju EJIF 2026</div>
-                    <div class="status-text">Status Berita : Aktif</div>
-                </td>
-                <td>
-                    <div class="isi-preview">DPMPTSP Surabaya Ikuti Banking Profiling IPRO Jati...</div>
-                </td>
-                <td><span class="badge">Berita Baru</span></td>
-                <td>04-08-2026</td>
-                <td><img src="https://placehold.co/120x70" class="thumbnail"></td>
-                <td class="aksi">
-                    <a href="#" class="edit">Edit</a>
-                    <a href="#" class="hapus">Hapus</a>
-                </td>
-            </tr>
-        </tbody>
+     <tbody>
+
+{
+dataArtikel.map((item)=>(
+    
+<tr>
+
+<td>
+{item.id_post}
+</td>
+
+
+<td>
+<div class="judul-cell">
+{item.title}
+</div>
+
+<div class="status-text">
+Status Berita : {item.active === "Y" ? "Aktif":"Nonaktif"}
+</div>
+</td>
+
+
+<td>
+<div class="isi-preview">
+{item.content.substring(0,80)}...
+</div>
+</td>
+
+
+<td>
+<span class="badge">
+{item.kategori}
+</span>
+</td>
+
+
+<td>
+{item.date}
+</td>
+
+
+<td>
+<img 
+src="/placeholder.png"
+class="thumbnail"
+/>
+</td>
+
+
+<td class="aksi">
+<a href="#" class="edit">
+Edit
+</a>
+
+<a href="#" class="hapus">
+Hapus
+</a>
+</td>
+
+
+</tr>
+))
+}
+
+</tbody>
     </table>
 
     <div class="pagination-footer">
