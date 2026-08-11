@@ -1,57 +1,687 @@
 ---
 import AdminShell from "../../components/admin/AdminShell.astro";
 
-const highlights = [
-  { title: "Target bulan ini", value: "94%", description: "Pencapaian kinerja investasi meningkat dibanding bulan lalu." },
-  { title: "Layanan aktif", value: "12", description: "Unit layanan yang sedang berjalan dan terpantau." },
-  { title: "Review menunggu", value: "3", description: "Dokumen atau data yang memerlukan verifikasi admin." },
+
+const dataKinerja = [
+  {
+    id: 1,
+    judul: "2025-2026",
+    file: "/pdf/kinerja-2025-2026.pdf"
+  },
+  {
+    id: 2,
+    judul: "TW I-IV 2024",
+    file: "/pdf/kinerja-2024.pdf"
+  }
 ];
+
 ---
 
-<AdminShell title="Kinerja Investasi" subtitle="Pantau pencapaian, layanan aktif, dan dokumen review dalam satu tampilan." actionLabel="Tambah Konten" actionHref="/admin/konten">
-  <div class="card-grid">
-    {highlights.map((item) => (
-      <article class="info-card">
-        <p class="label">{item.title}</p>
-        <h2>{item.value}</h2>
-        <p class="desc">{item.description}</p>
-      </article>
-    ))}
-  </div>
+
+<AdminShell 
+  title="Kinerja Investasi" 
+  subtitle="Pantau pencapaian, layanan aktif, dan dokumen review dalam satu tampilan." 
+  actionLabel="Tambah Konten" 
+  actionHref="/admin/konten"
+>
+
+
+<div class="table-box">
+
+
+<div class="table-header">
+
+
+<h2>Daftar Kinerja Investasi</h2>
+
+
+<a href="/admin/tambah-kinerja">
+Tambah Kinerja
+</a>
+
+
+</div>
+
+
+
+
+<table>
+
+
+<thead>
+
+
+<tr>
+<th>ID</th>
+<th>Judul</th>
+<th>Dokumen</th>
+<th>Aksi</th>
+</tr>
+
+
+</thead>
+
+
+
+
+<tbody>
+
+
+{dataKinerja.map((item) => (
+
+
+<tr>
+
+
+<td>{item.id}</td>
+
+
+<td>{item.judul}</td>
+
+
+
+<td>
+
+
+<div class="pdf-preview">
+
+
+<iframe src={item.file}></iframe>
+
+
+</div>
+
+
+</td>
+
+
+
+
+
+<td>
+
+
+<div class="action-btn">
+
+<button 
+class="edit"
+onclick={`openEditModal(${item.id})`}
+>
+
+<svg viewBox="0 0 24 24">
+<path d="M12 20h9"/>
+<path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+</svg>
+
+</button>
+
+
+<button 
+class="delete"
+onclick="openDeleteModal()"
+>
+<svg viewBox="0 0 24 24">
+<path d="M3 6h18"/>
+<path d="M8 6V4h8v2"/>
+<path d="M19 6l-1 14H6L5 6"/>
+<path d="M10 11v6"/>
+<path d="M14 11v6"/>
+</svg>
+</button>
+
+</div>
+
+</td>
+
+
+
+</tr>
+
+
+))}
+
+
+</tbody>
+
+
+</table>
+
+
+
+</div>
+
+
+
+<div class="modal" id="deleteModal">
+
+
+<div class="modal-content">
+
+
+<div class="icon">
+<i>!</i>
+</div>
+
+
+<h3>Hapus Data?</h3>
+
+
+<p>
+Apakah Anda yakin ingin menghapus data kinerja ini?
+</p>
+
+
+
+<div class="modal-action">
+
+
+<button 
+class="cancel"
+onclick="closeDeleteModal()">
+Batal
+</button>
+
+
+
+<button 
+class="confirm-delete">
+Hapus
+</button>
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+<div class="modal" id="editModal">
+
+
+<div class="modal-content">
+
+
+<div class="icon">
+<i>!</i>
+</div>
+
+
+<h3>Edit Data?</h3>
+
+
+<p>
+Apakah Anda yakin ingin mengedit data kinerja ini?
+</p>
+
+
+<div class="modal-action">
+
+
+<button 
+class="cancel"
+onclick="closeEditModal()">
+Batal
+</button>
+
+
+<button 
+class="confirm-edit"
+onclick="goEdit()">
+Ya, Edit
+</button>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
 </AdminShell>
 
+
+
+
+
 <style>
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
+
+
+.table-box {
+
+background:white;
+
+border-radius:20px;
+
+padding:25px;
+
+box-shadow:0 12px 30px rgba(15,23,42,.06);
+
 }
 
-.info-card {
-  padding: 18px;
-  border-radius: 18px;
-  background: white;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+
+
+
+.table-header {
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+margin-bottom:20px;
+
 }
 
-.label {
-  margin: 0 0 6px;
-  color: #64748b;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-weight: 700;
+
+
+
+.table-header h2 {
+
+margin:0;
+
+font-size:22px;
+
 }
 
-.info-card h2 {
-  margin: 0;
-  font-size: 1.6rem;
-  color: #0f172a;
+
+
+
+.table-header a {
+
+background:#2563eb;
+
+color:white;
+
+padding:10px 18px;
+
+border-radius:10px;
+
+text-decoration:none;
+
 }
 
-.desc {
-  margin: 8px 0 0;
-  color: #64748b;
-  font-size: 0.92rem;
+
+
+
+table {
+
+width:100%;
+
+border-collapse:collapse;
+
 }
+
+
+
+
+th {
+
+text-align:left;
+
+padding:15px;
+
+border-bottom:1px solid #ddd;
+
+}
+
+
+
+
+td {
+
+padding:15px;
+
+border-bottom:1px solid #eee;
+
+vertical-align:top;
+
+}
+
+
+
+
+
+.pdf-preview {
+
+width:300px;
+
+height:180px;
+
+overflow:hidden;
+
+border:1px solid #ddd;
+
+border-radius:8px;
+
+}
+
+
+
+
+.pdf-preview iframe {
+
+width:100%;
+
+height:100%;
+
+border:none;
+
+}
+
+
+
+
+
+.edit {
+
+color:#2563eb;
+
+margin-right:12px;
+
+}
+
+
+
+
+.delete {
+
+background:none;
+
+border:none;
+
+color:#ef4444;
+
+cursor:pointer;
+
+font-size:16px;
+
+text-decoration:underline;
+
+}
+
+
+
+
+.modal {
+
+display:none;
+
+position:fixed;
+
+top:0;
+
+left:0;
+
+width:100%;
+
+height:100%;
+
+background:rgba(15,23,42,.45);
+
+align-items:center;
+
+justify-content:center;
+
+z-index:999;
+
+}
+
+
+
+
+.modal-content {
+
+background:white;
+
+width:380px;
+
+padding:30px;
+
+border-radius:20px;
+
+text-align:center;
+
+box-shadow:0 20px 50px rgba(0,0,0,.15);
+
+}
+
+
+
+
+.icon {
+width:60px;
+height:60px;
+margin:0 auto 15px;
+border-radius:50%;
+background:#fee2e2;
+color:#ef4444;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:32px;
+font-weight:bold;
+}
+
+
+
+
+.modal-content h3 {
+
+font-size:24px;
+
+margin:10px 0;
+
+}
+
+
+
+
+.modal-content p {
+
+color:#64748b;
+
+}
+
+
+
+
+.modal-action {
+
+display:flex;
+
+justify-content:center;
+
+gap:15px;
+
+margin-top:25px;
+
+}
+
+
+
+
+.cancel {
+
+background:#e5e7eb;
+
+border:none;
+
+padding:10px 25px;
+
+border-radius:10px;
+
+cursor:pointer;
+
+}
+
+
+
+
+.confirm-delete {
+
+background:#ef4444;
+
+color:white;
+
+border:none;
+
+padding:10px 25px;
+
+border-radius:10px;
+
+cursor:pointer;
+
+}
+
+
+.action-btn {
+display:flex;
+gap:12px;
+align-items:center;
+}
+
+
+.edit,
+.delete {
+width:38px;
+height:38px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:10px;
+cursor:pointer;
+border:none;
+}
+
+
+.edit {
+background:#dbeafe;
+}
+
+
+.delete {
+background:#fee2e2;
+}
+
+
+.edit svg,
+.delete svg {
+width:20px;
+height:20px;
+fill:none;
+stroke-width:2;
+stroke-linecap:round;
+stroke-linejoin:round;
+}
+
+
+.edit svg {
+stroke:#2563eb;
+}
+
+
+.delete svg {
+stroke:#ef4444;
+}
+
+.confirm-edit {
+
+background:#2563eb;
+
+color:white;
+
+border:none;
+
+padding:10px 25px;
+
+border-radius:10px;
+
+cursor:pointer;
+
+}
+
 </style>
+
+
+
+
+<script is:inline>
+
+let editId = null;
+
+
+function openDeleteModal(){
+
+const modal = document.getElementById("deleteModal");
+
+if(modal){
+
+modal.style.display = "flex";
+
+}
+
+}
+
+
+
+function closeDeleteModal(){
+
+const modal = document.getElementById("deleteModal");
+
+if(modal){
+
+modal.style.display = "none";
+
+}
+
+}
+
+
+
+function openEditModal(id){
+
+editId = id;
+
+const modal = document.getElementById("editModal");
+
+if(modal){
+
+modal.style.display = "flex";
+
+}
+
+}
+
+
+
+function closeEditModal(){
+
+const modal = document.getElementById("editModal");
+
+if(modal){
+
+modal.style.display = "none";
+
+}
+
+}
+
+
+
+function goEdit(){
+
+if(editId){
+
+window.location.href = `/admin/edit-kinerja?id=${editId}`;
+
+}
+
+}
+
+</script>
