@@ -114,48 +114,53 @@ textarea{
 
                 <h2>Tambah Artikel / Berita</h2>
 
-                <form>
+           <form 
+method="POST" 
+action="/api/artikel"
+enctype="multipart/form-data"
+>
 
                     <div class="form-group">
                         <label>Judul Artikel</label>
-                        <input
-                            type="text"
-                            placeholder="Masukkan judul artikel"
-                        >
+                       <input
+ type="text"
+ name="title"
+ placeholder="Masukkan judul artikel"
+>
                     </div>
 
                     <div class="form-group">
                         <label>Kategori</label>
 
-                        <select>
-                            <option>Berita Baru</option>
-                            <option>Pengumuman</option>
-                            <option>Kegiatan</option>
-                            <option>Informasi</option>
-                        </select>
+                       <select name="category">
+    <option value="8">Berita Baru</option>
+    <option value="2">Artikel Penanaman Modal</option>
+    <option value="3">Artikel Perizinan</option>
+</select>
                     </div>
 
                     <div class="form-group">
                         <label>Isi Artikel</label>
 
-                        <textarea
-                            placeholder="Masukkan isi artikel..."
-                        ></textarea>
+                       <textarea
+ name="content"
+ placeholder="Masukkan isi artikel..."
+></textarea>
                     </div>
 
                     <div class="form-group">
                         <label>Upload Gambar</label>
 
-                        <input type="file">
+                    <input type="file" name="picture">
                     </div>
 
                     <div class="form-group">
                         <label>Status Berita</label>
 
-                        <select>
-                            <option>Aktif</option>
-                            <option>Nonaktif</option>
-                        </select>
+                       <select name="active">
+    <option value="Y">Aktif</option>
+    <option value="N">Nonaktif</option>
+</select>
                     </div>
 
                     <div class="button-group">
