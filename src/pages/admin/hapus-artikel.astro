@@ -1,0 +1,12 @@
+---
+import { db } from "../../lib/db";
+
+const url = new URL(Astro.request.url);
+const id = url.searchParams.get("id");
+
+if (id) {
+    await db.query(`DELETE FROM post WHERE id_post = ?`, [id]);
+}
+
+return Astro.redirect("/admin/artikel");
+---
