@@ -3,6 +3,18 @@ export const prerender = false;
 
 import { db } from "../../lib/db";
 
+// 1. Ambil parameter halaman aktif dari URL (?page=X)
+const url = new URL(Astro.request.url);
+const currentPage = parseInt(url.searchParams.get("page") || "1");
+const limit = 10;
+const offset = (currentPage - 1) * limit;
+
+// 2. Hitung total data untuk pagination
+const [countResult]: any = await db.query(`SELECT COUNT(*) as total FROM post`);
+const totalData = countResult[0].total;
+const totalPages = Math.ceil(totalData / limit);
+
+// 3. Ambil data artikel sesuai halaman
 const [artikel] = await db.query(`
 SELECT 
 post.*,
@@ -11,10 +23,24 @@ FROM post
 LEFT JOIN category_berita 
 ON post.id_category = category_berita.id_category
 ORDER BY post.id_post DESC
-LIMIT 10
-`);
+LIMIT ? OFFSET ?
+`, [limit, offset]);
 
 const dataArtikel = artikel as any[];
+
+// Hitung teks "Showing X to Y of Z entries"
+const showingStart = totalData === 0 ? 0 : offset + 1;
+const showingEnd = Math.min(offset + limit, totalData);
+
+// Logika batasan maksimal 5 angka halaman yang tampil
+let startPage = Math.max(1, currentPage - 2);
+let endPage = Math.min(totalPages, startPage + 4);
+
+if (endPage - startPage < 4) {
+    startPage = Math.max(1, endPage - 4);
+}
+
+const visiblePages = Array.from({ length: (endPage - startPage) + 1 }, (_, i) => startPage + i);
 ---
 
 <style>
@@ -280,24 +306,28 @@ img.thumbnail {
     gap: 8px;
 }
 
-.pages button {
+/* Mengubah tag button di pagination menjadi a agar bisa diklik sebagai link */
+.pages a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 38px;
     height: 38px;
     border: 1px solid #dbe3ef;
     background: #f8fafc;
     color: #64748b;
     border-radius: 6px;
-    cursor: pointer;
+    text-decoration: none;
     font-size: 14px;
     font-weight: 500;
     transition: 0.2s;
 }
 
-.pages button:hover {
+.pages a:hover {
     background: #e2e8f0;
 }
 
-.pages button.active {
+.pages a.active {
     background: #2563eb;
     color: white;
     border: 1px solid #2563eb;
@@ -368,7 +398,7 @@ img.thumbnail {
 
             <td>
                 <div class="isi-preview">
-                    {item.content.substring(0,80)}...
+                    {item.content ? item.content.substring(0,80) : ''}...
                 </div>
             </td>
 
@@ -454,15 +484,29 @@ img.thumbnail {
 
 
     <div class="pagination-footer">
-        <div>Showing 1 to 2 of 30 entries</div>
+        <div>Showing {showingStart} to {showingEnd} of {totalData} entries</div>
 
         <div class="pages">
-            <button>&lt;</button>
-            <button class="active">1</button>
-            <button>2</button>
-            <button>3</button>
-            <button>4</button>
-            <button>&gt;</button>
+            <!-- Tombol Panah Kiri -->
+            {currentPage > 1 ? (
+                <a href={`/admin/artikel?page=${currentPage - 1}`}>&lt;</a>
+            ) : (
+                <a href="#" style="opacity: 0.4; pointer-events: none;">&lt;</a>
+            )}
+
+            <!-- List Angka Halaman (Maksimal tampil 5 angka dan bergeser otomatis) -->
+            {visiblePages.map((p) => (
+                <a href={`/admin/artikel?page=${p}`} class={p === currentPage ? "active" : ""}>
+                    {p}
+                </a>
+            ))}
+
+            <!-- Tombol Panah Kanan -->
+            {currentPage < totalPages ? (
+                <a href={`/admin/artikel?page=${currentPage + 1}`}>&gt;</a>
+            ) : (
+                <a href="#" style="opacity: 0.4; pointer-events: none;">&gt;</a>
+            )}
         </div>
     </div>
 
@@ -579,12 +623,8 @@ img.thumbnail {
 </div>
 
 <script>
-    /* =========================
-       MODAL HAPUS
-    ========================= */
-
     const modalHapus = document.getElementById("hapusModal");
-    const btnBatalHapus = document.getElementById("btnBatal");
+    const btnBatal = document.getElementById("btnBatal");
     const btnHapus = document.querySelectorAll(".hapus");
     const btnKonfirmasiHapus = document.getElementById("btnKonfirmasiHapus");
 
@@ -594,7 +634,7 @@ img.thumbnail {
         });
     });
 
-    btnBatalHapus?.addEventListener("click", () => {
+    btnBatal?.addEventListener("click", () => {
         modalHapus?.classList.remove("show");
     });
 
@@ -602,69 +642,44 @@ img.thumbnail {
         modalHapus?.classList.remove("show");
     });
 
+    modalHapus?.addEventListener("click", (event) => {
+        if (event.target === modalHapus) {
+            modalHapus.classList.remove("show");
+        }
+    });
 
     /* =========================
        MODAL EDIT
     ========================= */
-
     const modalEdit = document.getElementById("editModal");
     const btnEdit = document.querySelectorAll(".edit");
     const btnBatalEdit = document.getElementById("btnBatalEdit");
     const btnKonfirmasiEdit = document.getElementById("btnKonfirmasiEdit");
 
-    let idArtikelEdit = null;
+    let idArtikelEdit: string | null = null;
 
     btnEdit.forEach((button) => {
         button.addEventListener("click", () => {
-
             idArtikelEdit = button.getAttribute("data-id");
-
             modalEdit?.classList.add("show");
-
         });
     });
 
-
     btnBatalEdit?.addEventListener("click", () => {
-
         modalEdit?.classList.remove("show");
-
         idArtikelEdit = null;
-
     });
-
 
     btnKonfirmasiEdit?.addEventListener("click", () => {
-
         if (idArtikelEdit) {
-
-            window.location.href =
-                `/admin/edit-artikel?id=${idArtikelEdit}`;
-
+            window.location.href = `/admin/edit-artikel?id=${idArtikelEdit}`;
         }
-
     });
-
-
-    /* =========================
-       TUTUP MODAL JIKA KLIK LUAR
-    ========================= */
-
-    modalHapus?.addEventListener("click", (event) => {
-
-        if (event.target === modalHapus) {
-            modalHapus.classList.remove("show");
-        }
-
-    });
-
 
     modalEdit?.addEventListener("click", (event) => {
-
         if (event.target === modalEdit) {
             modalEdit.classList.remove("show");
             idArtikelEdit = null;
         }
-
     });
 </script>
