@@ -405,8 +405,8 @@ try {
     select.addEventListener("change", () => {
       if (!select.value) return;
 
-      viewer.data = "/" + select.value;
-      download.href = "/" + select.value;
+     viewer.data = "/pdf/" + select.value;
+download.href = "/pdf/" + select.value;
 
       container.classList.remove("hidden");
       ket.innerHTML = `

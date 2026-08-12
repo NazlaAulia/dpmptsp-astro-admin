@@ -1,19 +1,20 @@
 ---
 import AdminShell from "../../components/admin/AdminShell.astro";
+import { db } from "../../lib/db";
 
 
-const dataKinerja = [
-  {
-    id: 1,
-    judul: "2025-2026",
-    file: "/pdf/kinerja-2025-2026.pdf"
-  },
-  {
-    id: 2,
-    judul: "TW I-IV 2024",
-    file: "/pdf/kinerja-2024.pdf"
-  }
-];
+const [rows] = await db.query(`
+    SELECT *
+    FROM twdata
+    ORDER BY id DESC
+`);
+
+
+const dataKinerja = rows as Array<{
+    id:number;
+    tw_option:string;
+    file_path:string;
+}>;
 
 ---
 
@@ -76,7 +77,7 @@ Tambah Kinerja
 <td>{item.id}</td>
 
 
-<td>{item.judul}</td>
+<td>{item.tw_option}</td>
 
 
 
@@ -86,7 +87,7 @@ Tambah Kinerja
 <div class="pdf-preview">
 
 
-<iframe src={item.file}></iframe>
+<iframe src={`/pdf/${item.file_path}`}></iframe>
 
 
 </div>
@@ -118,8 +119,9 @@ onclick={`openEditModal(${item.id})`}
 
 <button 
 class="delete"
-onclick="openDeleteModal()"
+onclick={`openDeleteModal(${item.id})`}
 >
+
 <svg viewBox="0 0 24 24">
 <path d="M3 6h18"/>
 <path d="M8 6V4h8v2"/>
@@ -184,7 +186,8 @@ Batal
 
 
 <button 
-class="confirm-delete">
+class="confirm-delete"
+onclick="hapusKinerja()">
 Hapus
 </button>
 
@@ -614,16 +617,17 @@ cursor:pointer;
 <script is:inline>
 
 let editId = null;
+let deleteId = null;
 
 
-function openDeleteModal(){
+function openDeleteModal(id){
+
+deleteId = id;
 
 const modal = document.getElementById("deleteModal");
 
 if(modal){
-
 modal.style.display = "flex";
-
 }
 
 }
@@ -681,6 +685,20 @@ if(editId){
 window.location.href = `/admin/edit-kinerja?id=${editId}`;
 
 }
+
+}
+
+async function hapusKinerja(){
+
+    console.log("hapus id:", deleteId);
+
+    const response = await fetch(`/api/kinerja/${deleteId}`, {
+        method:"DELETE"
+    });
+
+    console.log("status:", response.status);
+
+    window.location.reload();
 
 }
 

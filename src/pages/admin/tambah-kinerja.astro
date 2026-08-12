@@ -1,7 +1,55 @@
 ---
 import AdminShell from "../../components/admin/AdminShell.astro";
----
+import { db } from "../../lib/db";
+import { writeFile } from "fs/promises";
+import path from "path";
 
+
+if (Astro.request.method === "POST") {
+
+    const formData = await Astro.request.formData();
+
+    const judul = formData.get("judul") as string;
+    const file = formData.get("file") as File;
+
+
+    const buffer = Buffer.from(await file.arrayBuffer());
+
+
+    const namaFile = file.name;
+
+
+    const lokasi = path.join(
+        process.cwd(),
+        "public/pdf",
+        namaFile
+    );
+
+
+    await writeFile(
+        lokasi,
+        buffer
+    );
+
+
+    await db.query(
+        `
+        INSERT INTO twdata
+        (tw_option, file_path)
+        VALUES (?, ?)
+        `,
+        [
+            judul,
+            namaFile
+        ]
+    );
+
+
+    return Astro.redirect("/admin/kinerja");
+
+}
+
+---
 
 <AdminShell 
 title="Tambah Kinerja Investasi"
@@ -15,7 +63,7 @@ subtitle="Tambahkan dokumen kinerja investasi baru."
 <h2>Form Tambah Kinerja</h2>
 
 
-<form>
+<form method="POST" enctype="multipart/form-data">
 
 
 <div class="form-group">
@@ -26,6 +74,7 @@ Judul Kinerja
 
 <input 
 type="text"
+name="judul"
 placeholder="Masukkan judul kinerja"
 />
 
@@ -41,6 +90,7 @@ Upload Dokumen PDF
 
 <input 
 type="file"
+name="file"
 accept=".pdf"
 />
 
