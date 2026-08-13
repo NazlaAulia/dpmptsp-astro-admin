@@ -1,11 +1,96 @@
 ---
 import AdminShell from "../../components/admin/AdminShell.astro";
+import { db } from "../../lib/db";
+import { writeFile } from "fs/promises";
+import path from "path";
+
+const id = Number(Astro.url.searchParams.get("id"));
+
+const [rows] = await db.query(
+  `
+  SELECT *
+  FROM twdata
+  WHERE id = ?
+  `,
+  [id]
+);
+
+const data = (rows as Array<{
+  id: number;
+  tw_option: string;
+  file_path: string;
+}>)[0];
+
+if (!data) {
+  return Astro.redirect("/admin/kinerja");
+}
+
+
+if (Astro.request.method === "POST") {
+
+  const formData = await Astro.request.formData();
+
+  const judul = formData.get("judul") as string;
+  const file = formData.get("file") as File;
+
+
+  if (file && file.size > 0) {
+
+    const buffer = Buffer.from(await file.arrayBuffer());
+
+    const namaFile = file.name;
+
+    const lokasi = path.join(
+      process.cwd(),
+      "public/pdf",
+      namaFile
+    );
+
+    await writeFile(
+      lokasi,
+      buffer
+    );
+
+
+    await db.query(
+      `
+      UPDATE twdata
+      SET tw_option = ?, file_path = ?
+      WHERE id = ?
+      `,
+      [
+        judul,
+        namaFile,
+        id
+      ]
+    );
+
+  } else {
+
+    await db.query(
+      `
+      UPDATE twdata
+      SET tw_option = ?
+      WHERE id = ?
+      `,
+      [
+        judul,
+        id
+      ]
+    );
+
+  }
+
+
+  return Astro.redirect("/admin/kinerja");
+}
+
 ---
 
-
 <AdminShell
-title="Edit Kinerja Investasi"
-subtitle="Perbarui data kinerja investasi."
+  title="Edit Kinerja Investasi"
+  subtitle="Perbarui data kinerja investasi."
+  showHeader={false}
 >
 
 
@@ -15,7 +100,7 @@ subtitle="Perbarui data kinerja investasi."
 <h2>Edit Kinerja</h2>
 
 
-<form>
+<form method="POST" enctype="multipart/form-data">
 
 
 <div class="form-group">
@@ -26,7 +111,23 @@ Judul Kinerja
 
 <input 
 type="text"
-value="2025-2026"
+name="judul"
+value={data.tw_option}
+/>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+Dokumen Saat Ini
+</label>
+
+<input 
+type="text"
+value={data.file_path}
+readonly
 />
 
 </div>
@@ -40,13 +141,14 @@ Upload Dokumen Baru
 
 <input 
 type="file"
+name="file"
 accept=".pdf"
 />
 
 </div>
 
 
-<button>
+<button type="submit">
 Simpan Perubahan
 </button>
 
@@ -111,6 +213,8 @@ border:none;
 padding:12px 20px;
 
 border-radius:10px;
+
+cursor:pointer;
 
 }
 
