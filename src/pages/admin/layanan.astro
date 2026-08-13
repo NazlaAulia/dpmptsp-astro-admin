@@ -1,60 +1,477 @@
 ---
 import AdminShell from "../../components/admin/AdminShell.astro";
 
-const layanan = [
-  { title: "Layanan online", status: "Aktif", detail: "Pengaduan dan informasi dapat diakses publik." },
-  { title: "Layanan fisik", status: "Normal", detail: "Pelayanan langsung menjaga kualitas respons." },
-  { title: "Monitoring antrian", status: "Tersedia", detail: "Data antrean dapat dipantau pada dashboard admin." },
+const semuaLayanan = [
+  { id: 13, judul: "SPP PAKAL", lokasi: "https://maps.app.goo.gl/NqAj6LLWN8KZpUTp9", alamat: "SPP Pakal, Kec. Pakal, Surabaya, Jawa Timur", gambar: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=150&q=80" },
+  { id: 12, judul: "SPP NAMBANGAN", lokasi: "https://maps.app.goo.gl/YqrTVqMSDYBE6Mbk9", alamat: "SPP NAMBANGAN, Taman Segoro, Jl. Nambangan, Tanah Kali Kedinding, Kenjeran, Surabaya, East Java 60129", gambar: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=150&q=80" },
+  { id: 4, judul: "PTSP TIMUR", lokasi: "https://maps.app.goo.gl/uQTPY3GLz1wwIju7", alamat: "Jl. Raya Menur No.31 C, Manyar Sabrangan, Kec. Mulyorejo, Surabaya, Jawa Timur 60141", gambar: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=150&q=80" },
+  { id: 3, judul: "PTSP BARAT", lokasi: "https://maps.app.goo.gl/example1", alamat: "Jl. Darmo No. 12, Surabaya", gambar: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=150&q=80" },
+  { id: 2, judul: "PTSP UTARA", lokasi: "https://maps.app.goo.gl/example2", alamat: "Jl. Indrapura No. 5, Surabaya", gambar: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=150&q=80" },
+  { id: 1, judul: "PTSP SELATAN", lokasi: "https://maps.app.goo.gl/example3", alamat: "Jl. Ahmad Yani No. 88, Surabaya", gambar: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=150&q=80" },
+  { id: 7, judul: "SPP RUNGKUT", lokasi: "https://maps.app.goo.gl/example4", alamat: "Jl. Rungkut Industri Raya", gambar: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=150&q=80" },
+  { id: 8, judul: "SPP TANDES", lokasi: "https://maps.app.goo.gl/example5", alamat: "Jl. Margomulyo", gambar: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=150&q=80" },
+  { id: 9, judul: "SPP GUBENG", lokasi: "https://maps.app.goo.gl/example6", alamat: "Jl. Gubeng Airlangga", gambar: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=150&q=80" },
+  { id: 10, judul: "SPP KEPUTIH", lokasi: "https://maps.app.goo.gl/example7", alamat: "Jl. Keputih Tegal", gambar: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=150&q=80" },
+  { id: 11, judul: "SPP WONOKROMO", lokasi: "https://maps.app.goo.gl/example8", alamat: "Jl. Joyoboyo", gambar: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=150&q=80" },
+  { id: 14, judul: "SPP KENJERAN", lokasi: "https://maps.app.goo.gl/example9", alamat: "Jl. Kenjeran Baru", gambar: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=150&q=80" },
+  { id: 15, judul: "SPP MERR", lokasi: "https://maps.app.goo.gl/example10", alamat: "Jl. Ir. Soekarno", gambar: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=150&q=80" },
 ];
 ---
 
-<AdminShell title="Tempat Layanan" subtitle="Pantau layanan yang tersedia dan status operasional harian." actionLabel="Tambah Konten" actionHref="/admin/konten">
-  <div class="list-card">
-    {layanan.map((item) => (
-      <article class="item">
-        <div>
-          <h3>{item.title}</h3>
-          <p>{item.detail}</p>
-        </div>
-        <span>{item.status}</span>
-      </article>
-    ))}
+<AdminShell title="Tempat Layanan" subtitle="Pantau layanan yang tersedia dan status operasional harian." actionLabel="Tambah Tempat Pelayanan" actionHref="/admin/konten">
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Judul</th>
+          <th>Lokasi</th>
+          <th>Alamat</th>
+          <th>Gambar</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <!-- Render dinamis via script -->
+      </tbody>
+    </table>
+
+    <div class="pagination-footer">
+      <span class="page-info" id="page-info">Menampilkan 0 dari 0 entri</span>
+      <div class="pagination-controls" id="pagination-controls">
+        <!-- Tombol paginasi dinamis -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Konfirmasi Edit -->
+  <div class="modal-overlay" id="edit-modal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-icon-wrapper edit-icon-bg">
+        <span class="modal-exclamation">!</span>
+      </div>
+      <h2>Edit Data?</h2>
+      <p>Apakah Anda yakin ingin mengedit data layanan ini?</p>
+      <div class="modal-actions">
+        <button class="modal-btn btn-batal" id="edit-batal">Batal</button>
+        <button class="modal-btn btn-ya-edit" id="edit-ya">Ya, Edit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Konfirmasi Hapus -->
+  <div class="modal-overlay" id="delete-modal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-icon-wrapper delete-icon-bg">
+        <span class="modal-exclamation">!</span>
+      </div>
+      <h2>Hapus Layanan?</h2>
+      <p>Apakah Anda yakin ingin menghapus layanan ini?</p>
+      <div class="modal-actions">
+        <button class="modal-btn btn-batal" id="delete-batal">Batal</button>
+        <button class="modal-btn btn-hapus" id="delete-ya">Hapus</button>
+      </div>
+    </div>
   </div>
 </AdminShell>
 
+<script define:vars={{ semuaLayanan: semuaLayanan }}>
+  let dataLayanan = [...semuaLayanan];
+  const itemsPerPage = 5;
+  let currentPage = 1;
+  let selectedId = null;
+
+  function renderTable(page) {
+    currentPage = page;
+    const totalItems = dataLayanan.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const currentData = dataLayanan.slice(start, end);
+
+    const tbody = document.getElementById("table-body");
+    tbody.innerHTML = "";
+
+    currentData.forEach(item => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${item.id}</td>
+        <td class="fw-bold">${item.judul}</td>
+        <td><a href="${item.lokasi}" target="_blank" class="map-link">${item.lokasi}</a></td>
+        <td>${item.alamat}</td>
+        <td><img src="${item.gambar}" alt="${item.judul}" class="thumb-img" /></td>
+        <td>
+          <div class="action-buttons">
+            <button class="btn-icon btn-edit" title="Edit" data-id="${item.id}">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            </button>
+            <button class="btn-icon btn-delete" title="Hapus" data-id="${item.id}">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    const displayStart = totalItems === 0 ? 0 : start + 1;
+    const displayEnd = Math.min(end, totalItems);
+    document.getElementById("page-info").innerText = `Menampilkan ${displayStart} sampai ${displayEnd} dari ${totalItems} entri`;
+
+    renderPaginationControls(totalPages);
+    attachActionListeners();
+  }
+
+  function renderPaginationControls(totalPages) {
+    const controls = document.getElementById("pagination-controls");
+    controls.innerHTML = "";
+
+    const prevBtn = document.createElement("button");
+    prevBtn.className = `page-btn ${currentPage === 1 ? 'disabled' : ''}`;
+    prevBtn.innerHTML = "&lt;";
+    prevBtn.onclick = () => {
+      if (currentPage > 1) renderTable(currentPage - 1);
+    };
+    controls.appendChild(prevBtn);
+
+    for (let i = 1; i <= totalPages; i++) {
+      const pageBtn = document.createElement("button");
+      pageBtn.className = `page-btn ${currentPage === i ? 'active' : ''}`;
+      pageBtn.innerText = i;
+      pageBtn.onclick = () => renderTable(i);
+      controls.appendChild(pageBtn);
+    }
+
+    const nextBtn = document.createElement("button");
+    nextBtn.className = `page-btn ${currentPage === totalPages ? 'disabled' : ''}`;
+    nextBtn.innerHTML = "&gt;";
+    nextBtn.onclick = () => {
+      if (currentPage < totalPages) renderTable(currentPage + 1);
+    };
+    controls.appendChild(nextBtn);
+  }
+
+  function attachActionListeners() {
+    document.querySelectorAll(".btn-edit").forEach(btn => {
+      btn.addEventListener("click", () => {
+        selectedId = parseInt(btn.getAttribute("data-id"));
+        document.getElementById("edit-modal").style.display = "flex";
+      });
+    });
+
+    document.querySelectorAll(".btn-delete").forEach(btn => {
+      btn.addEventListener("click", () => {
+        selectedId = parseInt(btn.getAttribute("data-id"));
+        document.getElementById("delete-modal").style.display = "flex";
+      });
+    });
+  }
+
+  document.getElementById("edit-batal").addEventListener("click", () => {
+    document.getElementById("edit-modal").style.display = "none";
+    selectedId = null;
+  });
+
+  document.getElementById("edit-ya").addEventListener("click", () => {
+    if (selectedId !== null) {
+      alert(`Mengarahkan ke halaman edit untuk ID: ${selectedId}`);
+      document.getElementById("edit-modal").style.display = "none";
+      selectedId = null;
+    }
+  });
+
+  document.getElementById("delete-batal").addEventListener("click", () => {
+    document.getElementById("delete-modal").style.display = "none";
+    selectedId = null;
+  });
+
+  document.getElementById("delete-ya").addEventListener("click", () => {
+    if (selectedId !== null) {
+      dataLayanan = dataLayanan.filter(item => item.id !== selectedId);
+      document.getElementById("delete-modal").style.display = "none";
+      selectedId = null;
+      renderTable(currentPage);
+    }
+  });
+
+  renderTable(1);
+</script>
+
 <style>
-.list-card {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.table-container {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+  overflow-x: auto;
+  padding: 16px;
 }
 
-.item {
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.data-table th,
+.data-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.data-table th {
+  font-weight: 700;
+  color: #1e293b;
+  background: #f8fafc;
+}
+
+.fw-bold {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.map-link {
+  color: #2563eb;
+  text-decoration: none;
+  max-width: 180px;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.map-link:hover {
+  text-decoration: underline;
+}
+
+.thumb-img {
+  width: 80px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* TOMBOL AKSI */
+:global(.action-buttons) {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+:global(.btn-icon) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 42px !important;
+  height: 42px !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 12px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  box-sizing: border-box !important;
+}
+
+:global(.btn-icon svg) {
+  width: 22px !important;
+  height: 22px !important;
+  display: block !important;
+}
+
+:global(.btn-edit) {
+  color: #2563eb !important;
+  background: #dbeafe !important;
+}
+
+:global(.btn-edit:hover) {
+  background: #bfdbfe !important;
+}
+
+:global(.btn-delete) {
+  color: #ef4444 !important;
+  background: #fee2e2 !important;
+}
+
+:global(.btn-delete:hover) {
+  background: #fecaca !important;
+}
+
+.pagination-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
-  padding: 16px 18px;
-  border-radius: 16px;
-  background: white;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
-}
-
-.item h3 {
-  margin: 0 0 4px;
-}
-
-.item p {
-  margin: 0;
+  padding-top: 16px;
+  margin-top: 8px;
+  border-top: 1px solid #f1f5f9;
+  font-size: 0.85rem;
   color: #64748b;
 }
 
-.item span {
-  padding: 8px 10px;
-  border-radius: 999px;
-  background: #eff6ff;
-  color: #1d4ed8;
-  font-weight: 700;
-  font-size: 0.82rem;
+.pagination-controls {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.page-btn {
+  padding: 6px 12px;
+  border: 1px solid #cbd5e1;
+  background: white;
+  color: #334155;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 36px;
+  text-align: center;
+}
+
+.page-btn.hover:not(.disabled) {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.page-btn.active {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+  font-weight: 600;
+}
+
+.page-btn.disabled {
+  color: #94a3b8;
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  cursor: not-allowed;
+}
+
+/* Modal Styling */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal-card {
+  background: white;
+  width: 100%;
+  max-width: 480px;
+  border-radius: 24px;
+  padding: 36px 32px;
+  text-align: center;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  animation: modalScaleIn 0.25s ease-out;
+}
+
+@keyframes modalScaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-icon-wrapper {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-icon-bg {
+  background: #fee2e2;
+}
+
+.delete-icon-bg {
+  background: #fee2e2;
+}
+
+.modal-exclamation {
+  font-size: 40px;
+  font-weight: 800;
+  color: #ef4444;
+  line-height: 1;
+}
+
+.modal-card h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 12px;
+}
+
+.modal-card p {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin: 0 0 28px;
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.modal-btn {
+  padding: 12px 28px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.btn-batal {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.btn-batal:hover {
+  background: #cbd5e1;
+}
+
+.btn-ya-edit {
+  background: #2563eb;
+  color: white;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.btn-ya-edit:hover {
+  background: #1d4ed8;
+}
+
+.btn-hapus {
+  background: #ef4444;
+  color: white;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+}
+
+.btn-hapus:hover {
+  background: #dc2626;
 }
 </style>
