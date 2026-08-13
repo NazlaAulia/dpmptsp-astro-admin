@@ -24,6 +24,7 @@ const dataKinerja = rows as Array<{
   subtitle="Pantau pencapaian, layanan aktif, dan dokumen review dalam satu tampilan." 
   actionLabel="Tambah Konten" 
   actionHref="/admin/konten"
+  showHeader={false}
 >
 
 
@@ -692,7 +693,7 @@ async function hapusKinerja(){
 
     console.log("hapus id:", deleteId);
 
-    const response = await fetch(`/api/kinerja/${deleteId}`, {
+    const response = await fetch(`/api/${deleteId}`, {
         method:"DELETE"
     });
 
