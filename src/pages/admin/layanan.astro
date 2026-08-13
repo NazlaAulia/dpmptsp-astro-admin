@@ -18,7 +18,7 @@ const semuaLayanan = [
 ];
 ---
 
-<AdminShell title="Tempat Layanan" subtitle="Pantau layanan yang tersedia dan status operasional harian." actionLabel="Tambah Tempat Pelayanan" actionHref="/admin/konten">
+<AdminShell title="Tempat Layanan" subtitle="Pantau layanan yang tersedia dan status operasional harian." actionLabel="Tambah Tempat Pelayanan" aactionHref="/admin/layanan/tambah-layanan"
   <div class="table-container">
     <table class="data-table">
       <thead>
@@ -77,6 +77,12 @@ const semuaLayanan = [
 
 <script define:vars={{ semuaLayanan: semuaLayanan }}>
   let dataLayanan = [...semuaLayanan];
+
+const layananTambahan = JSON.parse(
+  localStorage.getItem("layananTambahan") || "[]"
+);
+
+dataLayanan = [...dataLayanan, ...layananTambahan];
   const itemsPerPage = 5;
   let currentPage = 1;
   let selectedId = null;
