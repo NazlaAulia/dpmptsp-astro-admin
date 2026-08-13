@@ -422,10 +422,11 @@ img.thumbnail {
 
 
             <td>
-              <img 
-    src={item.image}
+      <img 
+    src={`/uploads/${item.picture}`}
     class="thumbnail"
     alt={item.title}
+    onerror={`this.onerror=null; this.src='https://dpm-ptsp.surabaya.go.id/fileberita/${item.picture}'`}
 />
             </td>
 

@@ -124,12 +124,13 @@ const getLink = (p, t = type) => {
           <a href={`/media/${slugify(item.title)}`} class="flex flex-col h-full bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden">
             
             <div class="relative aspect-[4/3] overflow-hidden">
-              <img 
-                src={item.picture ? `https://dpm-ptsp.surabaya.go.id/fileberita/${item.picture}` : '/no-image.jpg'} 
-                alt={item.title}
-                loading="lazy"
-                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-              />
+            <img 
+  src={item.picture ? `/uploads/${item.picture}` : '/no-image.jpg'}
+  alt={item.title}
+  loading="lazy"
+  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+  onerror={`this.onerror=null; this.src='https://dpm-ptsp.surabaya.go.id/fileberita/${item.picture}'`}
+/>
               <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
 
