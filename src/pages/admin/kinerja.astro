@@ -2,12 +2,23 @@
 import AdminShell from "../../components/admin/AdminShell.astro";
 import { db } from "../../lib/db";
 
+// Ambil parameter halaman dari URL, default ke halaman 1
+const currentPage = Number(Astro.url.searchParams.get("page")) || 1;
+const limit = 10; // Jumlah item per halaman
+const offset = (currentPage - 1) * limit;
 
+// Ambil total data untuk menghitung jumlah total halaman
+const [countRows]: any = await db.query(`SELECT COUNT(*) as total FROM twdata`);
+const totalData = countRows[0].total;
+const totalPages = Math.ceil(totalData / limit) || 1;
+
+// Ambil data sesuai halaman aktif
 const [rows] = await db.query(`
     SELECT *
     FROM twdata
     ORDER BY id DESC
-`);
+    LIMIT ? OFFSET ?
+`, [limit, offset]);
 
 
 const dataKinerja = rows as Array<{
@@ -15,9 +26,7 @@ const dataKinerja = rows as Array<{
     tw_option:string;
     file_path:string;
 }>;
-
 ---
-
 
 <AdminShell 
   title="Kinerja Investasi" 
@@ -27,102 +36,51 @@ const dataKinerja = rows as Array<{
   showHeader={false}
 >
 
-
 <div class="table-box">
 
-
 <div class="table-header">
-
-
 <h2>Daftar Kinerja Investasi</h2>
-
-
 <a href="/admin/tambah-kinerja">
 Tambah Kinerja
 </a>
-
-
 </div>
 
-
-
-
 <table>
-
-
 <thead>
-
-
 <tr>
 <th>ID</th>
 <th>Judul</th>
 <th>Dokumen</th>
 <th>Aksi</th>
 </tr>
-
-
 </thead>
 
-
-
-
 <tbody>
-
-
 {dataKinerja.map((item) => (
-
-
 <tr>
-
-
 <td>{item.id}</td>
-
-
 <td>{item.tw_option}</td>
-
-
-
 <td>
-
-
 <div class="pdf-preview">
-
-
 <iframe src={`/pdf/${item.file_path}`}></iframe>
-
-
 </div>
-
-
 </td>
-
-
-
-
-
 <td>
-
-
 <div class="action-btn">
-
 <button 
 class="edit"
 onclick={`openEditModal(${item.id})`}
 >
-
 <svg viewBox="0 0 24 24">
 <path d="M12 20h9"/>
 <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>
 </svg>
-
 </button>
-
 
 <button 
 class="delete"
 onclick={`openDeleteModal(${item.id})`}
 >
-
 <svg viewBox="0 0 24 24">
 <path d="M3 6h18"/>
 <path d="M8 6V4h8v2"/>
@@ -131,332 +89,183 @@ onclick={`openDeleteModal(${item.id})`}
 <path d="M14 11v6"/>
 </svg>
 </button>
-
 </div>
-
 </td>
-
-
-
 </tr>
-
-
 ))}
-
-
 </tbody>
-
-
 </table>
 
+<!-- BAGIAN PAGINATION TAMBAHAN -->
+<div class="pagination-container">
+<div class="pagination-info">
+Showing {totalData === 0 ? 0 : offset + 1} to {Math.min(offset + limit, totalData)} of {totalData} entries
+</div>
 
+<div class="pagination-buttons">
+<a href={`?page=${currentPage - 1}`} class={`page-btn ${currentPage <= 1 ? 'disabled' : ''}`}>
+&lt;
+</a>
+
+{Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+<a href={`?page=${p}`} class={`page-btn ${p === currentPage ? 'active' : ''}`}>
+{p}
+</a>
+))}
+
+<a href={`?page=${currentPage + 1}`} class={`page-btn ${currentPage >= totalPages ? 'disabled' : ''}`}>
+&gt;
+</a>
+</div>
+</div>
+<!-- AKHIR PAGINATION -->
 
 </div>
 
-
-
 <div class="modal" id="deleteModal">
-
-
 <div class="modal-content">
-
-
 <div class="icon">
 <i>!</i>
 </div>
-
-
 <h3>Hapus Data?</h3>
-
-
 <p>
 Apakah Anda yakin ingin menghapus data kinerja ini?
 </p>
-
-
-
 <div class="modal-action">
-
-
 <button 
 class="cancel"
 onclick="closeDeleteModal()">
 Batal
 </button>
-
-
-
 <button 
 class="confirm-delete"
 onclick="hapusKinerja()">
 Hapus
 </button>
-
-
 </div>
-
-
-
 </div>
-
-
 </div>
 
 <div class="modal" id="editModal">
-
-
 <div class="modal-content">
-
-
 <div class="icon">
 <i>!</i>
 </div>
-
-
 <h3>Edit Data?</h3>
-
-
 <p>
 Apakah Anda yakin ingin mengedit data kinerja ini?
 </p>
-
-
 <div class="modal-action">
-
-
 <button 
 class="cancel"
 onclick="closeEditModal()">
 Batal
 </button>
-
-
 <button 
 class="confirm-edit"
 onclick="goEdit()">
 Ya, Edit
 </button>
-
-
 </div>
-
-
 </div>
-
-
 </div>
 
 </AdminShell>
 
-
-
-
-
 <style>
-
-
 .table-box {
-
 background:white;
-
 border-radius:20px;
-
 padding:25px;
-
 box-shadow:0 12px 30px rgba(15,23,42,.06);
-
 }
-
-
-
 
 .table-header {
-
 display:flex;
-
 justify-content:space-between;
-
 align-items:center;
-
 margin-bottom:20px;
-
 }
-
-
-
 
 .table-header h2 {
-
 margin:0;
-
 font-size:22px;
-
 }
-
-
-
 
 .table-header a {
-
 background:#2563eb;
-
 color:white;
-
 padding:10px 18px;
-
 border-radius:10px;
-
 text-decoration:none;
-
 }
-
-
-
 
 table {
-
 width:100%;
-
 border-collapse:collapse;
-
 }
-
-
-
 
 th {
-
 text-align:left;
-
 padding:15px;
-
 border-bottom:1px solid #ddd;
-
 }
-
-
-
 
 td {
-
 padding:15px;
-
 border-bottom:1px solid #eee;
-
 vertical-align:top;
-
 }
-
-
-
-
 
 .pdf-preview {
-
 width:300px;
-
 height:180px;
-
 overflow:hidden;
-
 border:1px solid #ddd;
-
 border-radius:8px;
-
 }
-
-
-
 
 .pdf-preview iframe {
-
 width:100%;
-
 height:100%;
-
 border:none;
-
 }
-
-
-
-
 
 .edit {
-
 color:#2563eb;
-
 margin-right:12px;
-
 }
-
-
-
 
 .delete {
-
 background:none;
-
 border:none;
-
 color:#ef4444;
-
 cursor:pointer;
-
 font-size:16px;
-
 text-decoration:underline;
-
 }
-
-
-
 
 .modal {
-
 display:none;
-
 position:fixed;
-
 top:0;
-
 left:0;
-
 width:100%;
-
 height:100%;
-
 background:rgba(15,23,42,.45);
-
 align-items:center;
-
 justify-content:center;
-
 z-index:999;
-
 }
-
-
-
 
 .modal-content {
-
 background:white;
-
 width:380px;
-
 padding:30px;
-
 border-radius:20px;
-
 text-align:center;
-
 box-shadow:0 20px 50px rgba(0,0,0,.15);
-
 }
-
-
-
 
 .icon {
 width:60px;
@@ -472,84 +281,44 @@ font-size:32px;
 font-weight:bold;
 }
 
-
-
-
 .modal-content h3 {
-
 font-size:24px;
-
 margin:10px 0;
-
 }
-
-
-
 
 .modal-content p {
-
 color:#64748b;
-
 }
-
-
-
 
 .modal-action {
-
 display:flex;
-
 justify-content:center;
-
 gap:15px;
-
 margin-top:25px;
-
 }
-
-
-
 
 .cancel {
-
 background:#e5e7eb;
-
 border:none;
-
 padding:10px 25px;
-
 border-radius:10px;
-
 cursor:pointer;
-
 }
-
-
-
 
 .confirm-delete {
-
 background:#ef4444;
-
 color:white;
-
 border:none;
-
 padding:10px 25px;
-
 border-radius:10px;
-
 cursor:pointer;
-
 }
-
 
 .action-btn {
 display:flex;
 gap:12px;
 align-items:center;
 }
-
 
 .edit,
 .delete {
@@ -563,16 +332,13 @@ cursor:pointer;
 border:none;
 }
 
-
 .edit {
 background:#dbeafe;
 }
 
-
 .delete {
 background:#fee2e2;
 }
-
 
 .edit svg,
 .delete svg {
@@ -584,123 +350,117 @@ stroke-linecap:round;
 stroke-linejoin:round;
 }
 
-
 .edit svg {
 stroke:#2563eb;
 }
-
 
 .delete svg {
 stroke:#ef4444;
 }
 
 .confirm-edit {
-
 background:#2563eb;
-
 color:white;
-
 border:none;
-
 padding:10px 25px;
-
 border-radius:10px;
-
 cursor:pointer;
-
 }
 
+/* Styling untuk Pagination */
+.pagination-container {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-top: 25px;
+padding-top: 15px;
+border-top: 1px solid #eee;
+font-size: 14px;
+color: #64748b;
+}
+
+.pagination-buttons {
+display: flex;
+gap: 6px;
+}
+
+.page-btn {
+min-width: 38px;
+height: 38px;
+display: flex;
+align-items: center;
+justify-content: center;
+border: 1px solid #e2e8f0;
+border-radius: 8px;
+background: white;
+color: #334155;
+text-decoration: none;
+font-weight: 500;
+transition: all 0.2s;
+}
+
+.page-btn:hover {
+background: #f1f5f9;
+}
+
+.page-btn.active {
+background: #2563eb;
+color: white;
+border-color: #2563eb;
+}
+
+.page-btn.disabled {
+opacity: 0.4;
+pointer-events: none;
+}
 </style>
 
-
-
-
 <script is:inline>
-
 let editId = null;
 let deleteId = null;
 
-
 function openDeleteModal(id){
-
 deleteId = id;
-
 const modal = document.getElementById("deleteModal");
-
 if(modal){
 modal.style.display = "flex";
 }
-
 }
-
-
 
 function closeDeleteModal(){
-
 const modal = document.getElementById("deleteModal");
-
 if(modal){
-
 modal.style.display = "none";
-
 }
-
 }
-
-
 
 function openEditModal(id){
-
 editId = id;
-
 const modal = document.getElementById("editModal");
-
 if(modal){
-
 modal.style.display = "flex";
-
 }
-
 }
-
-
 
 function closeEditModal(){
-
 const modal = document.getElementById("editModal");
-
 if(modal){
-
 modal.style.display = "none";
-
 }
-
 }
-
-
 
 function goEdit(){
-
 if(editId){
-
 window.location.href = `/admin/edit-kinerja?id=${editId}`;
-
 }
-
 }
 
 async function hapusKinerja(){
-
     console.log("hapus id:", deleteId);
-
     const response = await fetch(`/api/${deleteId}`, {
         method:"DELETE"
     });
-
     console.log("status:", response.status);
-
     window.location.reload();
-
 }
-
 </script>

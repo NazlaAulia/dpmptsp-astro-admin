@@ -18,7 +18,7 @@ const semuaLayanan = [
 ];
 ---
 
-<AdminShell title="Tempat Layanan" subtitle="Pantau layanan yang tersedia dan status operasional harian." actionLabel="Tambah Tempat Pelayanan" aactionHref="/admin/layanan/tambah-layanan"
+<AdminShell title="Tempat Layanan" subtitle="Pantau layanan yang tersedia dan status operasional harian." actionLabel="Tambah Tempat Pelayanan" actionHref="/admin/layanan/tambah-layanan">
   <div class="table-container">
     <table class="data-table">
       <thead>
@@ -78,11 +78,11 @@ const semuaLayanan = [
 <script define:vars={{ semuaLayanan: semuaLayanan }}>
   let dataLayanan = [...semuaLayanan];
 
-const layananTambahan = JSON.parse(
-  localStorage.getItem("layananTambahan") || "[]"
-);
+  const layananTambahan = JSON.parse(
+    localStorage.getItem("layananTambahan") || "[]"
+  );
 
-dataLayanan = [...dataLayanan, ...layananTambahan];
+  dataLayanan = [...dataLayanan, ...layananTambahan];
   const itemsPerPage = 5;
   let currentPage = 1;
   let selectedId = null;
@@ -322,37 +322,46 @@ dataLayanan = [...dataLayanan, ...layananTambahan];
   color: #64748b;
 }
 
+/* Ganti seluruh bagian pagination di dalam tag <style> dengan ini: */
+
 .pagination-controls {
   display: flex;
-  gap: 4px;
+  gap: 8px; 
   align-items: center;
 }
 
 .page-btn {
-  padding: 6px 12px;
-  border: 1px solid #cbd5e1;
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e2e8f0;
   background: white;
   color: #334155;
-  border-radius: 8px;
-  font-size: 0.85rem;
+  border-radius: 8px; /* Mengubah sudut menjadi kotak yang rapi */
+  font-size: 0.95rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
-  min-width: 36px;
-  text-align: center;
+  transition: all 0.2s ease-in-out;
+  padding: 0 12px;
 }
 
-.page-btn.hover:not(.disabled) {
-  background: #f8fafc;
-  border-color: #94a3b8;
+/* Efek saat kursor diarahkan ke tombol */
+.page-btn:hover:not(.disabled):not(.active) {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
 }
 
+/* BAGIAN INI UNTUK MENGUBAH TOMBOL AKTIF MENJADI BIRU */
 .page-btn.active {
-  background: #2563eb;
-  color: white;
-  border-color: #2563eb;
-  font-weight: 600;
+  background: #2563eb !important; 
+  color: #ffffff !important;
+  border-color: #2563eb !important;
+  font-weight: 700;
 }
 
+/* Tombol panah/navigasi saat tidak bisa diklik */
 .page-btn.disabled {
   color: #94a3b8;
   background: #f8fafc;
