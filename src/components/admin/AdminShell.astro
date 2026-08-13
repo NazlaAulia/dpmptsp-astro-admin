@@ -2,7 +2,7 @@
 import Sidebar from "./Sidebar.astro";
 import Navbar from "./Navbar.astro";
 
-const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih terarah.", actionLabel = "Tambah Artikel", actionHref = "/admin/tambah-artikel" } = Astro.props;
+const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih terarah.", actionLabel = "Tambah Artikel", actionHref = "/admin/tambah-artikel", showHeader = true } = Astro.props;
 ---
 
 <div class="admin-shell">
@@ -11,22 +11,26 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
   <div class="main-panel">
     <Navbar />
 
-    <main class="content">
-      <section class="page-header">
-        <div>
-          <p class="eyebrow">Panel Administrasi</p>
-          <h1>{title}</h1>
-          <p class="subtitle">{subtitle}</p>
-        </div>
+<main class="content">
 
-        <div class="page-actions">
-          <a href="/admin/artikel" class="ghost-action">Kelola Konten</a>
-          <a href={actionHref} class="primary-action">+ {actionLabel}</a>
-        </div>
-      </section>
+  {showHeader && (
+    <section class="page-header">
+      <div>
+        <p class="eyebrow">Panel Administrasi</p>
+        <h1>{title}</h1>
+        <p class="subtitle">{subtitle}</p>
+      </div>
 
-      <slot />
-    </main>
+      <div class="page-actions">
+        <a href="/admin/artikel" class="ghost-action">Kelola Konten</a>
+        <a href={actionHref} class="primary-action">+ {actionLabel}</a>
+      </div>
+    </section>
+  )}
+
+  <slot />
+
+</main>
   </div>
 </div>
 

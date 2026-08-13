@@ -44,3 +44,43 @@ status:200
 
 
 }
+
+export async function DELETE({ params }) {
+
+    const id = Number(params.id);
+
+    if (!id) {
+
+        return new Response(
+            JSON.stringify({
+                success: false,
+                message: "ID tidak valid"
+            }),
+            {
+                status: 400
+            }
+        );
+
+    }
+
+
+    const [result] = await db.query(
+        `
+        DELETE FROM twdata
+        WHERE id = ?
+        `,
+        [id]
+    );
+
+
+    return new Response(
+        JSON.stringify({
+            success: true,
+            message: "Data berhasil dihapus"
+        }),
+        {
+            status: 200
+        }
+    );
+
+}
