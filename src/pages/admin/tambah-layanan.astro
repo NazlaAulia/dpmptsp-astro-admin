@@ -91,69 +91,132 @@ import AdminShell from "../../components/admin/AdminShell.astro";
 </AdminShell>
 
 <script>
-  const form = document.getElementById("layanan-form") as HTMLFormElement;
-  const gambarInput = document.getElementById("gambar") as HTMLInputElement;
-  const fileName = document.getElementById("file-name") as HTMLElement;
+const form = document.getElementById("layanan-form") as HTMLFormElement;
+const gambarInput = document.getElementById("gambar") as HTMLInputElement;
+const fileName = document.getElementById("file-name") as HTMLElement;
 
-  gambarInput.addEventListener("change", () => {
-    const file = gambarInput.files?.[0];
 
-    if (file) {
-      fileName.innerText = file.name;
-    } else {
-      fileName.innerText = "Pilih gambar";
-    }
-  });
+gambarInput.addEventListener("change", () => {
+  const file = gambarInput.files?.[0];
 
-  document.getElementById("btn-kembali")?.addEventListener("click", () => {
-    window.location.href = "/admin/layanan";
-  });
+  if(file){
+    fileName.innerText = file.name;
+  }else{
+    fileName.innerText = "Pilih gambar";
+  }
+});
 
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
 
-    const file = gambarInput.files?.[0];
+document.getElementById("btn-kembali")?.addEventListener("click",()=>{
+  window.location.href="/admin/layanan";
+});
 
-    if (!file) {
-      alert("Silakan pilih gambar layanan.");
-      return;
-    }
 
-    if (file.size > 2 * 1024 * 1024) {
-      alert("Ukuran gambar maksimal 2 MB.");
-      return;
-    }
+form.addEventListener("submit", async(e)=>{
 
-    const reader = new FileReader();
+  e.preventDefault();
 
-    reader.onload = () => {
-      const layananBaru = {
-        id: Date.now(),
-        judul: (document.getElementById("judul") as HTMLInputElement).value,
-        lokasi: (document.getElementById("lokasi") as HTMLInputElement).value,
-        alamat: (document.getElementById("alamat") as HTMLTextAreaElement).value,
-        gambar: reader.result as string,
-        alt: (document.getElementById("alt") as HTMLInputElement).value
-      };
 
-      const dataLama = JSON.parse(
-        localStorage.getItem("layananTambahan") || "[]"
-      );
+  const file = gambarInput.files?.[0];
 
-      dataLama.push(layananBaru);
 
-      localStorage.setItem(
-        "layananTambahan",
-        JSON.stringify(dataLama)
-      );
+  if(!file){
+    alert("Pilih gambar terlebih dahulu");
+    return;
+  }
 
-      alert("Tempat layanan berhasil ditambahkan.");
 
-      window.location.href = "/admin/layanan";
+  if(file.size > 2 * 1024 * 1024){
+    alert("Ukuran gambar maksimal 2MB");
+    return;
+  }
+
+
+
+  const reader = new FileReader();
+
+
+  reader.onload = async()=>{
+
+
+    const data = {
+
+      judul:
+      (document.getElementById("judul") as HTMLInputElement).value,
+
+
+      deskripsi:"",
+
+
+      gambar: reader.result,
+
+
+      alt_text:
+      (document.getElementById("alt") as HTMLInputElement).value,
+
+
+      lokasi:
+      (document.getElementById("lokasi") as HTMLInputElement).value,
+
+
+      alamat:
+      (document.getElementById("alamat") as HTMLTextAreaElement).value
+
     };
 
-    reader.readAsDataURL(file);
-  });
+
+
+    try{
+
+
+     const response = await fetch("/api/layanan", {
+  method:"POST",
+  headers:{
+    "Content-Type":"application/json"
+  },
+  body:JSON.stringify(data)
+});
+
+
+      const result = await response.json();
+
+
+      console.log(result);
+
+
+
+      if(result.success){
+
+        alert("Tempat layanan berhasil ditambahkan");
+
+        window.location.href="/admin/layanan";
+
+      }else{
+
+        alert("Gagal menambahkan data");
+
+      }
+
+
+
+    }catch(error){
+
+      console.error(error);
+
+      alert("Terjadi error saat menyimpan data");
+
+    }
+
+
+
+  };
+
+
+  reader.readAsDataURL(file);
+
+
+});
+
 </script>
 
 <style>

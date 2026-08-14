@@ -1,24 +1,13 @@
 ---
 import AdminShell from "../../components/admin/AdminShell.astro";
+import { db } from "../../lib/db.js";
 
-const semuaLayanan = [
-  { id: 13, judul: "SPP PAKAL", lokasi: "https://maps.app.goo.gl/NqAj6LLWN8KZpUTp9", alamat: "SPP Pakal, Kec. Pakal, Surabaya, Jawa Timur", gambar: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=150&q=80" },
-  { id: 12, judul: "SPP NAMBANGAN", lokasi: "https://maps.app.goo.gl/YqrTVqMSDYBE6Mbk9", alamat: "SPP NAMBANGAN, Taman Segoro, Jl. Nambangan, Tanah Kali Kedinding, Kenjeran, Surabaya, East Java 60129", gambar: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=150&q=80" },
-  { id: 4, judul: "PTSP TIMUR", lokasi: "https://maps.app.goo.gl/uQTPY3GLz1wwIju7", alamat: "Jl. Raya Menur No.31 C, Manyar Sabrangan, Kec. Mulyorejo, Surabaya, Jawa Timur 60141", gambar: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=150&q=80" },
-  { id: 3, judul: "PTSP BARAT", lokasi: "https://maps.app.goo.gl/example1", alamat: "Jl. Darmo No. 12, Surabaya", gambar: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=150&q=80" },
-  { id: 2, judul: "PTSP UTARA", lokasi: "https://maps.app.goo.gl/example2", alamat: "Jl. Indrapura No. 5, Surabaya", gambar: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=150&q=80" },
-  { id: 1, judul: "PTSP SELATAN", lokasi: "https://maps.app.goo.gl/example3", alamat: "Jl. Ahmad Yani No. 88, Surabaya", gambar: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=150&q=80" },
-  { id: 7, judul: "SPP RUNGKUT", lokasi: "https://maps.app.goo.gl/example4", alamat: "Jl. Rungkut Industri Raya", gambar: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=150&q=80" },
-  { id: 8, judul: "SPP TANDES", lokasi: "https://maps.app.goo.gl/example5", alamat: "Jl. Margomulyo", gambar: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=150&q=80" },
-  { id: 9, judul: "SPP GUBENG", lokasi: "https://maps.app.goo.gl/example6", alamat: "Jl. Gubeng Airlangga", gambar: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=150&q=80" },
-  { id: 10, judul: "SPP KEPUTIH", lokasi: "https://maps.app.goo.gl/example7", alamat: "Jl. Keputih Tegal", gambar: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=150&q=80" },
-  { id: 11, judul: "SPP WONOKROMO", lokasi: "https://maps.app.goo.gl/example8", alamat: "Jl. Joyoboyo", gambar: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=150&q=80" },
-  { id: 14, judul: "SPP KENJERAN", lokasi: "https://maps.app.goo.gl/example9", alamat: "Jl. Kenjeran Baru", gambar: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=150&q=80" },
-  { id: 15, judul: "SPP MERR", lokasi: "https://maps.app.goo.gl/example10", alamat: "Jl. Ir. Soekarno", gambar: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=150&q=80" },
-];
+const [semuaLayanan] = await db.query(
+  "SELECT * FROM tempat_layanan ORDER BY id DESC"
+);
 ---
 
-<AdminShell title="Tempat Layanan" subtitle="Pantau layanan yang tersedia dan status operasional harian." actionLabel="Tambah Tempat Pelayanan" actionHref="/admin/layanan/tambah-layanan">
+<AdminShell title="Tempat Layanan" subtitle="Pantau layanan yang tersedia dan status operasional harian." actionLabel="Tambah Tempat Pelayanan" actionHref="/admin/tambah-layanan">
   <div class="table-container">
     <table class="data-table">
       <thead>
@@ -78,11 +67,6 @@ const semuaLayanan = [
 <script define:vars={{ semuaLayanan: semuaLayanan }}>
   let dataLayanan = [...semuaLayanan];
 
-  const layananTambahan = JSON.parse(
-    localStorage.getItem("layananTambahan") || "[]"
-  );
-
-  dataLayanan = [...dataLayanan, ...layananTambahan];
   const itemsPerPage = 5;
   let currentPage = 1;
   let selectedId = null;
@@ -215,7 +199,7 @@ document.getElementById("edit-ya").addEventListener("click", () => {
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  text-align: left;
+  table-layout: fixed; /* PENTING: Ini memaksa kolom tabel tidak melebar */
   font-size: 0.9rem;
 }
 
