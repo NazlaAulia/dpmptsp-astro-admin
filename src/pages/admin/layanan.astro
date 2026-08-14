@@ -180,13 +180,11 @@ const semuaLayanan = [
     selectedId = null;
   });
 
-  document.getElementById("edit-ya").addEventListener("click", () => {
-    if (selectedId !== null) {
-      alert(`Mengarahkan ke halaman edit untuk ID: ${selectedId}`);
-      document.getElementById("edit-modal").style.display = "none";
-      selectedId = null;
-    }
-  });
+document.getElementById("edit-ya").addEventListener("click", () => {
+  if (selectedId !== null) {
+    window.location.href = `/admin/edit-layanan?id=${selectedId}`;
+  }
+});
 
   document.getElementById("delete-batal").addEventListener("click", () => {
     document.getElementById("delete-modal").style.display = "none";
