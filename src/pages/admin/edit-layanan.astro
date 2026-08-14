@@ -1,0 +1,407 @@
+---
+import AdminShell from "../../components/admin/AdminShell.astro";
+---
+
+<AdminShell title="Edit Tempat Layanan" subtitle="Perbarui data tempat layanan.">
+
+  <div class="form-container">
+
+    <div class="form-header">
+      <div class="form-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+          <path d="M3 9h18"></path>
+          <path d="M9 21V9"></path>
+        </svg>
+      </div>
+
+      <h1>Edit Tempat Layanan Website</h1>
+    </div>
+
+    <form id="layanan-form">
+
+      <div class="form-group">
+        <label for="judul">Title <span>*</span></label>
+        <input
+          type="text"
+          id="judul"
+          placeholder="Judul"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="gambar">Gambar Layanan</label>
+        <p class="form-info">
+          Format Foto: png, jpg, jpeg (Maks: 2 MB)
+        </p>
+
+        <div class="file-upload">
+          <input
+            type="file"
+            id="gambar"
+            accept=".png,.jpg,.jpeg"
+          />
+
+          <label for="gambar" class="file-label">
+            <span id="file-name">Pilih gambar baru</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="alt">Alt Text <span>*</span></label>
+        <input
+          type="text"
+          id="alt"
+          placeholder="Alt Text"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="lokasi">Location <span>*</span></label>
+        <input
+          type="url"
+          id="lokasi"
+          placeholder="Lokasi"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="alamat">Alamat <span>*</span></label>
+        <textarea
+          id="alamat"
+          placeholder="Alamat"
+          required
+        ></textarea>
+      </div>
+
+      <div class="form-actions">
+
+        <button type="button" class="btn-kembali" id="btn-kembali">
+          Kembali
+        </button>
+
+        <button type="submit" class="btn-simpan">
+          Simpan Perubahan
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</AdminShell>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const id = Number(params.get("id"));
+
+  const dataLayanan = [
+    {
+      id: 13,
+      judul: "SPP PAKAL",
+      lokasi: "https://maps.app.goo.gl/NqAj6LLWN8KZpUTp9",
+      alamat: "SPP Pakal, Kec. Pakal, Surabaya, Jawa Timur",
+      gambar: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=150&q=80",
+      alt: "SPP PAKAL"
+    },
+    {
+      id: 12,
+      judul: "SPP NAMBANGAN",
+      lokasi: "https://maps.app.goo.gl/YqrTVqMSDYBE6Mbk9",
+      alamat: "SPP NAMBANGAN, Taman Segoro, Jl. Nambangan, Tanah Kali Kedinding, Kenjeran, Surabaya, East Java 60129",
+      gambar: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=150&q=80",
+      alt: "SPP NAMBANGAN"
+    },
+    {
+      id: 4,
+      judul: "PTSP TIMUR",
+      lokasi: "https://maps.app.goo.gl/uQTPY3GLz1wwIju7",
+      alamat: "Jl. Raya Menur No.31 C, Manyar Sabrangan, Kec. Mulyorejo, Surabaya, Jawa Timur 60141",
+      gambar: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=150&q=80",
+      alt: "PTSP TIMUR"
+    },
+    {
+      id: 3,
+      judul: "PTSP BARAT",
+      lokasi: "https://maps.app.goo.gl/example1",
+      alamat: "Jl. Darmo No. 12, Surabaya",
+      gambar: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=150&q=80",
+      alt: "PTSP BARAT"
+    },
+    {
+      id: 2,
+      judul: "PTSP UTARA",
+      lokasi: "https://maps.app.goo.gl/example2",
+      alamat: "Jl. Indrapura No. 5, Surabaya",
+      gambar: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=150&q=80",
+      alt: "PTSP UTARA"
+    },
+    {
+      id: 1,
+      judul: "PTSP SELATAN",
+      lokasi: "https://maps.app.goo.gl/example3",
+      alamat: "Jl. Ahmad Yani No. 88, Surabaya",
+      gambar: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=150&q=80",
+      alt: "PTSP SELATAN"
+    },
+    {
+      id: 7,
+      judul: "SPP RUNGKUT",
+      lokasi: "https://maps.app.goo.gl/example4",
+      alamat: "Jl. Rungkut Industri Raya",
+      gambar: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=150&q=80",
+      alt: "SPP RUNGKUT"
+    },
+    {
+      id: 8,
+      judul: "SPP TANDES",
+      lokasi: "https://maps.app.goo.gl/example5",
+      alamat: "Jl. Margomulyo",
+      gambar: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=150&q=80",
+      alt: "SPP TANDES"
+    },
+    {
+      id: 9,
+      judul: "SPP GUBENG",
+      lokasi: "https://maps.app.goo.gl/example6",
+      alamat: "Jl. Gubeng Airlangga",
+      gambar: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=150&q=80",
+      alt: "SPP GUBENG"
+    },
+    {
+      id: 10,
+      judul: "SPP KEPUTIH",
+      lokasi: "https://maps.app.goo.gl/example7",
+      alamat: "Jl. Keputih Tegal",
+      gambar: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=150&q=80",
+      alt: "SPP KEPUTIH"
+    },
+    {
+      id: 11,
+      judul: "SPP WONOKROMO",
+      lokasi: "https://maps.app.goo.gl/example8",
+      alamat: "Jl. Joyoboyo",
+      gambar: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=150&q=80",
+      alt: "SPP WONOKROMO"
+    },
+    {
+      id: 14,
+      judul: "SPP KENJERAN",
+      lokasi: "https://maps.app.goo.gl/example9",
+      alamat: "Jl. Kenjeran Baru",
+      gambar: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=150&q=80",
+      alt: "SPP KENJERAN"
+    },
+    {
+      id: 15,
+      judul: "SPP MERR",
+      lokasi: "https://maps.app.goo.gl/example10",
+      alamat: "Jl. Ir. Soekarno",
+      gambar: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=150&q=80",
+      alt: "SPP MERR"
+    }
+  ];
+
+  const layananTambahan = JSON.parse(
+    localStorage.getItem("layananTambahan") || "[]"
+  );
+
+  const semuaData = [...dataLayanan, ...layananTambahan];
+
+  const data = semuaData.find(item => item.id === id);
+
+  if (data) {
+    (document.getElementById("judul") as HTMLInputElement).value = data.judul;
+    (document.getElementById("alt") as HTMLInputElement).value =
+      data.alt || data.judul;
+    (document.getElementById("lokasi") as HTMLInputElement).value = data.lokasi;
+    (document.getElementById("alamat") as HTMLTextAreaElement).value =
+      data.alamat;
+  }
+
+  const gambarInput = document.getElementById("gambar") as HTMLInputElement;
+  const fileName = document.getElementById("file-name") as HTMLElement;
+
+  gambarInput.addEventListener("change", () => {
+    const file = gambarInput.files?.[0];
+
+    if (file) {
+      fileName.innerText = file.name;
+    } else {
+      fileName.innerText = "Pilih gambar baru";
+    }
+  });
+
+  document.getElementById("btn-kembali")?.addEventListener("click", () => {
+    window.location.href = "/admin/layanan";
+  });
+
+  document.getElementById("layanan-form")?.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    alert("Halaman edit berhasil digunakan.");
+  });
+</script>
+
+<style>
+  .form-container {
+    background: white;
+    border-radius: 20px;
+    padding: 36px 42px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+    margin-top: 20px;
+  }
+
+  .form-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 42px;
+  }
+
+  .form-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: #2563eb;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .form-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #0f172a;
+    font-weight: 700;
+  }
+
+  .form-group {
+    margin-bottom: 30px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #172033;
+    margin-bottom: 10px;
+  }
+
+  .form-group label span {
+    color: #ef4444;
+  }
+
+  .form-info {
+    color: #94a3b8;
+    margin: 0 0 12px;
+    font-size: 0.9rem;
+  }
+
+  .form-group input[type="text"],
+  .form-group input[type="url"],
+  .form-group textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: none;
+    outline: none;
+    background: #f1f5f9;
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-size: 1rem;
+    color: #172033;
+    font-family: inherit;
+  }
+
+  .form-group input[type="text"],
+  .form-group input[type="url"] {
+    height: 60px;
+  }
+
+  .form-group textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus {
+    box-shadow: 0 0 0 2px #bfdbfe;
+  }
+
+  .file-upload {
+    position: relative;
+    width: 100%;
+    min-height: 160px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 2px dashed #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .file-upload input {
+    display: none;
+  }
+
+  .file-label {
+    cursor: pointer;
+    width: 100%;
+    height: 160px;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8 !important;
+    font-weight: 500 !important;
+    margin: 0 !important;
+  }
+
+  .file-label:hover {
+    background: #f1f5f9;
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    margin-top: 40px;
+  }
+
+  .btn-simpan,
+  .btn-kembali {
+    border: none;
+    border-radius: 10px;
+    padding: 14px 32px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-simpan {
+    background: #0ea5e9;
+    color: white;
+  }
+
+  .btn-simpan:hover {
+    background: #0284c7;
+  }
+
+  .btn-kembali {
+    background: #e2e8f0;
+    color: #334155;
+  }
+
+  .btn-kembali:hover {
+    background: #cbd5e1;
+  }
+</style>
