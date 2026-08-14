@@ -175,14 +175,42 @@ document.getElementById("edit-ya").addEventListener("click", () => {
     selectedId = null;
   });
 
-  document.getElementById("delete-ya").addEventListener("click", () => {
-    if (selectedId !== null) {
-      dataLayanan = dataLayanan.filter(item => item.id !== selectedId);
-      document.getElementById("delete-modal").style.display = "none";
-      selectedId = null;
-      renderTable(currentPage);
+document.getElementById("delete-ya").addEventListener("click", async () => {
+  if (selectedId !== null) {
+
+    try {
+      const response = await fetch("/api/hapus-layanan", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          id: selectedId
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+
+        dataLayanan = dataLayanan.filter(item => item.id !== selectedId);
+
+        document.getElementById("delete-modal").style.display = "none";
+        selectedId = null;
+
+        renderTable(currentPage);
+
+      } else {
+        console.error("Gagal menghapus layanan");
+      }
+
+    } catch (error) {
+
+      console.error("Terjadi error saat menghapus layanan:", error);
+
     }
-  });
+  }
+});
 
   renderTable(1);
 </script>
