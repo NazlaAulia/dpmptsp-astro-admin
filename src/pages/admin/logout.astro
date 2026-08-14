@@ -1,0 +1,10 @@
+---
+// Server-side logout: clear cookie then redirect to login
+export const prerender = false;
+
+// Clear the admin-auth cookie
+Astro.cookies.set('admin-auth', '', { path: '/', maxAge: 0, httpOnly: true, sameSite: 'lax' });
+
+// Redirect back to login page
+return Astro.redirect('/admin/login');
+---

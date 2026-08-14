@@ -32,7 +32,7 @@ if (Astro.request.method === "POST") {
       return Astro.redirect("/admin/dashboard");
     }
 
-    error = result.error;
+    error = result.error ?? "Gagal melakukan login.";
   } catch (e) {
     console.error("LOGIN ERROR:", e);
     error = "Terjadi kesalahan pada server.";
