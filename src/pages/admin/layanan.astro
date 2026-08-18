@@ -89,7 +89,7 @@ const [semuaLayanan] = await db.query(
       tr.innerHTML = `
         <td>${item.id}</td>
         <td class="fw-bold">${item.judul}</td>
-        <td><a href="${item.lokasi}" target="_blank" class="map-link">${item.lokasi}</a></td>
+        <td><a href="${item.lokasi}" target="_blank" class="map-link" title="${item.lokasi}">${item.lokasi}</a></td>
         <td>${item.alamat}</td>
         <td><img src="${item.gambar}" alt="${item.judul}" class="thumb-img" /></td>
         <td>
@@ -164,53 +164,45 @@ const [semuaLayanan] = await db.query(
     selectedId = null;
   });
 
-document.getElementById("edit-ya").addEventListener("click", () => {
-  if (selectedId !== null) {
-    window.location.href = `/admin/edit-layanan?id=${selectedId}`;
-  }
-});
+  document.getElementById("edit-ya").addEventListener("click", () => {
+    if (selectedId !== null) {
+      window.location.href = `/admin/edit-layanan?id=${selectedId}`;
+    }
+  });
 
   document.getElementById("delete-batal").addEventListener("click", () => {
     document.getElementById("delete-modal").style.display = "none";
     selectedId = null;
   });
 
-document.getElementById("delete-ya").addEventListener("click", async () => {
-  if (selectedId !== null) {
+  document.getElementById("delete-ya").addEventListener("click", async () => {
+    if (selectedId !== null) {
+      try {
+        const response = await fetch("/api/hapus-layanan", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            id: selectedId
+          })
+        });
 
-    try {
-      const response = await fetch("/api/hapus-layanan", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          id: selectedId
-        })
-      });
+        const result = await response.json();
 
-      const result = await response.json();
-
-      if (result.success) {
-
-        dataLayanan = dataLayanan.filter(item => item.id !== selectedId);
-
-        document.getElementById("delete-modal").style.display = "none";
-        selectedId = null;
-
-        renderTable(currentPage);
-
-      } else {
-        console.error("Gagal menghapus layanan");
+        if (result.success) {
+          dataLayanan = dataLayanan.filter(item => item.id !== selectedId);
+          document.getElementById("delete-modal").style.display = "none";
+          selectedId = null;
+          renderTable(currentPage);
+        } else {
+          console.error("Gagal menghapus layanan");
+        }
+      } catch (error) {
+        console.error("Terjadi error saat menghapus layanan:", error);
       }
-
-    } catch (error) {
-
-      console.error("Terjadi error saat menghapus layanan:", error);
-
     }
-  }
-});
+  });
 
   renderTable(1);
 </script>
@@ -227,53 +219,62 @@ document.getElementById("delete-ya").addEventListener("click", async () => {
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed; /* PENTING: Ini memaksa kolom tabel tidak melebar */
+  table-layout: fixed;
   font-size: 0.9rem;
 }
 
+/* Atur lebar pasti tiap kolom secara konsisten */
+.data-table th:nth-child(1), .data-table td:nth-child(1) { width: 50px; }   /* ID */
+.data-table th:nth-child(2), .data-table td:nth-child(2) { width: 140px; }  /* Judul */
+.data-table th:nth-child(3), .data-table td:nth-child(3) { width: 180px; }  /* Lokasi */
+.data-table th:nth-child(4), .data-table td:nth-child(4) { width: 220px; }  /* Alamat */
+.data-table th:nth-child(5), .data-table td:nth-child(5) { width: 130px; }  /* Gambar */
+.data-table th:nth-child(6), .data-table td:nth-child(6) { width: 90px; }   /* Aksi */
+
 .data-table th,
+/* Pastikan sel tabel mengunci area dan tidak membiarkan konten jebol */
 .data-table td {
-  padding: 14px 12px;
+  padding: 14px 10px;
   border-bottom: 1px solid #f1f5f9;
-  vertical-align: middle;
-}
-
-.data-table th {
-  font-weight: 700;
-  color: #1e293b;
-  background: #f8fafc;
-}
-
-.fw-bold {
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.map-link {
-  color: #2563eb;
-  text-decoration: none;
-  max-width: 180px;
-  display: inline-block;
-  white-space: nowrap;
+  vertical-align: top;
   overflow: hidden;
-  text-overflow: ellipsis;
+}
+
+/* Khusus kolom Lokasi (kolom ke-3) */
+.data-table td:nth-child(3) {
+  width: 180px !important;
+  max-width: 180px !important;
+  white-space: normal !important;
+}
+
+/* Paksa link URL yang panjang agar terpotong dan turun ke bawah */
+.map-link {
+  display: inline-block !important;
+  max-width: 100% !important;
+  white-space: normal !important;
+  word-break: break-all !important;
+  overflow-wrap: break-word !important;
+  color: #2563eb;
+  text-decoration: underline;
 }
 
 .map-link:hover {
   text-decoration: underline;
 }
-
-.thumb-img {
-  width: 80px;
-  height: 50px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 8px;
-  align-items: center;
+:global(.thumb-img) {
+  width: 120px !important;
+  height: 72px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
+  min-height: 72px !important;
+  max-height: 72px !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  border-radius: 10px !important;
+  display: block !important;
+  margin: 0 auto !important;
+  border: 1px solid #e2e8f0 !important;
+  background: #f8fafc !important;
 }
 
 /* TOMBOL AKSI */
@@ -332,8 +333,6 @@ document.getElementById("delete-ya").addEventListener("click", async () => {
   color: #64748b;
 }
 
-/* Ganti seluruh bagian pagination di dalam tag <style> dengan ini: */
-
 .pagination-controls {
   display: flex;
   gap: 8px; 
@@ -349,7 +348,7 @@ document.getElementById("delete-ya").addEventListener("click", async () => {
   border: 1px solid #e2e8f0;
   background: white;
   color: #334155;
-  border-radius: 8px; /* Mengubah sudut menjadi kotak yang rapi */
+  border-radius: 8px;
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
@@ -357,13 +356,11 @@ document.getElementById("delete-ya").addEventListener("click", async () => {
   padding: 0 12px;
 }
 
-/* Efek saat kursor diarahkan ke tombol */
 .page-btn:hover:not(.disabled):not(.active) {
   background: #f1f5f9;
   border-color: #cbd5e1;
 }
 
-/* BAGIAN INI UNTUK MENGUBAH TOMBOL AKTIF MENJADI BIRU */
 .page-btn.active {
   background: #2563eb !important; 
   color: #ffffff !important;
@@ -371,7 +368,6 @@ document.getElementById("delete-ya").addEventListener("click", async () => {
   font-weight: 700;
 }
 
-/* Tombol panah/navigasi saat tidak bisa diklik */
 .page-btn.disabled {
   color: #94a3b8;
   background: #f8fafc;
@@ -498,5 +494,26 @@ document.getElementById("delete-ya").addEventListener("click", async () => {
 
 .btn-hapus:hover {
   background: #dc2626;
+}
+
+/* URL Google Maps supaya turun ke bawah */
+td a {
+    display: block;
+    max-width: 250px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+table {
+    width: 100%;
+    table-layout: fixed;
+
+}
+
+th:nth-child(3),
+td:nth-child(3) {
+    width: 250px;
+    max-width: 250px;
 }
 </style>
