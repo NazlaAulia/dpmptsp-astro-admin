@@ -1,44 +1,289 @@
 ---
 import AdminShell from "../../components/admin/AdminShell.astro";
 
-const fitur = [
-  { title: "Integrasi dashboard", detail: "Menyatukan data artikel, layanan, dan notifikasi dalam satu panel." },
-  { title: "Respons cepat", detail: "Mempermudah admin mengelola konten tanpa berpindah halaman." },
-  { title: "Akses mudah", detail: "Tampilan baru dibuat agar navigasi lebih intuitif untuk tim administrasi." },
+const daftarInovasi = [
+  {
+    id: 10,
+    namaKonten: "KLINIK INVESTASI",
+    isi: "Lokasi strategis pusat kota, fasilitas nyaman (cafe, ruang tamu, CS, TV Display, WiFi) Konsultasi, matchmaking, data ekonomi, forum komunikasi.",
+    foto: "KLINIK-INVESTASI-2025-07-15._0.png",
+    judul: "Klinik Investasi",
+    keterangan: "Inovasi pelayanan investasi terpadu",
+    tags: "klinik-investasi",
+  },
 ];
 ---
 
-<AdminShell title="Inovasi" subtitle="Lihat fitur-fitur yang memudahkan pengelolaan admin." actionLabel="Tambah Konten" actionHref="/admin/konten">
-  <div class="list-card">
-    {fitur.map((item) => (
-      <article class="item">
-        <h3>{item.title}</h3>
-        <p>{item.detail}</p>
-      </article>
-    ))}
+<AdminShell 
+  title="Daftar Inovasi Website" 
+  subtitle="Kelola data inovasi yang ditampilkan pada website." 
+  actionLabel="Tambah Inovasi" 
+  actionHref="/admin/tambah-inovasi"
+>
+  <div class="card-table-container">
+    {/* Baris Kontrol: Entri & Pencarian */}
+    <div class="table-controls">
+      <div class="entries-wrapper">
+        Tampilkan 
+        <select class="select-entries">
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+        </select> 
+        entri
+      </div>
+      <div class="search-wrapper">
+        <label for="search">Cari:</label>
+        <input type="text" id="search" placeholder="Cari data..." class="search-input" />
+      </div>
+    </div>
+
+    {/* Wrapper Tabel */}
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th class="col-id">ID</th>
+            <th>Nama Konten</th>
+            <th class="col-isi">Isi</th>
+            <th>Foto</th>
+            <th>Judul</th>
+            <th>Keterangan</th>
+            <th>Tags</th>
+            <th class="col-aksi">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {daftarInovasi.length > 0 ? (
+            daftarInovasi.map((item) => (
+              <tr>
+                <td class="fw-medium text-center">{item.id}</td>
+                <td><strong>{item.namaKonten}</strong></td>
+                <td>
+                  <div class="wrap-text">{item.isi}</div>
+                </td>
+                <td>
+                  <span class="file-name" title={item.foto}>{item.foto}</span>
+                </td>
+                <td>{item.judul}</td>
+                <td>{item.keterangan}</td>
+                <td>
+                  <span class="badge-tag">{item.tags}</span>
+                </td>
+<td>
+  <div class="action-buttons">
+    {/* Tombol Edit (Ikon Pensil) */}
+    <a href={`/admin/inovasi/edit/${item.id}`} class="btn-action edit" title="Edit">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+      </svg>
+    </a>
+
+    {/* Tombol Hapus (Ikon Tong Sampah) */}
+    <button class="btn-action delete" title="Hapus" onclick={`alert('Hapus ID ${item.id}?')`}>
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 6 5 6 21 6"></polyline>
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+      </svg>
+    </button>
+  </div>
+</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colspan="8" class="text-center">Tidak ada data ditemukan.</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+
+    {/* Footer Tabel / Paginasi */}
+    <div class="table-footer">
+      <div class="table-info">Menampilkan 1 sampai {daftarInovasi.length} dari {daftarInovasi.length} entri</div>
+      <div class="pagination">
+        <button class="page-btn" disabled>Sebelumnya</button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn" disabled>Selanjutnya</button>
+      </div>
+    </div>
   </div>
 </AdminShell>
 
 <style>
-.list-card {
+.card-table-container {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.04);
+  border: 1px solid #f1f5f9;
+}
+
+.table-controls {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 14px;
+  color: #475569;
+}
+
+.select-entries {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background-color: #fff;
+  margin: 0 6px;
+  outline: none;
+}
+
+.search-input {
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  margin-left: 6px;
+  outline: none;
+  font-size: 14px;
+  width: 200px;
+}
+
+.search-input:focus, .select-entries:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.data-table th {
+  background: #f8fafc;
+  color: #1e293b;
+  padding: 14px 16px;
+  border-bottom: 2px solid #e2e8f0;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 16px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+  vertical-align: top;
+}
+
+/* Mengatur agar teks turun ke bawah secara natural (tidak terpotong satu baris) */
+.wrap-text {
+  min-width: 220px;
+  max-width: 350px;
+  white-space: normal;
+  word-wrap: break-word;
+  line-height: 1.5;
+}
+
+.file-name {
+  display: inline-block;
+  max-width: 150px;
+  white-space: normal;
+  word-wrap: break-word;
+  color: #2563eb;
+  line-height: 1.4;
+}
+
+.badge-tag {
+  background: #eff6ff;
+  color: #1d4ed8;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.btn-action {
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.btn-action.edit {
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.btn-action.edit:hover {
+  background: #dbeafe;
+}
+
+.btn-action.delete {
+  color: #dc2626;
+  background: #fef2f2;
+}
+
+.btn-action.delete:hover {
+  background: #fee2e2;
+}
+
+.table-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  font-size: 14px;
+  color: #64748b;
+  flex-wrap: wrap;
   gap: 12px;
 }
 
-.item {
+.pagination {
+  display: flex;
+  gap: 6px;
+}
+
+.page-btn {
+  padding: 7px 14px;
+  border: 1px solid #cbd5e1;
   background: white;
-  border-radius: 16px;
-  padding: 16px 18px;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #334155;
+  font-weight: 500;
 }
 
-.item h3 {
-  margin: 0 0 6px;
+.page-btn.active {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
 }
 
-.item p {
-  margin: 0;
-  color: #64748b;
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #f8fafc;
 }
 </style>

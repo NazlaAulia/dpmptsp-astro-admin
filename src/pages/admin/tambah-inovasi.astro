@@ -1,0 +1,158 @@
+---
+import AdminShell from "../../components/admin/AdminShell.astro";
+---
+
+<!-- Tambahkan showHeader={false} di bawah ini -->
+<AdminShell title="" subtitle="" showHeader={false}>
+  <div class="page-header-simple">
+    <h2>Tambah Inovasi</h2>
+    <a href="/admin/inovasi" class="btn-back">+ Kembali</a>
+  </div>
+
+  <div class="card-form-container">
+    <form action="/admin/inovasi" method="POST">
+      <div class="form-group">
+        <label for="namaKonten">Nama Konten</label>
+        <input type="text" id="namaKonten" name="namaKonten" placeholder="Masukkan nama konten..." required />
+      </div>
+
+      <div class="form-group">
+        <label for="judul">Judul</label>
+        <input type="text" id="judul" name="judul" placeholder="Masukkan judul inovasi..." required />
+      </div>
+
+      <div class="form-group">
+        <label for="isi">Isi</label>
+        <textarea id="isi" name="isi" rows="4" placeholder="Tuliskan isi atau deskripsi inovasi..." required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="keterangan">Keterangan</label>
+        <input type="text" id="keterangan" name="keterangan" placeholder="Keterangan singkat..." />
+      </div>
+
+      <div class="form-group">
+        <label for="tags">Tags</label>
+        <input type="text" id="tags" name="tags" placeholder="Contoh: klinik-investasi" />
+      </div>
+
+      <div class="form-group">
+        <label for="foto">Upload Foto</label>
+        <input type="file" id="foto" name="foto" />
+      </div>
+
+      <div class="form-actions">
+        <a href="/admin/inovasi" class="btn-cancel">Batal</a>
+        <button type="submit" class="btn-submit">Simpan Inovasi</button>
+      </div>
+    </form>
+  </div>
+</AdminShell>
+
+<style>
+.page-header-simple {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.page-header-simple h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.btn-back {
+  background: #0284c7;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.btn-back:hover {
+  opacity: 0.9;
+}
+
+.card-form-container {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.04);
+  border: 1px solid #f1f5f9;
+  max-width: 100%;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.form-group input[type="text"],
+.form-group textarea,
+.form-group input[type="file"] {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+  outline: none;
+  color: #334155;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.btn-cancel {
+  padding: 9px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  background: #f1f5f9;
+  color: #475569;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.btn-cancel:hover {
+  background: #e2e8f0;
+}
+
+.btn-submit {
+  padding: 9px 18px;
+  border-radius: 8px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn-submit:hover {
+  background: #1d4ed8;
+}
+</style>
