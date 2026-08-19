@@ -2,7 +2,7 @@
 const pathname = Astro.url.pathname;
 ---
 
- <header class="sticky top-0 z-50 bg-[#F7F7F7] animate-slide-in-left">
+ <header id="site-header" class={`site-header ${pathname === "/" ? "home-header fixed top-0 left-0 right-0 bg-transparent" : "inner-header sticky top-0 bg-[#F7F7F7]"} z-50 animate-slide-in-left`}>
   <div class="container mx-auto px-4 sm:px-6 md:px-8">
 
     <!-- ✅ WRAPPER FIX -->
@@ -267,6 +267,56 @@ const pathname = Astro.url.pathname;
   </div>
 </header>
 
+<style>
+  .home-header {
+    transition: background-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .home-header:not(.is-scrolled) .text-gray-700,
+  .home-header:not(.is-scrolled) .text-blue-600,
+  .home-header:not(.is-scrolled) .mobile-dropdown-btn,
+  .home-header:not(.is-scrolled) #mobile-menu-button {
+    color: #ffffff !important;
+  }
+
+  .home-header:not(.is-scrolled) #mobile-menu {
+    background: rgba(15, 23, 42, 0.92);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .home-header:not(.is-scrolled) #mobile-menu a,
+  .home-header:not(.is-scrolled) #mobile-menu button {
+    color: #ffffff !important;
+  }
+
+  .home-header:not(.is-scrolled) #mobile-menu a:hover,
+  .home-header:not(.is-scrolled) #mobile-menu button:hover {
+    color: #ffd41d !important;
+  }
+
+  .home-header.is-scrolled {
+    background: #ffffff;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.08);
+  }
+
+  .home-header.is-scrolled .text-gray-700,
+  .home-header.is-scrolled .text-blue-600,
+  .home-header.is-scrolled .mobile-dropdown-btn,
+  .home-header.is-scrolled #mobile-menu-button {
+    color: #374151 !important;
+  }
+</style>
+
+<script is:inline>
+  const siteHeader = document.getElementById('site-header');
+
+  function updateHeaderOnScroll() {
+    siteHeader?.classList.toggle('is-scrolled', window.scrollY > 24);
+  }
+
+  updateHeaderOnScroll();
+  window.addEventListener('scroll', updateHeaderOnScroll, { passive: true });
+</script>
 
     <!-- JavaScript untuk interaksi -->
      <script is:inline>
