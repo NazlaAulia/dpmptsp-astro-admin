@@ -289,7 +289,7 @@ try {
 
   <div class="relative z-10 h-full container mx-auto px-6 flex flex-col justify-center">
 
-    <div class="grid md:grid-cols-[1.2fr_0.8fr] gap-12 items-center w-full">
+    <div class="grid md:grid-cols-[1.2fr_0.8fr] gap-12 items-end w-full">
 
       <!-- TEXT -->
       <div class="text-white max-w-xl hero-slide-left">
@@ -318,50 +318,46 @@ try {
         </div>
       </div>
 
-      <!-- APP SWITCHER PANEL (single icon slider, full besar) -->
-      <div class="w-full hero-slide-right flex flex-col items-center gap-6">
+      <!-- APP SWITCHER PANEL (glass) -->
+      <div class="w-full hero-slide-right">
+        <div class="backdrop-blur-md bg-white/10 border border-white/15 rounded-2xl p-4 space-y-2">
 
-        <div class="relative w-[clamp(260px,28vw,440px)] h-[clamp(260px,28vw,440px)] overflow-hidden rounded-full">
-          <div id="appTrack" class="flex h-full transition-transform duration-700 ease-[cubic-bezier(.22,1,.36,1)]">
-
-            <div class="app-slide w-[clamp(260px,28vw,440px)] h-[clamp(260px,28vw,440px)] flex-shrink-0"
-                 data-bg="/hero/hero-kantor.webp"
-                 data-title="Pelayanan Publik"
-                 data-sub="di Kota Surabaya — cepat, transparan, dan terpadu satu pintu.">
-              <img src="https://epmal.surabaya.go.id/simpedal/assets2/TAKON-SOBAT.png"
-                   class="w-full h-full rounded-full object-cover border-4 border-white/40">
+          <div class="item group flex items-center gap-5 p-4 rounded-xl cursor-pointer transition-all duration-300 active"
+               data-bg="/hero/hero-kantor.webp"
+               data-title="Pelayanan Publik"
+               data-sub="di Kota Surabaya — cepat, transparan, dan terpadu satu pintu.">
+            <img src="https://epmal.surabaya.go.id/simpedal/assets2/TAKON-SOBAT.png"
+                 class="w-20 h-20 rounded-full object-cover border-4 border-white/40 flex-shrink-0">
+            <div class="min-w-0">
+              <p class="text-white font-semibold text-lg truncate">Takon Sobat</p>
+              <p class="text-white/50 text-sm truncate">Konsultasi &amp; Tanya Jawab Perizinan</p>
             </div>
-
-            <div class="app-slide w-[clamp(260px,28vw,440px)] h-[clamp(260px,28vw,440px)] flex-shrink-0"
-                 data-bg="/hero/hero-kantor.webp"
-                 data-title="Lapis Lupis"
-                 data-sub="Layanan pengaduan investasi dan perizinan terintegrasi.">
-              <img src="https://epmal.surabaya.go.id/simpedal/assets2/lapis_lupis_baru.png"
-                   class="w-full h-full rounded-full object-cover border-4 border-white/40">
-            </div>
-
-            <div class="app-slide w-[clamp(260px,28vw,440px)] h-[clamp(260px,28vw,440px)] flex-shrink-0"
-                 data-bg="/hero/hero-kantor.webp"
-                 data-title="Wani Ngurus Izin"
-                 data-sub="Pendampingan pengurusan izin usaha untuk warga Surabaya.">
-              <img src="https://epmal.surabaya.go.id/simpedal/assets2/Wani Ngurus Izin.jpeg"
-                   class="w-full h-full rounded-full object-cover border-4 border-white/40">
-            </div>
-
           </div>
-        </div>
 
-        <!-- Navigasi geser -->
-        <div class="flex items-center gap-5">
-          <button id="appPrev" aria-label="Sebelumnya"
-                  class="w-10 h-10 rounded-full bg-white/10 border border-white/20 text-white flex items-center justify-center hover:bg-white/20 transition">
-            <i class="fas fa-chevron-left text-sm"></i>
-          </button>
-          <div id="appDots" class="flex items-center gap-2"></div>
-          <button id="appNext" aria-label="Berikutnya"
-                  class="w-10 h-10 rounded-full bg-white/10 border border-white/20 text-white flex items-center justify-center hover:bg-white/20 transition">
-            <i class="fas fa-chevron-right text-sm"></i>
-          </button>
+          <div class="item group flex items-center gap-5 p-4 rounded-xl cursor-pointer transition-all duration-300"
+               data-bg="https://dpm-ptsp.surabaya.go.id/carousel/5.png"
+               data-title="Lapis Lupis"
+               data-sub="Layanan pengaduan investasi dan perizinan terintegrasi.">
+            <img src="https://epmal.surabaya.go.id/simpedal/assets2/lapis_lupis_baru.png"
+                 class="w-20 h-20 rounded-full object-cover border-4 border-white/40 flex-shrink-0">
+            <div class="min-w-0">
+              <p class="text-white font-semibold text-lg truncate">Lapis Lupis</p>
+              <p class="text-white/50 text-sm truncate">Layanan Pengaduan Investasi</p>
+            </div>
+          </div>
+
+          <div class="item group flex items-center gap-5 p-4 rounded-xl cursor-pointer transition-all duration-300"
+               data-bg="/hero/hero-kantor.webp"
+               data-title="Wani Ngurus Izin"
+               data-sub="Pendampingan pengurusan izin usaha untuk warga Surabaya.">
+            <img src="https://epmal.surabaya.go.id/simpedal/assets2/Wani Ngurus Izin.jpeg"
+                 class="w-20 h-20 rounded-full object-cover border-4 border-white/40 flex-shrink-0">
+            <div class="min-w-0">
+              <p class="text-white font-semibold text-lg truncate">Wani Ngurus Izin</p>
+              <p class="text-white/50 text-sm truncate">Pendampingan Pengurusan Izin</p>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -377,6 +373,19 @@ try {
 </section>
 
 <style>
+.item {
+  background: transparent;
+}
+.item.active {
+  background: rgba(255,255,255,.12);
+}
+.item.active img {
+  border-color: #FFC72C;
+}
+.item:hover:not(.active) {
+  background: rgba(255,255,255,.06);
+}
+
 .fadeChange {
   animation: fadeChange .5s ease;
 }
@@ -411,32 +420,19 @@ try {
 
 <script is:inline>
 document.addEventListener('DOMContentLoaded', () => {
-  const track = document.getElementById('appTrack');
-  const slides = document.querySelectorAll('.app-slide');
-  const dotsWrap = document.getElementById('appDots');
-  const prevBtn = document.getElementById('appPrev');
-  const nextBtn = document.getElementById('appNext');
+  const heroItems = document.querySelectorAll('.item');
   const heroBg = document.getElementById('bg');
   const heroTitle = document.getElementById('heroTitle');
   const heroSub = document.getElementById('heroSub');
 
-  if (!track || slides.length === 0) return;
+  let heroIdx = 0;
 
-  let idx = 0;
+  function updateHeroPanel(el) {
+    heroItems.forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
 
-  // buat dot indicator sejumlah slide
-  slides.forEach((_, i) => {
-    const dot = document.createElement('button');
-    dot.setAttribute('aria-label', `Ke item ${i + 1}`);
-    dot.className = 'w-2.5 h-2.5 rounded-full transition-all duration-300 ' +
-      (i === 0 ? 'bg-[#FFC72C] w-6' : 'bg-white/30');
-    dot.addEventListener('click', () => goTo(i));
-    dotsWrap.appendChild(dot);
-  });
-  const dots = dotsWrap.querySelectorAll('button');
-
-  function updateHeroText(el) {
     if (el.dataset.bg) heroBg.src = el.dataset.bg;
+
     [heroTitle, heroSub].forEach(t => {
       t.classList.remove('fadeChange');
       void t.offsetWidth;
@@ -446,30 +442,11 @@ document.addEventListener('DOMContentLoaded', () => {
     heroSub.textContent = el.dataset.sub;
   }
 
-  function goTo(i) {
-    idx = (i + slides.length) % slides.length;
-    track.style.transform = `translateX(-${idx * 100}%)`;
-
-    dots.forEach((d, di) => {
-      d.className = 'h-2.5 rounded-full transition-all duration-300 ' +
-        (di === idx ? 'bg-[#FFC72C] w-6' : 'bg-white/30 w-2.5');
+  heroItems.forEach((el, i) => {
+    el.addEventListener('click', () => {
+      heroIdx = i;
+      updateHeroPanel(el);
     });
-
-    updateHeroText(slides[idx]);
-  }
-
-  prevBtn.addEventListener('click', () => goTo(idx - 1));
-  nextBtn.addEventListener('click', () => goTo(idx + 1));
-
-  goTo(0);
-
-  // Auto-slide
-  let autoSlide = setInterval(() => goTo(idx + 1), 4000);
-
-  const wrapper = track.closest('.hero-slide-right');
-  wrapper?.addEventListener('mouseenter', () => clearInterval(autoSlide));
-  wrapper?.addEventListener('mouseleave', () => {
-    autoSlide = setInterval(() => goTo(idx + 1), 4000);
   });
 });
 </script>
