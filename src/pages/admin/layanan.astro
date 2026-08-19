@@ -216,51 +216,50 @@ const [semuaLayanan] = await db.query(
   padding: 16px;
 }
 
-.data-table {
+:global(.data-table) {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
+  table-layout: fixed !important;
   font-size: 0.9rem;
 }
 
-/* Atur lebar pasti tiap kolom secara konsisten */
-.data-table th:nth-child(1), .data-table td:nth-child(1) { width: 50px; }   /* ID */
-.data-table th:nth-child(2), .data-table td:nth-child(2) { width: 140px; }  /* Judul */
-.data-table th:nth-child(3), .data-table td:nth-child(3) { width: 180px; }  /* Lokasi */
-.data-table th:nth-child(4), .data-table td:nth-child(4) { width: 220px; }  /* Alamat */
-.data-table th:nth-child(5), .data-table td:nth-child(5) { width: 130px; }  /* Gambar */
-.data-table th:nth-child(6), .data-table td:nth-child(6) { width: 90px; }   /* Aksi */
+/* ATUR LEBAR KOLOM SECARA TEGAS */
+:global(.data-table th:nth-child(1)), :global(.data-table td:nth-child(1)) { width: 50px; }
+:global(.data-table th:nth-child(2)), :global(.data-table td:nth-child(2)) { width: 130px; }
+:global(.data-table th:nth-child(3)), :global(.data-table td:nth-child(3)) { width: 220px !important; max-width: 220px !important; }
+:global(.data-table th:nth-child(4)), :global(.data-table td:nth-child(4)) { width: 220px !important; max-width: 220px !important; }
+:global(.data-table th:nth-child(5)), :global(.data-table td:nth-child(5)) { width: 130px; }
+:global(.data-table th:nth-child(6)), :global(.data-table td:nth-child(6)) { width: 90px; }
 
-.data-table th,
-/* Pastikan sel tabel mengunci area dan tidak membiarkan konten jebol */
-.data-table td {
-  padding: 14px 10px;
+:global(.data-table th),
+:global(.data-table td) {
+  padding: 14px 8px;
   border-bottom: 1px solid #f1f5f9;
   vertical-align: top;
   overflow: hidden;
 }
 
-/* Khusus kolom Lokasi (kolom ke-3) */
-.data-table td:nth-child(3) {
-  width: 180px !important;
-  max-width: 180px !important;
-  white-space: normal !important;
-}
-
-/* Paksa link URL yang panjang agar terpotong dan turun ke bawah */
-.map-link {
-  display: inline-block !important;
+/* PAKSA LINK MAPS AGAR TURUN KE BAWAH DAN TIDAK MELUBER */
+:global(.map-link) {
+  display: block !important;
+  width: 100% !important;
   max-width: 100% !important;
   white-space: normal !important;
   word-break: break-all !important;
-  overflow-wrap: break-word !important;
+  overflow-wrap: anywhere !important;
   color: #2563eb;
   text-decoration: underline;
 }
 
-.map-link:hover {
+:global(.map-link:hover) {
   text-decoration: underline;
 }
+
+:global(.data-table td:nth-child(4)) {
+  white-space: normal !important;
+  word-break: break-word !important;
+}
+
 :global(.thumb-img) {
   width: 120px !important;
   height: 72px !important;
@@ -494,26 +493,5 @@ const [semuaLayanan] = await db.query(
 
 .btn-hapus:hover {
   background: #dc2626;
-}
-
-/* URL Google Maps supaya turun ke bawah */
-td a {
-    display: block;
-    max-width: 250px;
-    white-space: normal;
-    overflow-wrap: anywhere;
-    word-break: break-word;
-}
-
-table {
-    width: 100%;
-    table-layout: fixed;
-
-}
-
-th:nth-child(3),
-td:nth-child(3) {
-    width: 250px;
-    max-width: 250px;
 }
 </style>

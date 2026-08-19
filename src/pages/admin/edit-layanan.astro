@@ -1,5 +1,17 @@
 ---
 import AdminShell from "../../components/admin/AdminShell.astro";
+import { db } from "../../lib/db.js";
+
+const id = Astro.url.searchParams.get("id");
+
+let layananData = null;
+
+if (id) {
+  const [rows] = (await db.query("SELECT * FROM tempat_layanan WHERE id = ?", [id])) as any;
+  if (rows && rows.length > 0) {
+    layananData = rows[0];
+  }
+}
 ---
 
 <AdminShell title="Edit Tempat Layanan" subtitle="Perbarui data tempat layanan.">
@@ -27,6 +39,7 @@ import AdminShell from "../../components/admin/AdminShell.astro";
           type="text"
           id="judul"
           placeholder="Judul"
+          value={layananData ? layananData.judul : ""}
           required
         />
       </div>
@@ -56,6 +69,7 @@ import AdminShell from "../../components/admin/AdminShell.astro";
           type="text"
           id="alt"
           placeholder="Alt Text"
+          value={layananData ? (layananData.alt_text || layananData.judul) : ""}
           required
         />
       </div>
@@ -66,6 +80,7 @@ import AdminShell from "../../components/admin/AdminShell.astro";
           type="url"
           id="lokasi"
           placeholder="Lokasi"
+          value={layananData ? layananData.lokasi : ""}
           required
         />
       </div>
@@ -76,7 +91,7 @@ import AdminShell from "../../components/admin/AdminShell.astro";
           id="alamat"
           placeholder="Alamat"
           required
-        ></textarea>
+        >{layananData ? layananData.alamat : ""}</textarea>
       </div>
 
       <div class="form-actions">
@@ -97,136 +112,9 @@ import AdminShell from "../../components/admin/AdminShell.astro";
 
 </AdminShell>
 
-<script>
-  const params = new URLSearchParams(window.location.search);
-  const id = Number(params.get("id"));
-
-  const dataLayanan = [
-    {
-      id: 13,
-      judul: "SPP PAKAL",
-      lokasi: "https://maps.app.goo.gl/NqAj6LLWN8KZpUTp9",
-      alamat: "SPP Pakal, Kec. Pakal, Surabaya, Jawa Timur",
-      gambar: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=150&q=80",
-      alt: "SPP PAKAL"
-    },
-    {
-      id: 12,
-      judul: "SPP NAMBANGAN",
-      lokasi: "https://maps.app.goo.gl/YqrTVqMSDYBE6Mbk9",
-      alamat: "SPP NAMBANGAN, Taman Segoro, Jl. Nambangan, Tanah Kali Kedinding, Kenjeran, Surabaya, East Java 60129",
-      gambar: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=150&q=80",
-      alt: "SPP NAMBANGAN"
-    },
-    {
-      id: 4,
-      judul: "PTSP TIMUR",
-      lokasi: "https://maps.app.goo.gl/uQTPY3GLz1wwIju7",
-      alamat: "Jl. Raya Menur No.31 C, Manyar Sabrangan, Kec. Mulyorejo, Surabaya, Jawa Timur 60141",
-      gambar: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=150&q=80",
-      alt: "PTSP TIMUR"
-    },
-    {
-      id: 3,
-      judul: "PTSP BARAT",
-      lokasi: "https://maps.app.goo.gl/example1",
-      alamat: "Jl. Darmo No. 12, Surabaya",
-      gambar: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=150&q=80",
-      alt: "PTSP BARAT"
-    },
-    {
-      id: 2,
-      judul: "PTSP UTARA",
-      lokasi: "https://maps.app.goo.gl/example2",
-      alamat: "Jl. Indrapura No. 5, Surabaya",
-      gambar: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=150&q=80",
-      alt: "PTSP UTARA"
-    },
-    {
-      id: 1,
-      judul: "PTSP SELATAN",
-      lokasi: "https://maps.app.goo.gl/example3",
-      alamat: "Jl. Ahmad Yani No. 88, Surabaya",
-      gambar: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=150&q=80",
-      alt: "PTSP SELATAN"
-    },
-    {
-      id: 7,
-      judul: "SPP RUNGKUT",
-      lokasi: "https://maps.app.goo.gl/example4",
-      alamat: "Jl. Rungkut Industri Raya",
-      gambar: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=150&q=80",
-      alt: "SPP RUNGKUT"
-    },
-    {
-      id: 8,
-      judul: "SPP TANDES",
-      lokasi: "https://maps.app.goo.gl/example5",
-      alamat: "Jl. Margomulyo",
-      gambar: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=150&q=80",
-      alt: "SPP TANDES"
-    },
-    {
-      id: 9,
-      judul: "SPP GUBENG",
-      lokasi: "https://maps.app.goo.gl/example6",
-      alamat: "Jl. Gubeng Airlangga",
-      gambar: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=150&q=80",
-      alt: "SPP GUBENG"
-    },
-    {
-      id: 10,
-      judul: "SPP KEPUTIH",
-      lokasi: "https://maps.app.goo.gl/example7",
-      alamat: "Jl. Keputih Tegal",
-      gambar: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=150&q=80",
-      alt: "SPP KEPUTIH"
-    },
-    {
-      id: 11,
-      judul: "SPP WONOKROMO",
-      lokasi: "https://maps.app.goo.gl/example8",
-      alamat: "Jl. Joyoboyo",
-      gambar: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=150&q=80",
-      alt: "SPP WONOKROMO"
-    },
-    {
-      id: 14,
-      judul: "SPP KENJERAN",
-      lokasi: "https://maps.app.goo.gl/example9",
-      alamat: "Jl. Kenjeran Baru",
-      gambar: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=150&q=80",
-      alt: "SPP KENJERAN"
-    },
-    {
-      id: 15,
-      judul: "SPP MERR",
-      lokasi: "https://maps.app.goo.gl/example10",
-      alamat: "Jl. Ir. Soekarno",
-      gambar: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=150&q=80",
-      alt: "SPP MERR"
-    }
-  ];
-
-  const layananTambahan = JSON.parse(
-    localStorage.getItem("layananTambahan") || "[]"
-  );
-
-  const semuaData = [...dataLayanan, ...layananTambahan];
-
-  const data = semuaData.find(item => item.id === id);
-
-  if (data) {
-    (document.getElementById("judul") as HTMLInputElement).value = data.judul;
-    (document.getElementById("alt") as HTMLInputElement).value =
-      data.alt || data.judul;
-    (document.getElementById("lokasi") as HTMLInputElement).value = data.lokasi;
-    (document.getElementById("alamat") as HTMLTextAreaElement).value =
-      data.alamat;
-  }
-
-  const gambarInput = document.getElementById("gambar") as HTMLInputElement;
-  const fileName = document.getElementById("file-name") as HTMLElement;
+<script define:vars={{ layananId: id }}>
+  const gambarInput = document.getElementById("gambar");
+  const fileName = document.getElementById("file-name");
 
   gambarInput.addEventListener("change", () => {
     const file = gambarInput.files?.[0];
@@ -242,10 +130,57 @@ import AdminShell from "../../components/admin/AdminShell.astro";
     window.location.href = "/admin/layanan";
   });
 
-  document.getElementById("layanan-form")?.addEventListener("submit", (event) => {
+  document.getElementById("layanan-form")?.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    alert("Halaman edit berhasil digunakan.");
+    const judul = document.getElementById("judul").value;
+    const alt = document.getElementById("alt").value;
+    const lokasi = document.getElementById("lokasi").value;
+    const alamat = document.getElementById("alamat").value;
+    const file = gambarInput.files?.[0];
+
+    let gambarBase64 = null;
+
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert("Ukuran gambar maksimal 2MB");
+        return;
+      }
+
+      gambarBase64 = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    try {
+      const response = await fetch(`/api/layanan?id=${layananId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          judul,
+          alt_text: alt,
+          lokasi,
+          alamat,
+          gambar: gambarBase64
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Langsung pindah ke halaman layanan tanpa memunculkan alert sukses
+        window.location.href = "/admin/layanan";
+      } else {
+        alert("Gagal memperbarui data dari server.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Terjadi kesalahan koneksi ke server API.");
+    }
   });
 </script>
 
