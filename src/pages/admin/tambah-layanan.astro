@@ -186,9 +186,7 @@ form.addEventListener("submit", async(e)=>{
 
 
       if(result.success){
-
-        alert("Tempat layanan berhasil ditambahkan");
-
+        // Alert sukses dihapus, langsung pindah halaman ke depan
         window.location.href="/admin/layanan";
 
       }else{
@@ -199,11 +197,10 @@ form.addEventListener("submit", async(e)=>{
 
 
 
-    }catch(error){
+}catch(error){
 
       console.error(error);
-
-      alert("Terjadi error saat menyimpan data");
+      alert("Error: " + error);
 
     }
 

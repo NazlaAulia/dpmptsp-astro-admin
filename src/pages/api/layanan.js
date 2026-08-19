@@ -85,3 +85,96 @@ export async function POST({ request }) {
         );
     }
 }
+
+export async function PUT({ request }) {
+    try {
+        const url = new URL(request.url);
+        const id = url.searchParams.get("id");
+        const body = await request.json();
+        let imagePath = body.gambar;
+
+        if (imagePath && imagePath.startsWith('data:image')) {
+            const matches = imagePath.match(/^data:image\/([a-zA-Z0-9]+);base64,(.+)$/);
+            
+            if (matches && matches.length === 3) {
+                const ext = matches[1];
+                const base64Data = matches[2];
+                
+                const fileName = `layanan-${Date.now()}.${ext}`;
+                const uploadDir = path.join(process.cwd(), 'public/uploads');
+
+                if (!fs.existsSync(uploadDir)) {
+                    fs.mkdirSync(uploadDir, { recursive: true });
+                }
+
+                fs.writeFileSync(path.join(uploadDir, fileName), Buffer.from(base64Data, 'base64'));
+                imagePath = `/uploads/${fileName}`;
+            }
+        }
+
+        if (imagePath && imagePath.startsWith('data:image') === false) {
+            await db.query(
+                `
+                UPDATE tempat_layanan
+                SET 
+                    judul = ?,
+                    deskripsi = ?,
+                    gambar = ?,
+                    alt_text = ?,
+                    lokasi = ?,
+                    alamat = ?
+                WHERE id = ?
+                `,
+                [
+                    body.judul,
+                    body.deskripsi || "",
+                    imagePath,
+                    body.alt_text,
+                    body.lokasi,
+                    body.alamat,
+                    id
+                ]
+            );
+        } else {
+            await db.query(
+                `
+                UPDATE tempat_layanan
+                SET 
+                    judul = ?,
+                    deskripsi = ?,
+                    alt_text = ?,
+                    lokasi = ?,
+                    alamat = ?
+                WHERE id = ?
+                `,
+                [
+                    body.judul,
+                    body.deskripsi || "",
+                    body.alt_text,
+                    body.lokasi,
+                    body.alamat,
+                    id
+                ]
+            );
+        }
+
+        return new Response(
+            JSON.stringify({ success: true }),
+            {
+                status: 200,
+                headers: { "Content-Type": "application/json" }
+            }
+        );
+
+    } catch (error) { 
+        console.log("ERROR DATABASE:", error);
+
+        return new Response(
+            JSON.stringify({ success: false, error: error.message }),
+            {
+                status: 500,
+                headers: { "Content-Type": "application/json" }
+            }
+        );
+    }
+}
