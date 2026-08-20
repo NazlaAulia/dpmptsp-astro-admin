@@ -38,7 +38,7 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
 .admin-shell {
   display: flex;
   min-height: 100vh;
-  background: #f6f8fb;
+  background: #f4f7fb;
   color: #0f172a;
 }
 
@@ -46,13 +46,25 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
   flex: 1;
   display: flex;
   flex-direction: column;
+  height: 100vh;
+  min-height: 0;
 }
 
 .content {
-  padding: 18px 18px 26px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: 24px 28px 32px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 22px;
+}
+
+:global(.content > .box),
+:global(.content > .table-box),
+:global(.content > .table-container) {
+  flex: 1;
+  min-height: 0;
 }
 
 .page-header {
@@ -60,10 +72,11 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  padding: 18px 20px;
-  border-radius: 14px;
+  padding: 20px 22px;
+  border-radius: 12px;
   background: white;
-  box-shadow: 0 8px 20px rgba(2,6,23,0.04);
+  border: 1px solid #e5eaf2;
+  box-shadow: 0 8px 24px rgba(15,23,42,0.04);
 }
 
 .eyebrow {

@@ -45,6 +45,7 @@ Tambah Kinerja
 </a>
 </div>
 
+<div class="table-scroll">
 <table>
 <thead>
 <tr>
@@ -95,6 +96,7 @@ onclick={`openDeleteModal(${item.id})`}
 ))}
 </tbody>
 </table>
+</div>
 
 <!-- BAGIAN PAGINATION TAMBAHAN -->
 <div class="pagination-container">
@@ -178,6 +180,17 @@ background:white;
 border-radius:20px;
 padding:25px;
 box-shadow:0 12px 30px rgba(15,23,42,.06);
+display:flex;
+flex-direction:column;
+min-height:0;
+}
+
+.table-scroll {
+max-height:calc(100vh - 330px);
+min-height:220px;
+overflow:auto;
+border:1px solid #e5eaf2;
+border-radius:12px;
 }
 
 .table-header {
@@ -209,6 +222,10 @@ th {
 text-align:left;
 padding:15px;
 border-bottom:1px solid #ddd;
+position:sticky;
+top:0;
+z-index:1;
+background:#f8fafc;
 }
 
 td {
