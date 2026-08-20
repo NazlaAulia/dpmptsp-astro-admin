@@ -70,25 +70,25 @@ const daftarInovasi = [
                 <td>
                   <span class="badge-tag">{item.tags}</span>
                 </td>
-<td>
-  <div class="action-buttons">
-    {/* Tombol Edit (Ikon Pensil) */}
-    <a href={`/admin/inovasi/edit/${item.id}`} class="btn-action edit" title="Edit">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-      </svg>
-    </a>
+                <td>
+                  <div class="action-buttons">
+                    {/* Tombol Edit (Ikon Pensil) - Memicu Modal Edit */}
+                    <button class="btn-action edit" title="Edit" data-id={item.id} onclick="openEditModal(this)">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                      </svg>
+                    </button>
 
-    {/* Tombol Hapus (Ikon Tong Sampah) */}
-    <button class="btn-action delete" title="Hapus" onclick={`alert('Hapus ID ${item.id}?')`}>
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="3 6 5 6 21 6"></polyline>
-        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-      </svg>
-    </button>
-  </div>
-</td>
+                    {/* Tombol Hapus (Ikon Tong Sampah) */}
+                    <button class="btn-action delete" title="Hapus" data-id={item.id} onclick="openDeleteModal(this)">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
               </tr>
             ))
           ) : (
@@ -107,6 +107,36 @@ const daftarInovasi = [
         <button class="page-btn" disabled>Sebelumnya</button>
         <button class="page-btn active">1</button>
         <button class="page-btn" disabled>Selanjutnya</button>
+      </div>
+    </div>
+  </div>
+
+  {/* Modal Konfirmasi Edit */}
+  <div id="editModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-icon-wrapper">
+        <div class="modal-icon">!</div>
+      </div>
+      <h3>Edit Data?</h3>
+      <p>Apakah Anda yakin ingin mengedit data inovasi ini?</p>
+      <div class="modal-actions">
+        <button type="button" class="btn-modal-cancel" onclick="closeEditModal()">Batal</button>
+        <button type="button" class="btn-modal-edit" id="confirmEditBtn">Ya, Edit</button>
+      </div>
+    </div>
+  </div>
+
+  {/* Modal Konfirmasi Hapus */}
+  <div id="deleteModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-icon-wrapper">
+        <div class="modal-icon">!</div>
+      </div>
+      <h3>Hapus Data?</h3>
+      <p>Apakah Anda yakin ingin menghapus data inovasi ini?</p>
+      <div class="modal-actions">
+        <button type="button" class="btn-modal-cancel" onclick="closeDeleteModal()">Batal</button>
+        <button type="button" class="btn-modal-delete" id="confirmDeleteBtn">Hapus</button>
       </div>
     </div>
   </div>
@@ -184,7 +214,6 @@ const daftarInovasi = [
   vertical-align: top;
 }
 
-/* Mengatur agar teks turun ke bawah secara natural (tidak terpotong satu baris) */
 .wrap-text {
   min-width: 220px;
   max-width: 350px;
@@ -286,4 +315,162 @@ const daftarInovasi = [
   cursor: not-allowed;
   background: #f8fafc;
 }
+
+/* CSS POP-UP / MODAL */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.6);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal-card {
+  background: white;
+  padding: 32px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+}
+
+.modal-icon-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.modal-icon {
+  width: 60px;
+  height: 60px;
+  background: #fee2e2;
+  color: #dc2626;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.modal-card h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.modal-card p {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 24px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.btn-modal-cancel {
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: none;
+  background: #e2e8f0;
+  color: #334155;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-modal-delete {
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: none;
+  background: #ef4444;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+}
+.btn-modal-delete:hover {
+  background: #dc2626;
+}
+
+.btn-modal-edit {
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+}
+.btn-modal-edit:hover {
+  background: #1d4ed8;
+}
 </style>
+
+<script>
+  let selectedEditId: any = null;
+  let selectedDeleteId: any = null;
+
+  // Fungsi Modal Edit
+  // @ts-ignore
+  window.openEditModal = function(button: HTMLElement) {
+    selectedEditId = button.getAttribute('data-id');
+    const modal = document.getElementById('editModal');
+    if (modal) {
+      modal.style.display = 'flex';
+    }
+  };
+
+  // @ts-ignore
+  window.closeEditModal = function() {
+    selectedEditId = null;
+    const modal = document.getElementById('editModal');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+  };
+
+  document.getElementById('confirmEditBtn')?.addEventListener('click', function() {
+    if (selectedEditId) {
+      window.location.href = `/admin/inovasi/edit/${selectedEditId}`;
+    }
+  });
+
+  // Fungsi Modal Hapus
+  // @ts-ignore
+  window.openDeleteModal = function(button: HTMLElement) {
+    selectedDeleteId = button.getAttribute('data-id');
+    const modal = document.getElementById('deleteModal');
+    if (modal) {
+      modal.style.display = 'flex';
+    }
+  };
+
+  // @ts-ignore
+  window.closeDeleteModal = function() {
+    selectedDeleteId = null;
+    const modal = document.getElementById('deleteModal');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+  };
+
+  document.getElementById('confirmDeleteBtn')?.addEventListener('click', function() {
+    if (selectedDeleteId) {
+      alert('Data dengan ID ' + selectedDeleteId + ' berhasil dihapus!');
+      // @ts-ignore
+      window.closeDeleteModal();
+    }
+  });
+</script>
