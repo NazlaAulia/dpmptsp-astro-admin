@@ -9,6 +9,7 @@ const [semuaLayanan] = await db.query(
 
 <AdminShell title="Tempat Layanan" subtitle="Pantau layanan yang tersedia dan status operasional harian." actionLabel="Tambah Tempat Pelayanan" actionHref="/admin/tambah-layanan">
   <div class="table-container">
+    <div class="table-scroll">
     <table class="data-table">
       <thead>
         <tr>
@@ -24,6 +25,7 @@ const [semuaLayanan] = await db.query(
         <!-- Render dinamis via script -->
       </tbody>
     </table>
+    </div>
 
     <div class="pagination-footer">
       <span class="page-info" id="page-info">Menampilkan 0 dari 0 entri</span>
@@ -212,8 +214,15 @@ const [semuaLayanan] = await db.query(
   background: white;
   border-radius: 16px;
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
-  overflow-x: auto;
   padding: 16px;
+}
+
+.table-scroll {
+  max-height: calc(100vh - 330px);
+  min-height: 220px;
+  overflow: auto;
+  border: 1px solid #e5eaf2;
+  border-radius: 12px;
 }
 
 :global(.data-table) {
@@ -237,6 +246,13 @@ const [semuaLayanan] = await db.query(
   border-bottom: 1px solid #f1f5f9;
   vertical-align: top;
   overflow: hidden;
+}
+
+:global(.data-table th) {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #f8fafc;
 }
 
 /* PAKSA LINK MAPS AGAR TURUN KE BAWAH DAN TIDAK MELUBER */

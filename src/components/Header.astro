@@ -17,7 +17,7 @@ const pathname = Astro.url.pathname;
             class="
               h-8 sm:h-10 md:h-12
               w-auto
-              max-w-[140px] sm:max-w-[180px]
+              max-w-35 sm:max-w-45
               object-contain
               transition duration-300
               hover:scale-105
@@ -117,10 +117,10 @@ const pathname = Astro.url.pathname;
   Pelayanan <i class="fas fa-chevron-down ml-1 text-xs"></i>
 </a>
             <div class="absolute left-0 mt-2 w-64 bg-white rounded-b-lg translate-y-5 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 animate-drop-in">
-              <a href="/Pelayanan#stdjenis-sec" class="block px-4 py-3 hover:bg-[#FFD41D]">Standar Pelayanan</a>
-              <a href="/Pelayanan#info-sec" class="block px-4 py-3 hover:bg-[#FFD41D]">Keterbukaan Informasi</a>
-              <a href="/regulasi" class="block px-4 py-3 hover:bg-[#FFD41D]">Regulasi</a>
-              <a href="/inovasi" class="block px-4 py-3 hover:bg-[#FFD41D]">Inovasi</a>
+              <a href="/Pelayanan#stdjenis-sec" class="block font-medium text-gray-700 px-4 py-3 hover:bg-[#FFD41D]">Standar Pelayanan</a>
+              <a href="/Pelayanan#info-sec" class="block font-medium text-gray-700 px-4 py-3 hover:bg-[#FFD41D]">Keterbukaan Informasi</a>
+              <a href="/regulasi" class="block font-medium text-gray-700 px-4 py-3 hover:bg-[#FFD41D]">Regulasi</a>
+              <a href="/inovasi" class="block font-medium text-gray-700 px-4 py-3 hover:bg-[#FFD41D]">Inovasi</a>
             </div>
           </li>
 
@@ -138,11 +138,11 @@ const pathname = Astro.url.pathname;
 
             <div class="absolute left-0 mt-2 w-64 bg-white rounded-b-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 translate-y-5">
 
-              <a href="/lokasi" class="block px-4 py-3 hover:bg-[#FFD41D]">Foto</a>
-              <a href="/beritalist" class="block px-4 py-3 hover:bg-[#FFD41D]">Berita</a>
+              <a href="/lokasi" class="block font-medium text-gray-700 px-4 py-3 hover:bg-[#FFD41D]">Foto</a>
+              <a href="/beritalist" class="block font-medium text-gray-700 px-4 py-3 hover:bg-[#FFD41D]">Berita</a>
 
               <div class="relative group/artikel border-t">
-                <div class="px-4 py-3 flex justify-between cursor-pointer hover:bg-[#FFD41D]">
+                <div class="font-medium text-gray-700 px-4 py-3 flex justify-between cursor-pointer hover:bg-[#FFD41D]">
                   Artikel <i class="fas fa-chevron-down text-xs"></i>
                 </div>
 
@@ -272,11 +272,17 @@ const pathname = Astro.url.pathname;
     transition: background-color 0.25s ease, box-shadow 0.25s ease;
   }
 
-  .home-header:not(.is-scrolled) .text-gray-700,
-  .home-header:not(.is-scrolled) .text-blue-600,
+  .home-header:not(.is-scrolled) nav > ul > li > a,
+  .home-header:not(.is-scrolled) nav > ul > li > div,
   .home-header:not(.is-scrolled) .mobile-dropdown-btn,
   .home-header:not(.is-scrolled) #mobile-menu-button {
     color: #ffffff !important;
+  }
+
+  .home-header:not(.is-scrolled) nav > ul > li > a:hover,
+  .home-header:not(.is-scrolled) nav > ul > li > div:hover,
+  .home-header:not(.is-scrolled) .mobile-dropdown-btn:hover {
+    color: #ffd41d !important;
   }
 
   .home-header:not(.is-scrolled) #mobile-menu {
@@ -299,11 +305,17 @@ const pathname = Astro.url.pathname;
     box-shadow: 0 4px 18px rgba(15, 23, 42, 0.08);
   }
 
-  .home-header.is-scrolled .text-gray-700,
-  .home-header.is-scrolled .text-blue-600,
+  .home-header.is-scrolled nav > ul > li > a,
+  .home-header.is-scrolled nav > ul > li > div,
   .home-header.is-scrolled .mobile-dropdown-btn,
   .home-header.is-scrolled #mobile-menu-button {
     color: #374151 !important;
+  }
+
+  .home-header.is-scrolled nav > ul > li > a:hover,
+  .home-header.is-scrolled nav > ul > li > div:hover,
+  .home-header.is-scrolled .mobile-dropdown-btn:hover {
+    color: #d97706 !important;
   }
 </style>
 
