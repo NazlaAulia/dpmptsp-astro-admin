@@ -1,0 +1,637 @@
+---
+import AdminShell from "../../components/admin/AdminShell.astro";
+
+let errorMessage = "";
+
+if (Astro.request.method === "POST") {
+  try {
+    const formData = await Astro.request.formData();
+    
+    // Forward FormData langsung ke API Backend
+    const response = await fetch(new URL("/api/konten", Astro.url), {
+      method: "POST",
+      body: formData,
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      return Astro.redirect("/admin/konten?status=success");
+    } else {
+      errorMessage = result.message || "Gagal menyimpan data.";
+    }
+  } catch (error) {
+    console.error(error);
+    errorMessage = "Terjadi masalah jaringan atau server.";
+  }
+}
+---
+---
+
+<AdminShell
+  title="Tambah Konten"
+  subtitle="Tambahkan dokumen dan informasi baru yang akan ditampilkan pada website publik."
+>
+  <div class="page-layout">
+
+    <!-- FORM -->
+    <section class="form-card">
+
+      <div class="form-header">
+        <div>
+          <h2>Informasi Konten</h2>
+          <p>Lengkapi informasi konten yang ingin ditambahkan.</p>
+        </div>
+
+        <div class="header-icon">
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 5v14"></path>
+            <path d="M5 12h14"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Pesan Error / Notifikasi jika ada -->
+      {errorMessage && <div class="alert alert-error">{errorMessage}</div>}
+
+      <!-- PENTING: Tambahkan method="POST" dan enctype untuk upload file -->
+      <form method="POST" enctype="multipart/form-data">
+
+        <!-- NAMA KONTEN -->
+        <div class="form-group">
+          <label for="nama">
+            Nama Konten
+            <span>*</span>
+          </label>
+
+          <input
+            id="nama"
+            name="nama"
+            type="text"
+            placeholder="Contoh: Zona Integritas"
+            required
+          />
+
+          <small>
+            Nama yang digunakan untuk mengenali konten pada dashboard.
+          </small>
+        </div>
+
+
+        <!-- JUDUL -->
+        <div class="form-group">
+          <label for="judul">
+            Judul
+            <span>*</span>
+          </label>
+
+          <input
+            id="judul"
+            name="judul"
+            type="text"
+            placeholder="Masukkan judul konten"
+            required
+          />
+        </div>
+
+
+        <!-- ISI -->
+        <div class="form-group">
+          <label for="isi">
+            Isi Konten
+            <span>*</span>
+          </label>
+
+          <textarea
+            id="isi"
+            name="isi"
+            rows="8"
+            placeholder="Tulis isi konten di sini..."
+            required
+          ></textarea>
+
+          <small>
+            Masukkan informasi atau isi utama dari konten.
+          </small>
+        </div>
+
+
+        <!-- FOTO / FILE -->
+        <div class="form-group">
+          <label for="foto">
+            Foto / Video
+          </label>
+
+          <label class="upload-box" for="foto">
+
+            <div class="upload-icon">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+            </div>
+
+            <div class="upload-text">
+              <strong id="file-label">Pilih file untuk diunggah</strong>
+              <span>JPG, PNG, MP4, atau file yang sesuai</span>
+            </div>
+
+            <input
+              id="foto"
+              name="foto"
+              type="file"
+              accept="image/*,video/*"
+            />
+
+          </label>
+        </div>
+
+
+        <!-- KETERANGAN -->
+        <div class="form-group">
+          <label for="keterangan">
+            Keterangan
+          </label>
+
+          <textarea
+            id="keterangan"
+            name="keterangan"
+            rows="4"
+            placeholder="Contoh: Informasi mengenai Zona Integritas DPM-PTSP."
+          ></textarea>
+        </div>
+
+
+        <!-- TAGS -->
+        <div class="form-group">
+          <label for="tags">
+            Tags
+          </label>
+
+          <input
+            id="tags"
+            name="tags"
+            type="text"
+            placeholder="Contoh: zona-integritas"
+          />
+
+          <small>
+            Gunakan tanda hubung (-) untuk memisahkan kata.
+          </small>
+        </div>
+
+
+        <!-- FOOTER -->
+        <div class="form-footer">
+
+          <a
+            href="/admin/konten"
+            class="btn btn-cancel"
+          >
+            Batal
+          </a>
+
+          <button
+            type="submit"
+            class="btn btn-save"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"></path>
+              <polyline points="17 21 17 13 7 13 7 21"></polyline>
+              <polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
+
+            Simpan Konten
+          </button>
+
+        </div>
+
+      </form>
+
+    </section>
+
+
+    <!-- PREVIEW / INFO -->
+    <aside class="side-card">
+
+      <div class="side-icon">
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+      </div>
+
+      <h3>Informasi</h3>
+
+      <p>
+        Konten yang ditambahkan melalui halaman ini nantinya dapat
+        ditampilkan pada website publik DPM-PTSP.
+      </p>
+
+      <div class="info-list">
+
+        <div class="info-item">
+          <div class="mini-icon">1</div>
+          <span>Isi informasi konten dengan lengkap.</span>
+        </div>
+
+        <div class="info-item">
+          <div class="mini-icon">2</div>
+          <span>Tambahkan foto atau video jika diperlukan.</span>
+        </div>
+
+        <div class="info-item">
+          <div class="mini-icon">3</div>
+          <span>Gunakan tags yang mudah dikenali.</span>
+        </div>
+
+        <div class="info-item">
+          <div class="mini-icon">4</div>
+          <span>Klik Simpan Konten setelah semua data selesai.</span>
+        </div>
+
+      </div>
+
+    </aside>
+
+  </div>
+</AdminShell>
+
+<script>
+  // Menampilkan nama file yang dipilih pada UI upload
+  const fileInput = document.getElementById('foto') as HTMLInputElement;
+  const fileLabel = document.getElementById('file-label');
+
+  if (fileInput && fileLabel) {
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files && fileInput.files.length > 0) {
+        fileLabel.textContent = fileInput.files[0].name;
+      }
+    });
+  }
+</script>
+
+<style>
+.page-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 24px;
+  align-items: start;
+}
+
+/* Alert Error */
+.alert {
+  padding: 12px 16px;
+  margin: 20px 28px 0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.alert-error {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+/* FORM CARD */
+.form-card {
+  background: #ffffff;
+  border: 1px solid #edf1f5;
+  border-radius: 20px;
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.05);
+  overflow: hidden;
+}
+
+.form-header {
+  padding: 24px 28px;
+  border-bottom: 1px solid #edf1f5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.form-header h2 {
+  margin: 0 0 5px;
+  color: #0f172a;
+  font-size: 20px;
+  font-weight: 750;
+}
+
+.form-header p {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.header-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+/* FORM */
+form {
+  padding: 28px;
+}
+
+.form-group {
+  margin-bottom: 22px;
+}
+
+.form-group label:not(.upload-box) {
+  display: block;
+  margin-bottom: 8px;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.form-group label span {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #dbe3ec;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 12px 14px;
+  color: #334155;
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.6;
+}
+
+.form-group input[type="text"]:focus,
+.form-group textarea:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #a1a9b5;
+}
+
+.form-group small {
+  display: block;
+  margin-top: 7px;
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+/* UPLOAD */
+.upload-box {
+  min-height: 110px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 12px;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.upload-box:hover {
+  border-color: #93c5fd;
+  background: #f8fbff;
+}
+
+.upload-box input {
+  display: none;
+}
+
+.upload-icon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.upload-text {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.upload-text strong {
+  color: #334155;
+  font-size: 13px;
+}
+
+.upload-text span {
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+/* FOOTER */
+.form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 24px;
+  margin-top: 8px;
+  border-top: 1px solid #edf1f5;
+}
+
+.btn {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 18px;
+  border-radius: 9px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn-cancel {
+  border: 1px solid #dbe3ec;
+  background: #ffffff;
+  color: #475569;
+}
+
+.btn-cancel:hover {
+  background: #f8fafc;
+}
+
+.btn-save {
+  border: none;
+  background: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.18);
+}
+
+.btn-save:hover {
+  background: #1d4ed8;
+}
+
+/* SIDE CARD */
+.side-card {
+  background: #ffffff;
+  border: 1px solid #edf1f5;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.05);
+}
+
+.side-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.side-card h3 {
+  margin: 0 0 8px;
+  color: #0f172a;
+  font-size: 17px;
+  font-weight: 750;
+}
+
+.side-card > p {
+  margin: 0;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* INFO LIST */
+.info-list {
+  margin-top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding-top: 20px;
+  border-top: 1px solid #edf1f5;
+}
+
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.mini-icon {
+  width: 23px;
+  height: 23px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1000px) {
+  .page-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .side-card {
+    order: 2;
+  }
+}
+
+@media (max-width: 650px) {
+  form {
+    padding: 20px;
+  }
+
+  .form-header {
+    padding: 20px;
+  }
+
+  .form-footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}
+</style>

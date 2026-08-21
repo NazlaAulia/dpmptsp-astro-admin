@@ -1,46 +1,890 @@
 ---
 import AdminShell from "../../components/admin/AdminShell.astro";
 
+// Ambil data langsung dari Database via API (atau import db langsung di Astro)
+let konten = [];
+
+try {
+  const response = await fetch(new URL("/api/konten", Astro.url));
+  if (response.ok) {
+    konten = await response.json();
+  }
+} catch (error) {
+  console.error("Gagal memuat data konten:", error);
+}
+
 const items = [
-  { title: "Artikel unggulan", value: "8" },
-  { title: "Dokumen publik", value: "14" },
-  { title: "Berita hari ini", value: "2" },
+  { title: "Artikel unggulan", value: konten.length.toString(), icon: "article" },
+  { title: "Dokumen publik", value: "14", icon: "document" },
+  { title: "Berita hari ini", value: "2", icon: "news" },
 ];
 ---
 
-<AdminShell title="Konten" subtitle="Kelola dokumen dan informasi yang tampil di publik." actionLabel="Tambah Artikel" actionHref="/admin/tambah-artikel">
+<AdminShell
+  title="Konten"
+  subtitle="Kelola dokumen dan informasi yang tampil di publik."
+  actionLabel="Tambah Konten"
+  actionHref="/admin/tambah-konten"
+>
+
+  <!-- ================= SUMMARY ================= -->
+
   <div class="card-grid">
+
     {items.map((item) => (
       <article class="info-card">
-        <h3>{item.title}</h3>
-        <p>{item.value}</p>
+
+        <div class="card-icon">
+
+          {item.icon === "article" && (
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M4 4h16v16H4z"></path>
+              <path d="M8 8h8"></path>
+              <path d="M8 12h8"></path>
+              <path d="M8 16h5"></path>
+            </svg>
+          )}
+
+          {item.icon === "document" && (
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M6 2h9l5 5v15H6z"></path>
+              <path d="M14 2v6h6"></path>
+              <path d="M9 13h6"></path>
+              <path d="M9 17h6"></path>
+            </svg>
+          )}
+
+          {item.icon === "news" && (
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M4 4h16v16H4z"></path>
+              <path d="M8 8h8"></path>
+              <path d="M8 12h3"></path>
+              <path d="M8 16h8"></path>
+              <path d="M14 11h2"></path>
+            </svg>
+          )}
+
+        </div>
+
+        <div>
+          <h3>{item.title}</h3>
+          <p>{item.value}</p>
+        </div>
+
       </article>
     ))}
+
   </div>
+
+
+  <!-- ================= CONTENT ================= -->
+
+  <section class="content-card">
+
+    <div class="table-header">
+
+      <div>
+        <h2>Daftar Konten</h2>
+        <p>
+          Informasi dan konten yang tersedia pada website publik.
+        </p>
+      </div>
+
+      <div class="search-box">
+
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m20 20-4-4"></path>
+        </svg>
+
+        <input
+          type="text"
+          placeholder="Cari konten..."
+        />
+
+      </div>
+
+    </div>
+
+
+    <!-- TABLE -->
+
+    <div class="table-wrapper">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>id_konten</th>
+            <th>Nama_Konten</th>
+            <th>Isi_konten</th>
+            <th>Foto_konten</th>
+            <th>Judul_konten</th>
+            <th>Keterangan</th>
+            <th>Tags</th>
+            <th class="aksi-column">Aksi</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+        {konten.map((item: any) => (
+              <td>
+
+                <div class="action-buttons">
+
+                  <!-- EDIT -->
+
+                  <button
+                    type="button"
+                    class="action-btn edit-btn"
+                    title="Edit konten"
+                  >
+
+                    <svg
+                      width="17"
+                      height="17"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M12 20h9"></path>
+                      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"></path>
+                    </svg>
+
+                  </button>
+
+
+                  <!-- DELETE -->
+
+                  <button
+                    type="button"
+                    class="action-btn delete-btn"
+                    title="Hapus konten"
+                  >
+
+                    <svg
+                      width="17"
+                      height="17"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M3 6h18"></path>
+                      <path d="M8 6V4h8v2"></path>
+                      <path d="M19 6l-1 15H6L5 6"></path>
+                      <path d="M10 11v6"></path>
+                      <path d="M14 11v6"></path>
+                    </svg>
+
+                  </button>
+
+                </div>
+
+              </td>
+
+          
+          ))}
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+
+    <!-- FOOTER -->
+
+    <div class="table-footer">
+
+      <span>
+        Menampilkan <strong>1–{konten.length}</strong> dari{" "}
+        <strong>{konten.length}</strong> konten
+      </span>
+
+
+      <div class="pagination">
+
+        <button
+          type="button"
+          class="page-arrow"
+          disabled
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="m15 18-6-6 6-6"></path>
+          </svg>
+        </button>
+
+        <button
+          type="button"
+          class="page-number active"
+        >
+          1
+        </button>
+
+        <button
+          type="button"
+          class="page-number"
+        >
+          2
+        </button>
+
+        <button
+          type="button"
+          class="page-number"
+        >
+          3
+        </button>
+
+        <button
+          type="button"
+          class="page-arrow"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="m9 18 6-6-6-6"></path>
+          </svg>
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
 </AdminShell>
 
+
 <style>
+
+/* ================================================= */
+/* SUMMARY CARD */
+/* ================================================= */
+
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
 }
 
 .info-card {
-  background: white;
-  padding: 18px;
+  background: #ffffff;
+  border: 1px solid #edf1f5;
   border-radius: 18px;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+  padding: 22px 24px;
+
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+
+.card-icon {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+
+  border-radius: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #2563eb;
+  background: #eff6ff;
 }
 
 .info-card h3 {
-  margin: 0 0 8px;
+  margin: 0 0 5px;
+
+  color: #64748b;
+
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .info-card p {
   margin: 0;
-  font-size: 1.5rem;
+
+  color: #0f172a;
+
+  font-size: 26px;
   font-weight: 800;
+}
+
+
+/* ================================================= */
+/* CONTENT CARD */
+/* ================================================= */
+
+.content-card {
+  background: #ffffff;
+
+  border: 1px solid #edf1f5;
+  border-radius: 20px;
+
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.05);
+
+  overflow: hidden;
+}
+
+
+/* ================================================= */
+/* TABLE HEADER */
+/* ================================================= */
+
+.table-header {
+  padding: 24px 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  border-bottom: 1px solid #edf1f5;
+}
+
+.table-header h2 {
+  margin: 0 0 5px;
+
+  color: #0f172a;
+
+  font-size: 20px;
+  font-weight: 750;
+}
+
+.table-header p {
+  margin: 0;
+
+  color: #94a3b8;
+
+  font-size: 13px;
+}
+
+
+/* ================================================= */
+/* SEARCH */
+/* ================================================= */
+
+.search-box {
+  width: 240px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  padding: 0 13px;
+
+  border: 1px solid #dbe3ec;
+  border-radius: 10px;
+
+  background: #f8fafc;
+
+  color: #64748b;
+}
+
+.search-box input {
+  width: 100%;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  color: #334155;
+
+  font-size: 13px;
+}
+
+.search-box input::placeholder {
+  color: #94a3b8;
+}
+
+
+/* ================================================= */
+/* TABLE */
+/* ================================================= */
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+
+  min-width: 1250px;
+
+  border-collapse: collapse;
+}
+
+thead th {
+  padding: 15px 20px;
+
+  background: #f8fafc;
+
+  color: #64748b;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  text-align: left;
+
+  white-space: nowrap;
+
+  border-bottom: 1px solid #e2e8f0;
+}
+
+tbody td {
+  padding: 18px 20px;
+
+  vertical-align: top;
+
+  color: #334155;
+
+  font-size: 13px;
+
+  border-bottom: 1px solid #f1f5f9;
+}
+
+tbody tr {
+  transition: background 0.2s ease;
+}
+
+tbody tr:hover {
+  background: #fafcff;
+}
+
+
+/* ================================================= */
+/* ID */
+/* ================================================= */
+
+.id-badge {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 6px 9px;
+
+  border-radius: 8px;
+
+  background: #f1f5f9;
+
+  color: #64748b;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+
+/* ================================================= */
+/* NAMA KONTEN */
+/* ================================================= */
+
+.nama-konten {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  min-width: 150px;
+}
+
+.content-avatar {
+  width: 36px;
+  height: 36px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: #dbeafe;
+
+  color: #2563eb;
+
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.nama-konten strong {
+  color: #1e293b;
+
+  font-size: 13px;
+}
+
+
+/* ================================================= */
+/* ISI */
+/* ================================================= */
+
+.isi-text {
+  width: 235px;
+
+  color: #64748b;
+
+  line-height: 1.55;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+
+  overflow: hidden;
+}
+
+
+/* ================================================= */
+/* FILE */
+/* ================================================= */
+
+.file-box {
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  width: 190px;
+
+  color: #475569;
+
+  line-height: 1.4;
+
+  word-break: break-word;
+}
+
+.file-icon {
+  width: 32px;
+  height: 32px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 9px;
+
+  background: #fef3c7;
+
+  color: #d97706;
+}
+
+
+/* ================================================= */
+/* JUDUL */
+/* ================================================= */
+
+.judul-text {
+  color: #1e293b;
+
+  white-space: nowrap;
+}
+
+
+/* ================================================= */
+/* KETERANGAN */
+/* ================================================= */
+
+.keterangan {
+  display: block;
+
+  width: 170px;
+
+  color: #64748b;
+
+  line-height: 1.5;
+}
+
+
+/* ================================================= */
+/* TAG */
+/* ================================================= */
+
+.tag {
+  display: inline-flex;
+
+  padding: 6px 10px;
+
+  border-radius: 20px;
+
+  background: #eff6ff;
+
+  color: #2563eb;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+
+/* ================================================= */
+/* AKSI */
+/* ================================================= */
+
+.aksi-column {
+  text-align: center;
+}
+
+.action-buttons {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+}
+
+.action-btn {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 9px;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+}
+
+.edit-btn {
+  background: #eff6ff;
   color: #2563eb;
 }
+
+.edit-btn:hover {
+  background: #dbeafe;
+}
+
+.delete-btn {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.delete-btn:hover {
+  background: #fee2e2;
+}
+
+
+/* ================================================= */
+/* FOOTER */
+/* ================================================= */
+
+/* ================================================= */
+/* AKSI */
+/* ================================================= */
+
+.aksi-column {
+  text-align: center;
+}
+
+.action-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.action-btn {
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  color: #111827;
+  background: #f1f3f5;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  background: #e5e7eb;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
+}
+
+/* Pensil */
+.edit-btn {
+  background: #f1f3f5;
+  color: #111827;
+}
+
+.edit-btn:hover {
+  background: #e2e5e9;
+  color: #000000;
+}
+
+/* Tempat sampah */
+.delete-btn {
+  background: #f1f3f5;
+  color: #111827;
+}
+
+.delete-btn:hover {
+  background: #e2e5e9;
+  color: #000000;
+}
+
+/* ================================================= */
+/* PAGINATION */
+/* ================================================= */
+
+.pagination {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+}
+
+.pagination button {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #dbe3ec;
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  color: #64748b;
+
+  cursor: pointer;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: #f8fafc;
+}
+
+.pagination .active {
+  background: #2563eb;
+  border-color: #2563eb;
+
+  color: #ffffff;
+}
+
+.pagination button:disabled {
+  opacity: 0.4;
+
+  cursor: not-allowed;
+}
+
+
+/* ================================================= */
+/* RESPONSIVE */
+/* ================================================= */
+
+@media (max-width: 900px) {
+
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .table-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .table-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+}
+
 </style>
