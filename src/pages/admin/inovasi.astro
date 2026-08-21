@@ -441,11 +441,11 @@ const daftarInovasi = [
     }
   };
 
-  document.getElementById('confirmEditBtn')?.addEventListener('click', function() {
-    if (selectedEditId) {
-      window.location.href = `/admin/inovasi/edit/${selectedEditId}`;
-    }
-  });
+document.getElementById('confirmEditBtn')?.addEventListener('click', function() {
+  if (selectedEditId) {
+    window.location.href = `/admin/edit-inovasi?id=${selectedEditId}`;
+  }
+});
 
   // Fungsi Modal Hapus
   // @ts-ignore
