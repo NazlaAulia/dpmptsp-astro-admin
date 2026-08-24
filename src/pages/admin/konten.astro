@@ -1,16 +1,17 @@
 ---
 import AdminShell from "../../components/admin/AdminShell.astro";
+import { db } from "../../lib/db.js"; // Langsung import DB agar tidak perlu API endpoint terpisah
 
-// Ambil data langsung dari Database via API (atau import db langsung di Astro)
-let konten = [];
+let konten: any[] = [];
 
 try {
-  const response = await fetch(new URL("/api/konten", Astro.url));
-  if (response.ok) {
-    konten = await response.json();
-  }
+  // Query langsung ke MySQL database
+  const [rows]: any = await db.execute(
+    "SELECT * FROM tentangkamiswebv5 ORDER BY Id_Konten DESC"
+  );
+  konten = rows || [];
 } catch (error) {
-  console.error("Gagal memuat data konten:", error);
+  console.error("Gagal memuat data konten dari Database:", error);
 }
 
 const items = [
@@ -28,61 +29,28 @@ const items = [
 >
 
   <!-- ================= SUMMARY ================= -->
-
   <div class="card-grid">
-
     {items.map((item) => (
       <article class="info-card">
-
         <div class="card-icon">
-
           {item.icon === "article" && (
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 4h16v16H4z"></path>
               <path d="M8 8h8"></path>
               <path d="M8 12h8"></path>
               <path d="M8 16h5"></path>
             </svg>
           )}
-
           {item.icon === "document" && (
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M6 2h9l5 5v15H6z"></path>
               <path d="M14 2v6h6"></path>
               <path d="M9 13h6"></path>
               <path d="M9 17h6"></path>
             </svg>
           )}
-
           {item.icon === "news" && (
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 4h16v16H4z"></path>
               <path d="M8 8h8"></path>
               <path d="M8 12h3"></path>
@@ -90,68 +58,38 @@ const items = [
               <path d="M14 11h2"></path>
             </svg>
           )}
-
         </div>
-
         <div>
           <h3>{item.title}</h3>
           <p>{item.value}</p>
         </div>
-
       </article>
     ))}
-
   </div>
 
-
   <!-- ================= CONTENT ================= -->
-
   <section class="content-card">
-
     <div class="table-header">
-
       <div>
         <h2>Daftar Konten</h2>
-        <p>
-          Informasi dan konten yang tersedia pada website publik.
-        </p>
+        <p>Informasi dan konten yang tersedia pada website publik.</p>
       </div>
 
       <div class="search-box">
-
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="7"></circle>
           <path d="m20 20-4-4"></path>
         </svg>
-
-        <input
-          type="text"
-          placeholder="Cari konten..."
-        />
-
+        <input type="text" placeholder="Cari konten..." />
       </div>
-
     </div>
 
-
     <!-- TABLE -->
-
     <div class="table-wrapper">
-
       <table>
-
         <thead>
           <tr>
-            <th>id_konten</th>
+            <th>Id_Konten</th>
             <th>Nama_Konten</th>
             <th>Isi_konten</th>
             <th>Foto_konten</th>
@@ -161,156 +99,97 @@ const items = [
             <th class="aksi-column">Aksi</th>
           </tr>
         </thead>
-
-        <tbody>
-
-        {konten.map((item: any) => (
-              <td>
-
-                <div class="action-buttons">
-
-                  <!-- EDIT -->
-
-                  <button
-                    type="button"
-                    class="action-btn edit-btn"
-                    title="Edit konten"
-                  >
-
-                    <svg
-                      width="17"
-                      height="17"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <path d="M12 20h9"></path>
-                      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"></path>
-                    </svg>
-
-                  </button>
-
-
-                  <!-- DELETE -->
-
-                  <button
-                    type="button"
-                    class="action-btn delete-btn"
-                    title="Hapus konten"
-                  >
-
-                    <svg
-                      width="17"
-                      height="17"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <path d="M3 6h18"></path>
-                      <path d="M8 6V4h8v2"></path>
-                      <path d="M19 6l-1 15H6L5 6"></path>
-                      <path d="M10 11v6"></path>
-                      <path d="M14 11v6"></path>
-                    </svg>
-
-                  </button>
-
-                </div>
-
+  <tbody>
+          {konten.length === 0 ? (
+            <tr>
+              <td colspan="8" style="text-align: center; padding: 20px;">
+                Belum ada data konten.
               </td>
+            </tr>
+          ) : (
+            konten.map((item: any) => (
+              <tr>
+                <td><span class="id-badge">{item.Id_Konten}</span></td>
+                <td>
+                  <div class="nama-konten">
+                    <div class="content-avatar">
+                      {item.Nama_Konten ? item.Nama_Konten.charAt(0).toUpperCase() : "-"}
+                    </div>
+                    <strong>{item.Nama_Konten}</strong>
+                  </div>
+                </td>
+                <td><div class="isi-text">{item.Isi_Konten || "-"}</div></td>
+                
+                <!-- BAGIAN FOTO/GAMBAR KONTEN (SUDAH DIPERBAIKI) -->
+                <td>
+                  {item.Foto_Konten ? (
+                    <div class="file-box">
+                      <img 
+                        src={`/uploads/konten/${item.Foto_Konten}`} 
+                        alt={item.Nama_Konten}
+                        class="thumb-img"
+                        onerror="this.style.display='none'"
+                      />
+                      <span class="file-name">{item.Foto_Konten}</span>
+                    </div>
+                  ) : (
+                    <span style="color: #94a3b8;">Tanpa File</span>
+                  )}
+                </td>
 
-          
-          ))}
+                <td><span class="judul-text">{item.Judul_Konten}</span></td>
+                <td><span class="keterangan">{item.Keterangan || "-"}</span></td>
+                <td>{item.tags ? <span class="tag">{item.tags}</span> : "-"}</td>
+                <td>
+                  <div class="action-buttons">
+                    <!-- EDIT -->
+                    <button type="button" class="action-btn edit-btn" title="Edit konten">
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"></path>
+                      </svg>
+                    </button>
 
+                    <!-- DELETE -->
+                    <button type="button" class="action-btn delete-btn" title="Hapus konten">
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 6h18"></path>
+                        <path d="M8 6V4h8v2"></path>
+                        <path d="M19 6l-1 15H6L5 6"></path>
+                        <path d="M10 11v6"></path>
+                        <path d="M14 11v6"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
-
       </table>
-
     </div>
 
-
     <!-- FOOTER -->
-
     <div class="table-footer">
-
       <span>
-        Menampilkan <strong>1–{konten.length}</strong> dari{" "}
-        <strong>{konten.length}</strong> konten
+        Menampilkan <strong>{konten.length > 0 ? 1 : 0}-{konten.length}</strong> dari <strong>{konten.length}</strong> konten
       </span>
 
-
       <div class="pagination">
-
-        <button
-          type="button"
-          class="page-arrow"
-          disabled
-        >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
+        <button type="button" class="page-arrow" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="m15 18-6-6 6-6"></path>
           </svg>
         </button>
-
-        <button
-          type="button"
-          class="page-number active"
-        >
-          1
-        </button>
-
-        <button
-          type="button"
-          class="page-number"
-        >
-          2
-        </button>
-
-        <button
-          type="button"
-          class="page-number"
-        >
-          3
-        </button>
-
-        <button
-          type="button"
-          class="page-arrow"
-        >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
+        <button type="button" class="page-number active">1</button>
+        <button type="button" class="page-arrow">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="m9 18 6-6-6-6"></path>
           </svg>
         </button>
-
       </div>
-
     </div>
-
   </section>
-
 </AdminShell>
 
 
@@ -469,54 +348,38 @@ const items = [
 /* TABLE */
 /* ================================================= */
 
+/* Pembungkus Tabel: Agar bisa di-scroll Horizontal & Vertikal */
 .table-wrapper {
   width: 100%;
-  overflow-x: auto;
+  max-height: 480px; /* Batas tinggi tabel (sesuaikan kalau mau lebih tinggi/pendek) */
+  overflow-x: auto;  /* Mengaktifkan scroll kiri-kanan */
+  overflow-y: auto;  /* Mengaktifkan scroll atas-bawah */
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
 }
 
+/* Memastikan tabel memakai lebar penuh dan tidak collapse */
 table {
   width: 100%;
-
-  min-width: 1250px;
-
+  min-width: 900px; /* Memaksa tabel punya lebar minimal agar kolom tidak menumpuk */
   border-collapse: collapse;
 }
 
+/* Menjaga Header Tabel Tetap Menempel di Atas saat Di-scroll Vertikal */
 thead th {
-  padding: 15px 20px;
+  position: sticky;
+  top: 0;
+  background-color: #f8fafc; /* Warna background header */
+  z-index: 10;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
 
-  background: #f8fafc;
-
-  color: #64748b;
-
-  font-size: 12px;
-  font-weight: 700;
-
-  text-align: left;
-
+/* Kerapihan Teks di Kolom Isi Konten */
+.isi-text {
+  max-width: 200px;
   white-space: nowrap;
-
-  border-bottom: 1px solid #e2e8f0;
-}
-
-tbody td {
-  padding: 18px 20px;
-
-  vertical-align: top;
-
-  color: #334155;
-
-  font-size: 13px;
-
-  border-bottom: 1px solid #f1f5f9;
-}
-
-tbody tr {
-  transition: background 0.2s ease;
-}
-
-tbody tr:hover {
-  background: #fafcff;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Menampilkan '...' jika teks terlalu panjang */
 }
 
 
@@ -887,4 +750,22 @@ tbody tr:hover {
 
 }
 
+.thumb-img {
+  width: 45px;
+  height: 45px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  flex-shrink: 0;
+}
+
+.file-name {
+  font-size: 11px;
+  color: #64748b;
+  word-break: break-all;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 </style>

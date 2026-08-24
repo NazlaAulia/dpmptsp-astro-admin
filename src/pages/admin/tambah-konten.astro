@@ -1,31 +1,105 @@
 ---
 import AdminShell from "../../components/admin/AdminShell.astro";
+import { db } from "../../lib/db.js";
+import fs from "node:fs/promises";
+import path from "node:path";
 
 let errorMessage = "";
 
 if (Astro.request.method === "POST") {
   try {
     const formData = await Astro.request.formData();
-    
-    // Forward FormData langsung ke API Backend
-    const response = await fetch(new URL("/api/konten", Astro.url), {
-      method: "POST",
-      body: formData,
-    });
 
-    const result = await response.json();
+    // Mengambil data dari name="..." HTML
+    const namaKonten = formData.get("nama_konten")?.toString().trim();
+    const judulKonten = formData.get("judul_konten")?.toString().trim();
+    const isiKonten = formData.get("isi_konten")?.toString().trim();
+    const keterangan = formData.get("keterangan")?.toString().trim();
+    const tags = formData.get("tags")?.toString().trim();
+    const file = formData.get("foto_konten");
 
-    if (response.ok) {
-      return Astro.redirect("/admin/konten?status=success");
+    // 1. Validasi Input Utama
+    if (!namaKonten || !judulKonten || !isiKonten) {
+      errorMessage = "Nama konten, judul, dan isi konten wajib diisi.";
     } else {
-      errorMessage = result.message || "Gagal menyimpan data.";
+      let namaFile: string | null = null;
+
+      // 2. Process File Upload jika ada
+      if (file && typeof file !== "string" && file.size > 0) {
+        const allowedTypes = [
+          "image/jpeg",
+          "image/png",
+          "image/webp",
+          "image/jpg",
+          "video/mp4",
+          "video/webm",
+          "video/quicktime",
+        ];
+
+        if (!allowedTypes.includes(file.type)) {
+          throw new Error("Format file tidak didukung.");
+        }
+
+        if (file.size > 50 * 1024 * 1024) {
+          throw new Error("Ukuran file maksimal 50 MB.");
+        }
+
+        const originalName = file.name || "file";
+        const extension = path.extname(originalName).toLowerCase();
+        const safeName = namaKonten
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+
+        namaFile = `${safeName}-${Date.now()}${extension}`;
+
+        const uploadDir = path.join(
+          process.cwd(),
+          "public",
+          "uploads",
+          "konten"
+        );
+
+        await fs.mkdir(uploadDir, { recursive: true });
+
+        const buffer = Buffer.from(await file.arrayBuffer());
+        await fs.writeFile(path.join(uploadDir, namaFile), buffer);
+      }
+
+      // 3. Simpan Ke Database (Nama kolom disesuaikan persis dengan phpMyAdmin)
+      await db.execute(
+        `INSERT INTO tentangkamiswebv5
+        (
+          Nama_Konten,
+          Isi_Konten,
+          Foto_Konten,
+          Judul_Konten,
+          Keterangan,
+          tags
+        )
+        VALUES (?, ?, ?, ?, ?, ?)`,
+        [
+          namaKonten,
+          isiKonten,
+          namaFile,
+          judulKonten,
+          keterangan || null,
+          tags || null,
+        ]
+      );
+
+      // 4. Redirect kembali ke Dashboard Konten jika Sukses
+      return Astro.redirect("/admin/konten?status=success");
     }
   } catch (error) {
-    console.error(error);
-    errorMessage = "Terjadi masalah jaringan atau server.";
+    console.error("ERROR SIMPAN KONTEN:", error);
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    } else {
+      errorMessage = "Terjadi kesalahan saat menyimpan konten.";
+    }
   }
 }
----
 ---
 
 <AdminShell
@@ -75,7 +149,7 @@ if (Astro.request.method === "POST") {
 
           <input
             id="nama"
-            name="nama"
+        name="nama_konten"
             type="text"
             placeholder="Contoh: Zona Integritas"
             required
@@ -96,7 +170,7 @@ if (Astro.request.method === "POST") {
 
           <input
             id="judul"
-            name="judul"
+          name="judul_konten"
             type="text"
             placeholder="Masukkan judul konten"
             required
@@ -113,7 +187,7 @@ if (Astro.request.method === "POST") {
 
           <textarea
             id="isi"
-            name="isi"
+     name="isi_konten"
             rows="8"
             placeholder="Tulis isi konten di sini..."
             required
@@ -157,7 +231,7 @@ if (Astro.request.method === "POST") {
 
             <input
               id="foto"
-              name="foto"
+        name="foto_konten"
               type="file"
               accept="image/*,video/*"
             />
@@ -338,7 +412,7 @@ if (Astro.request.method === "POST") {
   border: 1px solid #edf1f5;
   border-radius: 20px;
   box-shadow: 0 8px 28px rgba(15, 23, 42, 0.05);
-  overflow: hidden;
+ 
 }
 
 .form-header {
@@ -633,5 +707,25 @@ form {
   .btn {
     width: 100%;
   }
+}
+
+/* FIX TAMPILAN TAMBAH KONTEN */
+:global(html),
+:global(body) {
+  height: auto;
+  min-height: 100%;
+  overflow-y: auto !important;
+}
+
+:global(main) {
+  height: auto !important;
+  min-height: 100vh;
+  overflow-y: visible !important;
+}
+
+:global(.page-content) {
+  height: auto !important;
+  min-height: 100vh;
+  overflow: visible !important;
 }
 </style>
