@@ -2,27 +2,19 @@
 import AdminShell from "../../components/admin/AdminShell.astro";
 import { db } from "../../lib/db.js";
 
-// === 1. TANGKAP PERINTAH HAPUS & EDIT DI SINI ===
+// === TANGKAP PERINTAH HAPUS DI SINI ===
 if (Astro.request.method === "POST") {
   try {
     const data = await Astro.request.formData();
     const deleteId = data.get("deleteId");
-    const editId = data.get("editId");
 
     // Jika perintah hapus
     if (deleteId) {
       await db.execute("DELETE FROM tentangkamiswebv5 WHERE Id_Konten = ?", [deleteId]);
       return Astro.redirect("/admin/konten");
     }
-
-    // Jika perintah edit (simpan perubahan berdasarkan ID)
-    if (editId) {
-      // Catatan: Jika Anda ingin mengambil data dari form lain atau jika edit diarahkan ke halaman form edit terpisah,
-      // sesuaikan query di bawah. Tapi jika ini untuk memproses aksi setelah konfirmasi:
-      return Astro.redirect(`/admin/edit-konten/${editId}`);
-    }
   } catch (error) {
-    console.error("Gagal memproses data dari Database:", error);
+    console.error("Gagal memproses penghapusan data:", error);
   }
 }
 
@@ -255,15 +247,16 @@ const items = [
     <h3>Edit Data?</h3>
     <p>Apakah Anda yakin ingin mengedit data konten ini?</p>
     
-    <form method="POST" class="modal-actions">
-      <input type="hidden" name="editId" id="modalEditInput" />
+    <div class="modal-actions">
       <button type="button" id="cancelEdit" class="modal-btn modal-btn-cancel">Batal</button>
-      <button type="submit" class="modal-btn modal-btn-edit">Ya, Edit</button>
-    </form>
+      <button type="button" id="confirmEditBtn" class="modal-btn modal-btn-edit">Ya, Edit</button>
+    </div>
   </div>
 </div>
 
 <script>
+  let selectedEditId: string | number = '';
+
   declare global {
     interface Window {
       openDeleteModal: (id: string | number) => void;
@@ -281,9 +274,8 @@ const items = [
 
   // Modal Edit
   window.openEditModal = function(id: string | number) {
+    selectedEditId = id; // Simpan ID yang akan diedit
     const modal = document.getElementById('editModal');
-    const input = document.getElementById('modalEditInput') as HTMLInputElement | null;
-    if (input) input.value = String(id);
     if (modal) modal.classList.add('is-open');
   };
 
@@ -293,6 +285,7 @@ const items = [
     
     const editModal = document.getElementById('editModal');
     const cancelEdit = document.getElementById('cancelEdit');
+    const confirmEditBtn = document.getElementById('confirmEditBtn');
 
     if (cancelDelete && deleteModal) {
       cancelDelete.addEventListener('click', () => deleteModal.classList.remove('is-open'));
@@ -300,6 +293,15 @@ const items = [
 
     if (cancelEdit && editModal) {
       cancelEdit.addEventListener('click', () => editModal.classList.remove('is-open'));
+    }
+
+    // Ketika tombol "Ya, Edit" diklik, lempar ke halaman edit-konten dengan query ID
+    if (confirmEditBtn) {
+      confirmEditBtn.addEventListener('click', () => {
+        if (selectedEditId) {
+          window.location.href = `/admin/edit-konten?id=${selectedEditId}`;
+        }
+      });
     }
 
     window.addEventListener('click', (e) => {
@@ -796,3 +798,4 @@ const items = [
     gap: 8px;
   }
 }
+</style>
