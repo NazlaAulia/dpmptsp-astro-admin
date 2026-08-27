@@ -21,17 +21,8 @@ const daftarInovasi = [
   actionHref="/admin/tambah-inovasi"
 >
   <div class="card-table-container">
-    {/* Baris Kontrol: Entri & Pencarian */}
-    <div class="table-controls">
-      <div class="entries-wrapper">
-        Tampilkan 
-        <select class="select-entries">
-          <option value="10">10</option>
-          <option value="25">25</option>
-          <option value="50">50</option>
-        </select> 
-        entri
-      </div>
+    {/* Baris Kontrol: Pencarian Saja */}
+    <div class="table-controls search-only">
       <div class="search-wrapper">
         <label for="search">Cari:</label>
         <input type="text" id="search" placeholder="Cari data..." class="search-input" />
@@ -162,13 +153,8 @@ const daftarInovasi = [
   color: #475569;
 }
 
-.select-entries {
-  padding: 6px 12px;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
-  background-color: #fff;
-  margin: 0 6px;
-  outline: none;
+.table-controls.search-only {
+  justify-content: flex-end;
 }
 
 .search-input {
@@ -181,7 +167,7 @@ const daftarInovasi = [
   width: 200px;
 }
 
-.search-input:focus, .select-entries:focus {
+.search-input:focus {
   border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
@@ -473,4 +459,4 @@ document.getElementById('confirmEditBtn')?.addEventListener('click', function() 
       window.closeDeleteModal();
     }
   });
-</script>
+</script> 
