@@ -2,6 +2,10 @@
 import AdminShell from "../../components/admin/AdminShell.astro";
 import { db } from "../../lib/db.js";
 
+// Tambahkan baris ini di bagian paling atas script Astro halaman depan Anda
+export const prerender = false;
+Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+
 // === 1. TANGKAP PERINTAH HAPUS & EDIT DI SINI ===
 if (Astro.request.method === "POST") {
   try {
@@ -15,11 +19,9 @@ if (Astro.request.method === "POST") {
       return Astro.redirect("/admin/konten");
     }
 
-    // Jika perintah edit (simpan perubahan berdasarkan ID)
+    // Jika perintah edit (mengarahkan ke halaman edit dengan query parameter id)
     if (editId) {
-      // Catatan: Jika Anda ingin mengambil data dari form lain atau jika edit diarahkan ke halaman form edit terpisah,
-      // sesuaikan query di bawah. Tapi jika ini untuk memproses aksi setelah konfirmasi:
-      return Astro.redirect(`/admin/edit-konten/${editId}`);
+      return Astro.redirect(`/admin/edit-konten?id=${editId}`);
     }
   } catch (error) {
     console.error("Gagal memproses data dari Database:", error);
@@ -165,7 +167,7 @@ const items = [
                 <td>{item.tags ? <span class="tag" title={item.tags}>{item.tags}</span> : <span style="color:#94a3b8">-</span>}</td>
                 <td>
                   <div class="action-buttons">
-                    <!-- EDIT -->
+                    <!-- EDIT BUTTON -->
                     <button 
                       type="button" 
                       class="action-btn edit-btn" 
@@ -178,7 +180,7 @@ const items = [
                       </svg>
                     </button>
 
-                    <!-- DELETE -->
+                    <!-- DELETE BUTTON -->
                     <button 
                       type="button" 
                       class="action-btn delete-btn" 
@@ -584,30 +586,31 @@ const items = [
 }
 
 .action-btn {
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   transition: background 0.15s ease;
 }
 
 .edit-btn {
-  background: #f1f3f5;
-  color: #111827;
+  background: #eff6ff;
+  color: #2563eb;
 }
-.edit-btn:hover { background: #e2e5e9; }
+.edit-btn:hover { 
+  background: #dbeafe; 
+}
 
 .delete-btn {
-  background: #f1f3f5;
-  color: #111827;
+  background: #fef2f2;
+  color: #ef4444;
 }
 .delete-btn:hover { 
-  background: #e2e5e9; 
-  color: #dc2626; 
+  background: #fee2e2; 
 }
 
 /* ================================================= */

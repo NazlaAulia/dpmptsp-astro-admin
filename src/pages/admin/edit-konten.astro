@@ -1,801 +1,321 @@
 ---
 import AdminShell from "../../components/admin/AdminShell.astro";
 import { db } from "../../lib/db.js";
+import fs from "node:fs/promises";
+import path from "node:path";
 
-// === TANGKAP PERINTAH HAPUS DI SINI ===
-if (Astro.request.method === "POST") {
-  try {
-    const data = await Astro.request.formData();
-    const deleteId = data.get("deleteId");
+const id = Astro.url.searchParams.get("id");
 
-    // Jika perintah hapus
-    if (deleteId) {
-      await db.execute("DELETE FROM tentangkamiswebv5 WHERE Id_Konten = ?", [deleteId]);
-      return Astro.redirect("/admin/konten");
-    }
-  } catch (error) {
-    console.error("Gagal memproses penghapusan data:", error);
-  }
+if (!id) {
+  return Astro.redirect("/admin/konten");
 }
 
-let konten: any[] = [];
+let kontenItem: any = null;
+let errorMessage = "";
 
 try {
   const [rows]: any = await db.execute(
-    "SELECT * FROM tentangkamiswebv5 ORDER BY Id_Konten DESC"
+    "SELECT * FROM tentangkamiswebv5 WHERE Id_Konten = ?",
+    [id]
   );
-  konten = rows || [];
-} catch (error) {
-  console.error("Gagal memuat data konten dari Database:", error);
+  if (rows.length > 0) {
+    kontenItem = rows[0];
+  }
+} catch (error: any) {
+  console.error("Gagal mengambil data:", error);
 }
 
-const items = [
-  { title: "Artikel unggulan", value: konten.length.toString(), icon: "article" },
-  { title: "Dokumen publik", value: "14", icon: "document" },
-  { title: "Berita hari ini", value: "2", icon: "news" },
-];
+if (!kontenItem) {
+  return Astro.redirect("/admin/konten");
+}
+
+if (Astro.request.method === "POST") {
+  try {
+    const formData = await Astro.request.formData();
+    
+    const namaKonten = (formData.get("Nama_Konten") as string) || "";
+    const isiKonten = (formData.get("Isi_Konten") as string) || "";
+    const judulKonten = (formData.get("Judul_Konten") as string) || "";
+    const keterangan = (formData.get("Keterangan") as string) || "";
+    const tags = (formData.get("tags") as string) || "";
+    const fotoFile = formData.get("Foto_Konten") as File;
+
+    let namaFotoBaru = kontenItem.Foto_Konten || "";
+
+    // Cek jika user mengupload file foto baru
+    if (fotoFile && fotoFile.size > 0 && fotoFile.name && fotoFile.name !== "undefined") {
+      const uploadDir = path.join(process.cwd(), "public/uploads");
+      try {
+        await fs.mkdir(uploadDir, { recursive: true });
+      } catch (e) {}
+
+      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+      const originalName = fotoFile.name.replace(/\s+/g, "_");
+      namaFotoBaru = `${uniqueSuffix}-${originalName}`;
+
+      const filePath = path.join(uploadDir, namaFotoBaru);
+      const buffer = Buffer.from(await fotoFile.arrayBuffer());
+      await fs.writeFile(filePath, buffer);
+    }
+
+    // Update database menggunakan kolom yang tepat: Foto_Konten
+    await db.execute(
+      `UPDATE tentangkamiswebv5 
+       SET Nama_Konten = ?, Isi_Konten = ?, Foto_Konten = ?, Judul_Konten = ?, Keterangan = ?, tags = ? 
+       WHERE Id_Konten = ?`,
+      [namaKonten, isiKonten, namaFotoBaru, judulKonten, keterangan, tags, id]
+    );
+
+    return Astro.redirect("/admin/konten");
+  } catch (error: any) {
+    console.error("Gagal mengupdate data:", error);
+    errorMessage = `Gagal menyimpan: ${error.message || error}`;
+  }
+}
 ---
 
 <AdminShell
-  title="Konten"
-  subtitle="Kelola dokumen dan informasi yang tampil di publik."
-  actionLabel="Tambah Konten"
-  actionHref="/admin/tambah-konten"
+  title="Edit Konten"
+  subtitle={`Mengubah data konten dengan ID: ${id}`}
 >
-
-  <!-- ================= SUMMARY ================= -->
-  <div class="card-grid">
-    {items.map((item) => (
-      <article class="info-card">
-        <div class="card-icon">
-          {item.icon === "article" && (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 4h16v16H4z"></path>
-              <path d="M8 8h8"></path>
-              <path d="M8 12h8"></path>
-              <path d="M8 16h5"></path>
-            </svg>
-          )}
-          {item.icon === "document" && (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M6 2h9l5 5v15H6z"></path>
-              <path d="M14 2v6h6"></path>
-              <path d="M9 13h6"></path>
-              <path d="M9 17h6"></path>
-            </svg>
-          )}
-          {item.icon === "news" && (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 4h16v16H4z"></path>
-              <path d="M8 8h8"></path>
-              <path d="M8 12h3"></path>
-              <path d="M8 16h8"></path>
-              <path d="M14 11h2"></path>
-            </svg>
-          )}
-        </div>
-        <div>
-          <h3>{item.title}</h3>
-          <p>{item.value}</p>
-        </div>
-      </article>
-    ))}
-  </div>
-
-  <!-- ================= CONTENT ================= -->
-  <section class="content-card">
-    <div class="table-header">
+  <div class="form-card">
+    <div class="form-header-top">
       <div>
-        <h2>Daftar Konten</h2>
-        <p>Informasi dan konten yang tersedia pada website publik.</p>
+        <h2>Form Edit Konten</h2>
+        <p>Silakan ubah informasi di bawah ini sesuai kebutuhan.</p>
       </div>
-
-      <div class="search-box">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="7"></circle>
-          <path d="m20 20-4-4"></path>
-        </svg>
-        <input type="text" placeholder="Cari konten..." />
+      <div class="form-actions-top">
+        <a href="/admin/konten" class="btn-cancel">Kembali</a>
+        <button type="submit" form="editForm" class="btn-submit">Simpan Perubahan</button>
       </div>
     </div>
 
-   <!-- TABLE -->
-    <div class="table-wrapper">
-      <table class="styled-table">
-        <thead>
-          <tr>
-            <th class="th-id">ID</th>
-            <th class="th-nama">Nama Konten</th>
-            <th class="th-isi">Isi</th>
-            <th class="th-foto">Foto</th>
-            <th class="th-judul">Judul</th>
-            <th class="th-ket">Keterangan</th>
-            <th class="th-tags">Tags</th>
-            <th class="th-aksi">Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          {konten.length === 0 ? (
-            <tr>
-              <td colspan="8" class="no-data">
-                Belum ada data konten.
-              </td>
-            </tr>
-          ) : (
-            konten.map((item: any) => (
-              <tr>
-                <td><span class="id-badge">{item.Id_Konten}</span></td>
-                <td>
-                  <div class="nama-konten">
-                    <div class="content-avatar">
-                      {item.Nama_Konten ? item.Nama_Konten.charAt(0).toUpperCase() : "-"}
-                    </div>
-                    <span class="nama-text" title={item.Nama_Konten}>{item.Nama_Konten}</span>
-                  </div>
-                </td>
-                <td><span class="cell-text" title={item.Isi_Konten}>{item.Isi_Konten || "-"}</span></td>
-                
-                <!-- FOTO -->
-                <td>
-                  {item.Foto_Konten ? (
-                    <div class="file-box">
-                      <img 
-                        src={`/uploads/konten/${item.Foto_Konten}`} 
-                        alt={item.Nama_Konten}
-                        class="thumb-img"
-                        onerror="this.style.display='none'"
-                      />
-                      <span class="file-name" title={item.Foto_Konten}>{item.Foto_Konten}</span>
-                    </div>
-                  ) : (
-                    <span style="color: #94a3b8; font-size: 11.5px;">-</span>
-                  )}
-                </td>
+    {errorMessage && <div class="alert error">{errorMessage}</div>}
 
-                <td><span class="cell-text" title={item.Judul_Konten}>{item.Judul_Konten || "-"}</span></td>
-                <td><span class="cell-text" title={item.Keterangan}>{item.Keterangan || "-"}</span></td>
-                <td>{item.tags ? <span class="tag" title={item.tags}>{item.tags}</span> : <span style="color:#94a3b8">-</span>}</td>
-                <td>
-                  <div class="action-buttons">
-                    <!-- EDIT -->
-                    <button 
-                      type="button" 
-                      class="action-btn edit-btn" 
-                      title="Edit konten"
-                      onclick={`window.openEditModal('${item.Id_Konten}')`}
-                    >
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 20h9"></path>
-                        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"></path>
-                      </svg>
-                    </button>
+    <form method="POST" enctype="multipart/form-data" class="styled-form" id="editForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="Nama_Konten">Nama Konten</label>
+          <input 
+            type="text" 
+            id="Nama_Konten" 
+            name="Nama_Konten" 
+            value={kontenItem.Nama_Konten || ""} 
+            required 
+          />
+        </div>
 
-                    <!-- DELETE -->
-                    <button 
-                      type="button" 
-                      class="action-btn delete-btn" 
-                      title="Hapus konten"
-                      onclick={`window.openDeleteModal('${item.Id_Konten}')`}
-                    >
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M3 6h18"></path>
-                        <path d="M8 6V4h8v2"></path>
-                        <path d="M19 6l-1 15H6L5 6"></path>
-                        <path d="M10 11v6"></path>
-                        <path d="M14 11v6"></path>
-                      </svg>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))
+        <div class="form-group">
+          <label for="Foto_Konten">Ganti Foto (Choose File)</label>
+          <input 
+            type="file" 
+            id="Foto_Konten" 
+            name="Foto_Konten" 
+            accept="image/*"
+          />
+          {kontenItem.Foto_Konten && (
+            <span class="file-info">File saat ini: {kontenItem.Foto_Konten}</span>
           )}
-        </tbody>
-      </table>
-    </div>
-
-    <!-- FOOTER -->
-    <div class="table-footer">
-      <span>
-        Menampilkan <strong>{konten.length > 0 ? 1 : 0}-{konten.length}</strong> dari <strong>{konten.length}</strong> konten
-      </span>
-
-      <div class="pagination">
-        <button type="button" class="page-arrow" disabled>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m15 18-6-6 6-6"></path>
-          </svg>
-        </button>
-        <button type="button" class="page-number active">1</button>
-        <button type="button" class="page-arrow">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m9 18 6-6-6-6"></path>
-          </svg>
-        </button>
+        </div>
       </div>
-    </div>
-  </section>
-</AdminShell>
 
-<!-- ================================================= -->
-<!-- MODAL KONFIRMASI HAPUS -->
-<!-- ================================================= -->
-<div id="deleteModal" class="modal-overlay">
-  <div class="modal-card">
-    <div class="modal-icon-wrapper">
-      <span class="modal-exclamation">!</span>
-    </div>
-    <h3>Hapus Data?</h3>
-    <p>Apakah Anda yakin ingin menghapus data konten ini?</p>
-    
-    <form method="POST" class="modal-actions">
-      <input type="hidden" name="deleteId" id="modalDeleteInput" />
-      <button type="button" id="cancelDelete" class="modal-btn modal-btn-cancel">Batal</button>
-      <button type="submit" class="modal-btn modal-btn-delete">Hapus</button>
+      <div class="form-group">
+        <label for="Isi_Konten">Isi Konten</label>
+        <textarea 
+          id="Isi_Konten" 
+          name="Isi_Konten" 
+          rows="3"
+        >{kontenItem.Isi_Konten || ""}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="Judul_Konten">Judul Konten</label>
+        <input 
+          type="text" 
+          id="Judul_Konten" 
+          name="Judul_Konten" 
+          value={kontenItem.Judul_Konten || ""} 
+        />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="Keterangan">Keterangan</label>
+          <input 
+            type="text" 
+            id="Keterangan" 
+            name="Keterangan" 
+            value={kontenItem.Keterangan || ""} 
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="tags">Tags</label>
+          <input 
+            type="text" 
+            id="tags" 
+            name="tags" 
+            value={kontenItem.tags || ""} 
+          />
+        </div>
+      </div>
     </form>
   </div>
-</div>
-
-<!-- ================================================= -->
-<!-- MODAL KONFIRMASI EDIT -->
-<!-- ================================================= -->
-<div id="editModal" class="modal-overlay">
-  <div class="modal-card">
-    <div class="modal-icon-wrapper">
-      <span class="modal-exclamation">!</span>
-    </div>
-    <h3>Edit Data?</h3>
-    <p>Apakah Anda yakin ingin mengedit data konten ini?</p>
-    
-    <div class="modal-actions">
-      <button type="button" id="cancelEdit" class="modal-btn modal-btn-cancel">Batal</button>
-      <button type="button" id="confirmEditBtn" class="modal-btn modal-btn-edit">Ya, Edit</button>
-    </div>
-  </div>
-</div>
-
-<script>
-  let selectedEditId: string | number = '';
-
-  declare global {
-    interface Window {
-      openDeleteModal: (id: string | number) => void;
-      openEditModal: (id: string | number) => void;
-    }
-  }
-
-  // Modal Hapus
-  window.openDeleteModal = function(id: string | number) {
-    const modal = document.getElementById('deleteModal');
-    const input = document.getElementById('modalDeleteInput') as HTMLInputElement | null;
-    if (input) input.value = String(id);
-    if (modal) modal.classList.add('is-open');
-  };
-
-  // Modal Edit
-  window.openEditModal = function(id: string | number) {
-    selectedEditId = id; // Simpan ID yang akan diedit
-    const modal = document.getElementById('editModal');
-    if (modal) modal.classList.add('is-open');
-  };
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const deleteModal = document.getElementById('deleteModal');
-    const cancelDelete = document.getElementById('cancelDelete');
-    
-    const editModal = document.getElementById('editModal');
-    const cancelEdit = document.getElementById('cancelEdit');
-    const confirmEditBtn = document.getElementById('confirmEditBtn');
-
-    if (cancelDelete && deleteModal) {
-      cancelDelete.addEventListener('click', () => deleteModal.classList.remove('is-open'));
-    }
-
-    if (cancelEdit && editModal) {
-      cancelEdit.addEventListener('click', () => editModal.classList.remove('is-open'));
-    }
-
-    // Ketika tombol "Ya, Edit" diklik, lempar ke halaman edit-konten dengan query ID
-    if (confirmEditBtn) {
-      confirmEditBtn.addEventListener('click', () => {
-        if (selectedEditId) {
-          window.location.href = `/admin/edit-konten?id=${selectedEditId}`;
-        }
-      });
-    }
-
-    window.addEventListener('click', (e) => {
-      if (deleteModal && e.target === deleteModal) deleteModal.classList.remove('is-open');
-      if (editModal && e.target === editModal) editModal.classList.remove('is-open');
-    });
-  });
-</script>
+</AdminShell>
 
 <style>
-/* ================================================= */
-/* SUMMARY CARD */
-/* ================================================= */
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.info-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  padding: 16px 20px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
-}
-
-.card-icon {
-  width: 42px;
-  height: 42px;
-  flex-shrink: 0;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #2563eb;
-  background: #eff6ff;
-}
-
-.info-card h3 {
-  margin: 0 0 2px;
-  color: #64748b;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.info-card p {
-  margin: 0;
-  color: #0f172a;
-  font-size: 22px;
-  font-weight: 750;
-}
-
-/* ================================================= */
-/* CONTENT CARD & HEADER */
-/* ================================================= */
-.content-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
-  overflow: hidden;
-}
-
-.table-header {
-  padding: 18px 22px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.table-header h2 {
-  margin: 0 0 2px;
-  color: #0f172a;
-  font-size: 17px;
-  font-weight: 700;
-}
-
-.table-header p {
-  margin: 0;
-  color: #94a3b8;
-  font-size: 12.5px;
-}
-
-/* ================================================= */
-/* SEARCH */
-/* ================================================= */
-.search-box {
-  width: 220px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 10px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  background: #f8fafc;
-  color: #64748b;
-}
-
-.search-box input {
-  width: 100%;
-  border: none;
-  outline: none;
-  background: transparent;
-  color: #334155;
-  font-size: 13px;
-}
-
-.search-box input::placeholder {
-  color: #94a3b8;
-}
-
-/* ================================================= */
-/* TABLE & FIXED LAYOUT */
-/* ================================================= */
-.table-wrapper {
-  width: 100%;
-  max-height: 420px;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.styled-table {
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: collapse;
-}
-
-.styled-table th.th-id { width: 6%; }
-.styled-table th.th-nama { width: 16%; }
-.styled-table th.th-isi { width: 13%; }
-.styled-table th.th-foto { width: 15%; }
-.styled-table th.th-judul { width: 14%; }
-.styled-table th.th-ket { width: 13%; }
-.styled-table th.th-tags { width: 10%; }
-.styled-table th.th-aksi { width: 13%; text-align: center; }
-
-.styled-table th {
-  background-color: #f8fafc;
-  color: #475569;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  padding: 10px 10px;
-  text-align: left;
-  border-bottom: 1px solid #e2e8f0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.styled-table td {
-  padding: 10px 10px;
-  color: #334155;
-  font-size: 12px;
-  border-bottom: 1px solid #f1f5f9;
-  vertical-align: middle;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.styled-table tbody tr:hover {
-  background-color: #f8fafc;
-}
-
-.no-data {
-  text-align: center;
-  padding: 24px !important;
-  color: #94a3b8;
-  font-style: italic;
-  white-space: normal !important;
-}
-
-/* ================================================= */
-/* CELL COMPONENTS */
-/* ================================================= */
-.id-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2px 6px;
-  border-radius: 5px;
-  background: #f1f5f9;
-  color: #64748b;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.nama-konten {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  overflow: hidden;
-}
-
-.content-avatar {
-  width: 24px;
-  height: 24px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  background: #dbeafe;
-  color: #2563eb;
-  font-size: 11px;
-  font-weight: 750;
-}
-
-.nama-text, .cell-text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  display: block;
-  width: 100%;
-}
-
-.nama-text {
-  color: #1e293b;
-  font-weight: 600;
-}
-
-.cell-text {
-  color: #64748b;
-}
-
-.file-box {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  overflow: hidden;
-}
-
-.thumb-img {
-  width: 26px;
-  height: 26px;
-  object-fit: cover;
-  border-radius: 5px;
-  border: 1px solid #e2e8f0;
-  flex-shrink: 0;
-}
-
-.file-name {
-  font-size: 11px;
-  color: #64748b;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.tag {
-  display: inline-flex;
-  padding: 2px 7px;
-  border-radius: 10px;
-  background: #eff6ff;
-  color: #2563eb;
-  font-size: 10px;
-  font-weight: 700;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* ================================================= */
-/* AKSI BUTTONS */
-/* ================================================= */
-.action-buttons {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-}
-
-.action-btn {
-  width: 26px;
-  height: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.edit-btn {
-  background: #f1f3f5;
-  color: #111827;
-}
-.edit-btn:hover { background: #e2e5e9; }
-
-.delete-btn {
-  background: #f1f3f5;
-  color: #111827;
-}
-.delete-btn:hover { 
-  background: #e2e5e9; 
-  color: #dc2626; 
-}
-
-/* ================================================= */
-/* FOOTER / PAGINATION */
-/* ================================================= */
-.table-footer {
-  padding: 12px 22px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: #64748b;
-  font-size: 12px;
-  background: #ffffff;
-  border-top: 1px solid #e2e8f0;
-}
-
-.pagination {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.pagination button {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  background: #ffffff;
-  color: #64748b;
-  cursor: pointer;
-  font-size: 11.5px;
-}
-
-.pagination button:hover:not(:disabled) {
-  background: #f8fafc;
-}
-
-.pagination .active {
-  background: #2563eb;
-  border-color: #2563eb;
-  color: #ffffff;
-}
-
-.pagination button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-/* ================================================= */
-/* MODAL STYLING */
-/* ================================================= */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(15, 23, 42, 0.5);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition: opacity 0.2s ease, visibility 0.2s ease;
-}
-
-.modal-overlay.is-open {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
-
-.modal-card {
-  background: #ffffff;
-  width: 100%;
-  max-width: 420px;
-  border-radius: 20px;
-  padding: 32px 24px;
-  text-align: center;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  transform: scale(0.95);
-  transition: transform 0.2s ease-in-out;
-}
-
-.modal-overlay.is-open .modal-card {
-  transform: scale(1);
-}
-
-.modal-icon-wrapper {
-  width: 64px;
-  height: 64px;
-  background: #fee2e2;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 20px;
-}
-
-.modal-exclamation {
-  color: #ef4444;
-  font-size: 32px;
-  font-weight: 800;
-  line-height: 1;
-}
-
-.modal-card h3 {
-  margin: 0 0 8px;
-  color: #0f172a;
-  font-size: 22px;
-  font-weight: 700;
-}
-
-.modal-card p {
-  margin: 0 0 24px;
-  color: #64748b;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-}
-
-.modal-btn {
-  padding: 10px 24px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  transition: background 0.15s ease;
-}
-
-.modal-btn-cancel {
-  background: #f1f5f9;
-  color: #334155;
-}
-
-.modal-btn-cancel:hover {
-  background: #e2e8f0;
-}
-
-.modal-btn-delete {
-  background: #ef4444;
-  color: #ffffff;
-}
-.modal-btn-delete:hover {
-  background: #dc2626;
-}
-
-.modal-btn-edit {
-  background: #2563eb;
-  color: #ffffff;
-}
-.modal-btn-edit:hover {
-  background: #1d4ed8;
-}
-
-/* ================================================= */
-/* RESPONSIVE */
-/* ================================================= */
-@media (max-width: 900px) {
-  .card-grid {
-    grid-template-columns: 1fr;
-  }
-  .table-header {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-  .search-box {
+  .form-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 20px 24px;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
     width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 40px;
   }
-  .table-footer {
-    align-items: flex-start;
-    flex-direction: column;
+
+  .form-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 12px;
+    gap: 12px;
+  }
+
+  .form-header-top h2 {
+    margin: 0 0 2px;
+    color: #0f172a;
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  .form-header-top p {
+    margin: 0;
+    color: #64748b;
+    font-size: 12.5px;
+  }
+
+  .form-actions-top {
+    display: flex;
     gap: 8px;
   }
-}
+
+  .styled-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .form-group label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #475569;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #1e293b;
+    background: #f8fafc;
+    outline: none;
+    box-sizing: border-box;
+    transition: all 0.15s ease;
+  }
+
+  .form-group input[type="file"] {
+    padding: 5px 8px;
+    background: #ffffff;
+    cursor: pointer;
+  }
+
+  .file-info {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 2px;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus {
+    border-color: #2563eb;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+
+  .btn-cancel {
+    padding: 7px 16px;
+    background: #f1f5f9;
+    color: #334155;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: background 0.15s ease;
+  }
+
+  .btn-cancel:hover {
+    background: #e2e8f0;
+  }
+
+  .btn-submit {
+    padding: 7px 18px;
+    background: #2563eb;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .btn-submit:hover {
+    background: #1d4ed8;
+  }
+
+  .alert {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    margin-bottom: 12px;
+  }
+
+  .alert.error {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  @media (max-width: 768px) {
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+    .form-header-top {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .form-actions-top {
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
 </style>
