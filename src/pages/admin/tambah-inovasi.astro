@@ -1,44 +1,183 @@
 ---
 import AdminShell from "../../components/admin/AdminShell.astro";
+import { db } from "../../lib/db";
+
+export const prerender = false;
+
+let errorMessage = "";
+
+// Handle Submit Form (POST Request)
+if (Astro.request.method === "POST") {
+  try {
+    const formData = await Astro.request.formData();
+
+    // 1. Tangkap seluruh input form sesuai kolom phpMyAdmin
+    const nama = formData.get("nama")?.toString() || "";
+    const singkatan = formData.get("singkatan")?.toString() || "";
+    const kategori = formData.get("kategori")?.toString() || "";
+    const deskripsi = formData.get("deskripsi")?.toString() || "";
+    const rancang_bangun = formData.get("rancang_bangun")?.toString() || "";
+    const tujuan = formData.get("tujuan")?.toString() || "";
+    const manfaat = formData.get("manfaat")?.toString() || "";
+    const hasil = formData.get("hasil")?.toString() || "";
+    const tahun_usulan = formData.get("tahun_usulan")?.toString() || new Date().getFullYear().toString();
+    const tahapan = formData.get("tahapan")?.toString() || "Penerapan Digital";
+    const jenis = formData.get("jenis")?.toString() || "Digital";
+    
+    // Field Tambahan dari Database phpMyAdmin
+    const url_layanan = formData.get("url_layanan")?.toString() || null;
+    const url_label = formData.get("url_label")?.toString() || null;
+    const icon = formData.get("icon")?.toString() || "fa-lightbulb";
+    const warna = formData.get("warna")?.toString() || "blue";
+    const urutan = parseInt(formData.get("urutan")?.toString() || "0");
+    const status = parseInt(formData.get("status")?.toString() || "1");
+
+    // Format slug otomatis (misal: "TAKON SOBAT" -> "takon-sobat")
+    const slug = nama.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
+
+    // 2. Handle Upload File Gambar
+    const fileGambar = formData.get("gambar") as File;
+    let gambarPath = null;
+
+    if (fileGambar && fileGambar.name && fileGambar.size > 0) {
+      gambarPath = `gambar/${fileGambar.name}`;
+      // Note: Jika butuh save fisik file ke folder public, aktifkan fs.writeFile di sini
+    }
+
+    // 3. Eksekusi Query MySQL Insert ke Database
+    await db.query(
+      `INSERT INTO inovasi_layanan 
+      (slug, nama, singkatan, kategori, deskripsi, rancang_bangun, tujuan, manfaat, hasil, tahun_usulan, tahapan, jenis, gambar, url_layanan, url_label, icon, warna, urutan, status) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        slug, nama, singkatan, kategori, deskripsi, rancang_bangun, 
+        tujuan, manfaat, hasil, tahun_usulan, tahapan, jenis, 
+        gambarPath, url_layanan, url_label, icon, warna, urutan, status
+      ]
+    );
+
+    // Redirect setelah sukses simpan
+    return Astro.redirect("/admin/inovasi?status=success");
+
+  } catch (error: any) {
+    console.error("Gagal menyimpan ke database:", error);
+    errorMessage = "Gagal menyimpan data: " + error.message;
+  }
+}
 ---
 
-<!-- Tambahkan showHeader={false} di bawah ini -->
 <AdminShell title="" subtitle="" showHeader={false}>
   <div class="page-header-simple">
-    <h2>Tambah Inovasi</h2>
-    <a href="/admin/inovasi" class="btn-back">+ Kembali</a>
+    <h2>Tambah Inovasi Layanan</h2>
+    <a href="/admin/inovasi" class="btn-back"> Kembali</a>
   </div>
 
+  {errorMessage && <div class="alert-error">{errorMessage}</div>}
+
   <div class="card-form-container">
-    <form action="/admin/inovasi" method="POST">
-      <div class="form-group">
-        <label for="namaKonten">Nama Konten</label>
-        <input type="text" id="namaKonten" name="namaKonten" placeholder="Masukkan nama konten..." required />
+    {/* Form action mengarah ke halaman ini sendiri biar ditangkap blok handler atas */}
+    <form method="POST" enctype="multipart/form-data">
+      
+      <div class="form-row">
+        <div class="form-group flex-1">
+          <label for="nama">Nama Inovasi (Singkatan Utamamu)</label>
+          <input type="text" id="nama" name="nama" placeholder="Contoh: TAKON SOBAT" required />
+        </div>
+
+        <div class="form-group flex-1">
+          <label for="kategori">Kategori</label>
+          <input type="text" id="kategori" name="kategori" placeholder="Contoh: Perizinan" required />
+        </div>
       </div>
 
       <div class="form-group">
-        <label for="judul">Judul</label>
-        <input type="text" id="judul" name="judul" placeholder="Masukkan judul inovasi..." required />
+        <label for="singkatan">Kepanjangan / Detail Singkatan</label>
+        <input type="text" id="singkatan" name="singkatan" placeholder="Contoh: Tanya Konsultasi Perizinan Solusi Dijawab..." />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group flex-1">
+          <label for="tahun_usulan">Tahun Usulan</label>
+          <input type="number" id="tahun_usulan" name="tahun_usulan" value={new Date().getFullYear()} required />
+        </div>
+
+        <div class="form-group flex-1">
+          <label for="tahapan">Tahapan</label>
+          <input type="text" id="tahapan" name="tahapan" placeholder="Contoh: Penerapan Digital" value="Penerapan Digital" />
+        </div>
+
+        <div class="form-group flex-1">
+          <label for="jenis">Jenis</label>
+          <input type="text" id="jenis" name="jenis" placeholder="Contoh: Digital" value="Digital" />
+        </div>
+      </div>
+
+      <!-- Tambahan Field Sesuai Database phpMyAdmin -->
+      <div class="form-row">
+        <div class="form-group flex-1">
+          <label for="url_layanan">URL Layanan (Link Web/Aplikasi)</label>
+          <input type="text" id="url_layanan" name="url_layanan" placeholder="https://epmal.surabaya.go.id/..." />
+        </div>
+
+        <div class="form-group flex-1">
+          <label for="url_label">Label URL (Teks Tombol Link)</label>
+          <input type="text" id="url_label" name="url_label" placeholder="Contoh: Akses Layanan" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group flex-1">
+          <label for="icon">Icon Class (FontAwesome)</label>
+          <input type="text" id="icon" name="icon" value="fa-lightbulb" placeholder="fa-lightbulb" />
+        </div>
+
+        <div class="form-group flex-1">
+          <label for="warna">Warna Aksen</label>
+          <input type="text" id="warna" name="warna" value="blue" placeholder="blue" />
+        </div>
+
+        <div class="form-group flex-1">
+          <label for="urutan">Urutan Tampil</label>
+          <input type="number" id="urutan" name="urutan" value="0" />
+        </div>
+
+        <div class="form-group flex-1">
+          <label for="status">Status</label>
+          <select id="status" name="status" class="form-select">
+            <option value="1">Aktif (1)</option>
+            <option value="0">Nonaktif (0)</option>
+          </select>
+        </div>
       </div>
 
       <div class="form-group">
-        <label for="isi">Isi</label>
-        <textarea id="isi" name="isi" rows="4" placeholder="Tuliskan isi atau deskripsi inovasi..." required></textarea>
+        <label for="deskripsi">Deskripsi</label>
+        <textarea id="deskripsi" name="deskripsi" rows="3" placeholder="Deskripsi ringkas inovasi..."></textarea>
       </div>
 
       <div class="form-group">
-        <label for="keterangan">Keterangan</label>
-        <input type="text" id="keterangan" name="keterangan" placeholder="Keterangan singkat..." />
+        <label for="rancang_bangun">Rancang Bangun</label>
+        <textarea id="rancang_bangun" name="rancang_bangun" rows="3" placeholder="Rancang bangun inovasi..."></textarea>
       </div>
 
       <div class="form-group">
-        <label for="tags">Tags</label>
-        <input type="text" id="tags" name="tags" placeholder="Contoh: klinik-investasi" />
+        <label for="tujuan">Tujuan</label>
+        <textarea id="tujuan" name="tujuan" rows="2" placeholder="Tujuan inovasi..."></textarea>
       </div>
 
       <div class="form-group">
-        <label for="foto">Upload Foto</label>
-        <input type="file" id="foto" name="foto" />
+        <label for="manfaat">Manfaat</label>
+        <textarea id="manfaat" name="manfaat" rows="2" placeholder="Manfaat inovasi..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="hasil">Hasil</label>
+        <textarea id="hasil" name="hasil" rows="2" placeholder="Hasil/pencapaian inovasi..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="gambar">Upload Gambar</label>
+        <input type="file" id="gambar" name="gambar" accept="image/*" />
       </div>
 
       <div class="form-actions">
@@ -85,25 +224,37 @@ import AdminShell from "../../components/admin/AdminShell.astro";
   padding: 24px;
   box-shadow: 0 10px 25px rgba(15, 23, 42, 0.04);
   border: 1px solid #f1f5f9;
-  max-width: 100%;
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.flex-1 {
+  flex: 1;
 }
 
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .form-group label {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: #1e293b;
 }
 
 .form-group input[type="text"],
+.form-group input[type="number"],
 .form-group textarea,
-.form-group input[type="file"] {
+.form-group input[type="file"],
+.form-select {
   padding: 10px 14px;
   border-radius: 8px;
   border: 1px solid #cbd5e1;
@@ -112,10 +263,12 @@ import AdminShell from "../../components/admin/AdminShell.astro";
   color: #334155;
   width: 100%;
   box-sizing: border-box;
+  background-color: white;
 }
 
 .form-group input:focus,
-.form-group textarea:focus {
+.form-group textarea:focus,
+.form-select:focus {
   border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
@@ -125,6 +278,8 @@ import AdminShell from "../../components/admin/AdminShell.astro";
   justify-content: flex-end;
   gap: 12px;
   margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
 }
 
 .btn-cancel {
@@ -154,5 +309,15 @@ import AdminShell from "../../components/admin/AdminShell.astro";
 
 .btn-submit:hover {
   background: #1d4ed8;
+}
+
+.alert-error {
+  background-color: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
 }
 </style>

@@ -1,17 +1,17 @@
 ---
 import AdminShell from "../../components/admin/AdminShell.astro";
+import { db } from "../../lib/db";
 
-const daftarInovasi = [
-  {
-    id: 10,
-    namaKonten: "KLINIK INVESTASI",
-    isi: "Lokasi strategis pusat kota, fasilitas nyaman (cafe, ruang tamu, CS, TV Display, WiFi) Konsultasi, matchmaking, data ekonomi, forum komunikasi.",
-    foto: "KLINIK-INVESTASI-2025-07-15._0.png",
-    judul: "Klinik Investasi",
-    keterangan: "Inovasi pelayanan investasi terpadu",
-    tags: "klinik-investasi",
-  },
-];
+export const prerender = false;
+
+let daftarInovasi: any[] = [];
+
+try {
+  const [rows]: any = await db.query("SELECT * FROM inovasi_layanan ORDER BY id DESC");
+  daftarInovasi = rows;
+} catch (error) {
+  console.error("Gagal ambil data:", error);
+}
 ---
 
 <AdminShell 
@@ -21,7 +21,7 @@ const daftarInovasi = [
   actionHref="/admin/tambah-inovasi"
 >
   <div class="card-table-container">
-    {/* Baris Kontrol: Pencarian Saja */}
+    {/* Baris Kontrol: Pencarian */}
     <div class="table-controls search-only">
       <div class="search-wrapper">
         <label for="search">Cari:</label>
@@ -29,51 +29,73 @@ const daftarInovasi = [
       </div>
     </div>
 
-    {/* Wrapper Tabel */}
+    {/* Wrapper Tabel Ringkas */}
     <div class="table-responsive">
-      <table class="data-table">
+      <table class="data-table" id="inovasiTable">
         <thead>
           <tr>
-            <th class="col-id">ID</th>
-            <th>Nama Konten</th>
-            <th class="col-isi">Isi</th>
-            <th>Foto</th>
-            <th>Judul</th>
-            <th>Keterangan</th>
-            <th>Tags</th>
-            <th class="col-aksi">Aksi</th>
+            <th style="width: 50px;">ID</th>
+            <th style="width: 140px;">Nama</th>
+            <th style="width: 90px;">Singkatan</th>
+            <th style="width: 60px;">Foto</th>
+            <th>Deskripsi</th>
+            <th style="width: 130px;">URL</th>
+            <th style="width: 90px;">Warna</th>
+            <th style="width: 100px;">Icon</th>
+            <th style="width: 80px;" class="text-center">Aksi</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="tableBody">
           {daftarInovasi.length > 0 ? (
             daftarInovasi.map((item) => (
-              <tr>
-                <td class="fw-medium text-center">{item.id}</td>
-                <td><strong>{item.namaKonten}</strong></td>
+              <tr class="table-row-item">
+                <td class="text-center fw-medium">{item.id}</td>
                 <td>
-                  <div class="wrap-text">{item.isi}</div>
+                  <div class="truncate-text fw-bold" title={item.nama}>{item.nama}</div>
+                </td>
+                <td>{item.singkatan || '-'}</td>
+              <td class="text-center">
+  {(item.gambar || item.foto) ? (
+    <img 
+      src={
+        // Jika sudah berupa URL online (diawali http/https)
+        (item.gambar || item.foto).startsWith('http') 
+          ? (item.gambar || item.foto)
+          // Jika cuma nama file (misal: 'mpp.png'), arahkan ke folder public/ uploads
+          : `/uploads/${item.gambar || item.foto}` 
+      } 
+      alt={item.nama} 
+      class="table-img-preview"
+      onerror="this.onerror=null; this.src='https://via.placeholder.com/40?text=No+Img';"
+    />
+  ) : (
+    <span class="no-img-text">-</span>
+  )}
+</td>
+                <td>
+                  <div class="truncate-multiline" title={item.deskripsi}>{item.deskripsi || '-'}</div>
                 </td>
                 <td>
-                  <span class="file-name" title={item.foto}>{item.foto}</span>
+                  {item.url_layanan ? (
+                    <a href={item.url_layanan} target="_blank" class="link-url" title={item.url_layanan}>
+                      {item.url_layanan}
+                    </a>
+                  ) : '-'}
                 </td>
-                <td>{item.judul}</td>
-                <td>{item.keterangan}</td>
                 <td>
-                  <span class="badge-tag">{item.tags}</span>
+                  <span class="badge-tag">{item.warna || '-'}</span>
                 </td>
+                <td><code class="code-icon">{item.icon || '-'}</code></td>
                 <td>
-                  <div class="action-buttons">
-                    {/* Tombol Edit (Ikon Pensil) - Memicu Modal Edit */}
+                  <div class="action-buttons justify-center">
                     <button class="btn-action edit" title="Edit" data-id={item.id} onclick="openEditModal(this)">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                       </svg>
                     </button>
-
-                    {/* Tombol Hapus (Ikon Tong Sampah) */}
                     <button class="btn-action delete" title="Hapus" data-id={item.id} onclick="openDeleteModal(this)">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="3 6 5 6 21 6"></polyline>
                         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                       </svg>
@@ -84,30 +106,28 @@ const daftarInovasi = [
             ))
           ) : (
             <tr>
-              <td colspan="8" class="text-center">Tidak ada data ditemukan.</td>
+              <td colspan="9" class="text-center empty-msg">Tidak ada data ditemukan.</td>
             </tr>
           )}
         </tbody>
       </table>
     </div>
 
-    {/* Footer Tabel / Paginasi */}
+    {/* Footer Tabel + Pagination Interaktif */}
     <div class="table-footer">
-      <div class="table-info">Menampilkan 1 sampai {daftarInovasi.length} dari {daftarInovasi.length} entri</div>
+      <div class="table-info" id="tableInfo">Menampilkan 0 entri</div>
       <div class="pagination">
-        <button class="page-btn" disabled>Sebelumnya</button>
-        <button class="page-btn active">1</button>
-        <button class="page-btn" disabled>Selanjutnya</button>
+        <button class="page-btn" id="prevBtn" disabled>Sebelumnya</button>
+        <div id="pageNumbers" class="page-numbers"></div>
+        <button class="page-btn" id="nextBtn" disabled>Selanjutnya</button>
       </div>
     </div>
   </div>
 
-  {/* Modal Konfirmasi Edit */}
+  {/* Modal Edit */}
   <div id="editModal" class="modal-overlay">
     <div class="modal-card">
-      <div class="modal-icon-wrapper">
-        <div class="modal-icon">!</div>
-      </div>
+      <div class="modal-icon-wrapper"><div class="modal-icon">!</div></div>
       <h3>Edit Data?</h3>
       <p>Apakah Anda yakin ingin mengedit data inovasi ini?</p>
       <div class="modal-actions">
@@ -117,12 +137,10 @@ const daftarInovasi = [
     </div>
   </div>
 
-  {/* Modal Konfirmasi Hapus */}
+  {/* Modal Hapus */}
   <div id="deleteModal" class="modal-overlay">
     <div class="modal-card">
-      <div class="modal-icon-wrapper">
-        <div class="modal-icon">!</div>
-      </div>
+      <div class="modal-icon-wrapper"><div class="modal-icon">!</div></div>
       <h3>Hapus Data?</h3>
       <p>Apakah Anda yakin ingin menghapus data inovasi ini?</p>
       <div class="modal-actions">
@@ -134,160 +152,248 @@ const daftarInovasi = [
 </AdminShell>
 
 <style>
+/* WRAPPER KONTEN UTAMA */
+/* WRAPPER UTAMA - Bikin tinggi dinamis ngikutin layar */
+/* WRAPPER KONTEN UTAMA */
 .card-table-container {
-  background: white;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.04);
-  border: 1px solid #f1f5f9;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+  border: 1px solid #e2e8f0;
+  width: 100%;
+  box-sizing: border-box;
+  
+  /* PERBAIKAN: Gunakan height dinamis & flexbox ketat */
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 120px); /* Kunci tinggi container pas se-ukuran viewport */
+  min-height: 400px;
+  overflow: hidden; /* Mencegah footer keluar dari card */
 }
 
 .table-controls {
   display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-shrink: 0; /* Header tetap di atas, gak ketekan */
+}
+
+/* CONTAINER TABEL - BIKIN SCROLLBAR DEDIKASI */
+.table-responsive {
+  width: 100%;
+  flex: 1; /* Otomatis ngisi sisa ruang antara header pencarian & pagination */
+  min-height: 0; /* PENTING: Trik flexbox biar scroll y mau jalan pas data melimpah */
+  overflow-y: auto; /* Hanya isi tabel yang di-scroll! */
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+/* FOOTER & PAGINATION - DIKUNCI DI PALING BAWAH */
+.table-footer {
+  display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  gap: 12px;
-  font-size: 14px;
+  padding-top: 12px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #64748b;
+  flex-shrink: 0; /* KUNCI UTAMA: Footer dilarang menyusut / terdorong keluar */
+  border-top: 1px solid #f1f5f9;
+}
+
+.search-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
   color: #475569;
 }
 
-.table-controls.search-only {
-  justify-content: flex-end;
-}
-
 .search-input {
-  padding: 7px 14px;
-  border-radius: 8px;
+  padding: 6px 12px;
+  border-radius: 6px;
   border: 1px solid #cbd5e1;
-  margin-left: 6px;
-  outline: none;
-  font-size: 14px;
+  font-size: 13px;
   width: 200px;
+  outline: none;
 }
 
 .search-input:focus {
   border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
+/* CONTAINER TABEL - INI YANG BISA DI-SCROLL ISI DATA TABELNYA AJA */
 .table-responsive {
   width: 100%;
+  flex: 1; /* Mengambil sisa ruang kosong yang tersedia */
+  overflow-y: auto; /* Scroll cuma jalan di sini kalau data banyak */
   overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
 }
 
 .data-table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 14px;
+  font-size: 12px;
+  table-layout: fixed; /* Kunci lebar kolom biar rapi */
 }
 
+/* HEADER NEMPEL DI ATAS WAKTU DI-SCROLL (STICKY) */
 .data-table th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   background: #f8fafc;
-  color: #1e293b;
-  padding: 14px 16px;
-  border-bottom: 2px solid #e2e8f0;
+  color: #334155;
+  padding: 8px 10px; /* Padding dipersingkat biar ringkas */
+  border-bottom: 1px solid #cbd5e1;
   font-weight: 600;
   white-space: nowrap;
 }
 
 .data-table td {
-  padding: 16px;
+  padding: 6px 10px; /* Tingginya dipres biar 10 data muat pas */
   border-bottom: 1px solid #f1f5f9;
-  color: #334155;
-  vertical-align: top;
+  color: #475569;
+  vertical-align: middle;
+  background: #ffffff;
 }
 
-.wrap-text {
-  min-width: 220px;
-  max-width: 350px;
-  white-space: normal;
-  word-wrap: break-word;
-  line-height: 1.5;
+.data-table tbody tr:hover td {
+  background-color: #f8fafc;
 }
 
-.file-name {
+/* POTONG TEKS PANJANG BIAR BENTUK TABEL STABIL */
+.truncate-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+.truncate-multiline {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.3;
+  font-size: 11.5px;
+}
+
+.link-url {
   display: inline-block;
-  max-width: 150px;
-  white-space: normal;
-  word-wrap: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 110px;
   color: #2563eb;
-  line-height: 1.4;
+  text-decoration: none;
+  font-size: 11.5px;
+}
+
+.link-url:hover {
+  text-decoration: underline;
+}
+
+.table-img-preview {
+  width: 30px;
+  height: 30px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+  display: inline-block;
+}
+
+.no-img-text {
+  font-size: 12px;
+  color: #94a3b8;
 }
 
 .badge-tag {
-  background: #eff6ff;
-  color: #1d4ed8;
-  padding: 5px 10px;
-  border-radius: 6px;
-  font-size: 12px;
+  background: #f1f5f9;
+  color: #334155;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10.5px;
   font-weight: 500;
   display: inline-block;
-  white-space: nowrap;
+  text-transform: capitalize;
 }
 
+.code-icon {
+  font-family: monospace;
+  font-size: 10.5px;
+  background: #f8fafc;
+  padding: 2px 5px;
+  border-radius: 4px;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+  word-break: break-all;
+}
+
+/* TOMBOL AKSI COMPACT */
 .action-buttons {
   display: flex;
-  gap: 8px;
-  white-space: nowrap;
+  gap: 4px;
+}
+
+.justify-center {
+  justify-content: center;
 }
 
 .btn-action {
-  font-size: 13px;
-  padding: 6px 12px;
-  border-radius: 6px;
-  text-decoration: none;
+  padding: 4px 6px;
+  border-radius: 4px;
   border: none;
   cursor: pointer;
-  font-weight: 500;
-  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.btn-action.edit {
-  color: #2563eb;
-  background: #eff6ff;
-}
+.btn-action.edit { color: #2563eb; background: #eff6ff; }
+.btn-action.edit:hover { background: #dbeafe; }
 
-.btn-action.edit:hover {
-  background: #dbeafe;
-}
+.btn-action.delete { color: #dc2626; background: #fef2f2; }
+.btn-action.delete:hover { background: #fee2e2; }
 
-.btn-action.delete {
-  color: #dc2626;
-  background: #fef2f2;
-}
-
-.btn-action.delete:hover {
-  background: #fee2e2;
-}
-
+/* FOOTER & PAGINATION - TETAP DI BAWAH & GA BISA KEPOTONG */
 .table-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 20px;
-  font-size: 14px;
+  margin-top: 12px;
+  font-size: 12px;
   color: #64748b;
-  flex-wrap: wrap;
-  gap: 12px;
+  flex-shrink: 0; /* Mengunci footer biar gak terdorong keluar layar */
 }
 
 .pagination {
   display: flex;
-  gap: 6px;
+  align-items: center;
+  gap: 4px;
+}
+
+.page-numbers {
+  display: flex;
+  gap: 4px;
 }
 
 .page-btn {
-  padding: 7px 14px;
+  padding: 4px 10px;
   border: 1px solid #cbd5e1;
   background: white;
-  border-radius: 6px;
+  border-radius: 5px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 12px;
   color: #334155;
-  font-weight: 500;
 }
 
 .page-btn.active {
@@ -297,19 +403,21 @@ const daftarInovasi = [
 }
 
 .page-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
-  background: #f8fafc;
 }
 
-/* CSS POP-UP / MODAL */
+.text-center { text-align: center; }
+.fw-bold { font-weight: 600; }
+.fw-medium { font-weight: 500; }
+.empty-msg { padding: 20px !important; color: #94a3b8; }
+
+/* MODAL STYLING */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(15, 23, 42, 0.6);
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(15, 23, 42, 0.5);
   display: none;
   justify-content: center;
   align-items: center;
@@ -318,138 +426,150 @@ const daftarInovasi = [
 
 .modal-card {
   background: white;
-  padding: 32px;
-  border-radius: 20px;
+  padding: 24px;
+  border-radius: 12px;
   width: 100%;
-  max-width: 400px;
+  max-width: 360px;
   text-align: center;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
 }
 
-.modal-icon-wrapper {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
+.modal-icon-wrapper { display: flex; justify-content: center; margin-bottom: 12px; }
 .modal-icon {
-  width: 60px;
-  height: 60px;
-  background: #fee2e2;
-  color: #dc2626;
+  width: 48px; height: 48px;
+  background: #fee2e2; color: #dc2626;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  font-weight: bold;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: bold;
 }
 
-.modal-card h3 {
-  font-size: 20px;
-  font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 8px;
-}
+.modal-card h3 { font-size: 18px; margin-bottom: 6px; color: #1e293b; }
+.modal-card p { font-size: 13px; color: #64748b; margin-bottom: 18px; }
+.modal-actions { display: flex; gap: 8px; justify-content: center; }
 
-.modal-card p {
-  font-size: 14px;
-  color: #64748b;
-  margin-bottom: 24px;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-}
-
-.btn-modal-cancel {
-  padding: 10px 24px;
-  border-radius: 8px;
-  border: none;
-  background: #e2e8f0;
-  color: #334155;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.btn-modal-delete {
-  padding: 10px 24px;
-  border-radius: 8px;
-  border: none;
-  background: #ef4444;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 14px;
-}
-.btn-modal-delete:hover {
-  background: #dc2626;
-}
-
-.btn-modal-edit {
-  padding: 10px 24px;
-  border-radius: 8px;
-  border: none;
-  background: #2563eb;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 14px;
-}
-.btn-modal-edit:hover {
-  background: #1d4ed8;
-}
+.btn-modal-cancel { padding: 8px 18px; border-radius: 6px; border: none; background: #e2e8f0; color: #334155; cursor: pointer; font-size: 13px; }
+.btn-modal-delete { padding: 8px 18px; border-radius: 6px; border: none; background: #ef4444; color: white; cursor: pointer; font-size: 13px; }
+.btn-modal-edit { padding: 8px 18px; border-radius: 6px; border: none; background: #2563eb; color: white; cursor: pointer; font-size: 13px; }
 </style>
 
 <script>
+  // ================= PAGINASI INTERAKTIF (MAX 10 DATA) =================
+  const ITEMS_PER_PAGE = 10;
+  let currentPage = 1;
+
+  const rows = Array.from(document.querySelectorAll('.table-row-item')) as HTMLElement[];
+  const searchInput = document.getElementById('search') as HTMLInputElement;
+  const prevBtn = document.getElementById('prevBtn') as HTMLButtonElement;
+  const nextBtn = document.getElementById('nextBtn') as HTMLButtonElement;
+  const pageNumbers = document.getElementById('pageNumbers') as HTMLElement;
+  const tableInfo = document.getElementById('tableInfo') as HTMLElement;
+
+  let filteredRows = [...rows];
+
+  function renderTable() {
+    const totalItems = filteredRows.length;
+    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE) || 1;
+
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    const end = start + ITEMS_PER_PAGE;
+
+    // Sembunyikan semua row dulu
+    rows.forEach(r => r.style.display = 'none');
+
+    // Tampilkan row yang masuk di page sekarang
+    filteredRows.slice(start, end).forEach(r => r.style.display = '');
+
+    // Update Info teks
+    const showingStart = totalItems === 0 ? 0 : start + 1;
+    const showingEnd = Math.min(end, totalItems);
+    if (tableInfo) {
+      tableInfo.innerText = `Menampilkan ${showingStart} sampai ${showingEnd} dari ${totalItems} entri`;
+    }
+
+    // Render Tombol Angka Halaman
+    if (pageNumbers) {
+      pageNumbers.innerHTML = '';
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+        btn.innerText = i.toString();
+        btn.addEventListener('click', () => {
+          currentPage = i;
+          renderTable();
+        });
+        pageNumbers.appendChild(btn);
+      }
+    }
+
+    // Toggle status tombol Prev & Next
+    if (prevBtn) prevBtn.disabled = currentPage === 1;
+    if (nextBtn) nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+  }
+
+  // Listener Tombol Prev & Next
+  prevBtn?.addEventListener('click', () => {
+    if (currentPage > 1) {
+      currentPage--;
+      renderTable();
+    }
+  });
+
+  nextBtn?.addEventListener('click', () => {
+    const totalPages = Math.ceil(filteredRows.length / ITEMS_PER_PAGE);
+    if (currentPage < totalPages) {
+      currentPage++;
+      renderTable();
+    }
+  });
+
+  // Listener Fitur Cari (Search)
+  searchInput?.addEventListener('input', (e) => {
+    const query = (e.target as HTMLInputElement).value.toLowerCase();
+    filteredRows = rows.filter(row => row.innerText.toLowerCase().includes(query));
+    currentPage = 1;
+    renderTable();
+  });
+
+  // Jalankan render awal saat halaman dimuat
+  renderTable();
+
+  // ================= LOGIKA MODAL =================
   let selectedEditId: any = null;
   let selectedDeleteId: any = null;
 
-  // Fungsi Modal Edit
   // @ts-ignore
   window.openEditModal = function(button: HTMLElement) {
     selectedEditId = button.getAttribute('data-id');
     const modal = document.getElementById('editModal');
-    if (modal) {
-      modal.style.display = 'flex';
-    }
+    if (modal) modal.style.display = 'flex';
   };
 
   // @ts-ignore
   window.closeEditModal = function() {
     selectedEditId = null;
     const modal = document.getElementById('editModal');
-    if (modal) {
-      modal.style.display = 'none';
-    }
+    if (modal) modal.style.display = 'none';
   };
 
-document.getElementById('confirmEditBtn')?.addEventListener('click', function() {
-  if (selectedEditId) {
-    window.location.href = `/admin/edit-inovasi?id=${selectedEditId}`;
-  }
-});
+  document.getElementById('confirmEditBtn')?.addEventListener('click', function() {
+    if (selectedEditId) {
+      window.location.href = `/admin/edit-inovasi?id=${selectedEditId}`;
+    }
+  });
 
-  // Fungsi Modal Hapus
   // @ts-ignore
   window.openDeleteModal = function(button: HTMLElement) {
     selectedDeleteId = button.getAttribute('data-id');
     const modal = document.getElementById('deleteModal');
-    if (modal) {
-      modal.style.display = 'flex';
-    }
+    if (modal) modal.style.display = 'flex';
   };
 
   // @ts-ignore
   window.closeDeleteModal = function() {
     selectedDeleteId = null;
     const modal = document.getElementById('deleteModal');
-    if (modal) {
-      modal.style.display = 'none';
-    }
+    if (modal) modal.style.display = 'none';
   };
 
   document.getElementById('confirmDeleteBtn')?.addEventListener('click', function() {
@@ -459,4 +579,4 @@ document.getElementById('confirmEditBtn')?.addEventListener('click', function() 
       window.closeDeleteModal();
     }
   });
-</script> 
+</script>
