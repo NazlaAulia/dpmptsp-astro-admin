@@ -4,6 +4,20 @@ import { db } from "../../lib/db";
 
 export const prerender = false;
 
+// 1. TAMBAHKAN PENANGANAN DELETE DI SINI (DI DALAM BLOK ---)
+if (Astro.request.method === "DELETE") {
+  const url = new URL(Astro.request.url);
+  const id = url.searchParams.get("id");
+  if (id) {
+    try {
+      await db.query("DELETE FROM inovasi_layanan WHERE id = ?", [id]);
+      return new Response(JSON.stringify({ success: true }), { status: 200 });
+    } catch (error) {
+      return new Response(JSON.stringify({ success: false }), { status: 500 });
+    }
+  }
+}
+
 let daftarInovasi: any[] = [];
 
 try {
@@ -474,20 +488,15 @@ try {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
     const end = start + ITEMS_PER_PAGE;
 
-    // Sembunyikan semua row dulu
     rows.forEach(r => r.style.display = 'none');
-
-    // Tampilkan row yang masuk di page sekarang
     filteredRows.slice(start, end).forEach(r => r.style.display = '');
 
-    // Update Info teks
     const showingStart = totalItems === 0 ? 0 : start + 1;
     const showingEnd = Math.min(end, totalItems);
     if (tableInfo) {
       tableInfo.innerText = `Menampilkan ${showingStart} sampai ${showingEnd} dari ${totalItems} entri`;
     }
 
-    // Render Tombol Angka Halaman
     if (pageNumbers) {
       pageNumbers.innerHTML = '';
       for (let i = 1; i <= totalPages; i++) {
@@ -502,12 +511,10 @@ try {
       }
     }
 
-    // Toggle status tombol Prev & Next
     if (prevBtn) prevBtn.disabled = currentPage === 1;
     if (nextBtn) nextBtn.disabled = currentPage === totalPages || totalPages === 0;
   }
 
-  // Listener Tombol Prev & Next
   prevBtn?.addEventListener('click', () => {
     if (currentPage > 1) {
       currentPage--;
@@ -523,7 +530,6 @@ try {
     }
   });
 
-  // Listener Fitur Cari (Search)
   searchInput?.addEventListener('input', (e) => {
     const query = (e.target as HTMLInputElement).value.toLowerCase();
     filteredRows = rows.filter(row => row.innerText.toLowerCase().includes(query));
@@ -531,12 +537,10 @@ try {
     renderTable();
   });
 
-  // Jalankan render awal saat halaman dimuat
   renderTable();
 
-  // ================= LOGIKA MODAL =================
+  // ================= LOGIKA MODAL EDIT =================
   let selectedEditId: any = null;
-  let selectedDeleteId: any = null;
 
   // @ts-ignore
   window.openEditModal = function(button: HTMLElement) {
@@ -558,25 +562,27 @@ try {
     }
   });
 
+  // ================= LANGSUNG HAPUS TANPA MODAL =================
   // @ts-ignore
-  window.openDeleteModal = function(button: HTMLElement) {
-    selectedDeleteId = button.getAttribute('data-id');
-    const modal = document.getElementById('deleteModal');
-    if (modal) modal.style.display = 'flex';
-  };
+  window.openDeleteModal = async function(button: HTMLElement) {
+    const id = button.getAttribute('data-id');
+    if (!id) return;
 
-  // @ts-ignore
-  window.closeDeleteModal = function() {
-    selectedDeleteId = null;
-    const modal = document.getElementById('deleteModal');
-    if (modal) modal.style.display = 'none';
-  };
+    try {
+      // Kirim request ke backend untuk menghapus data berdasarkan ID
+      const response = await fetch(`/admin/inovasi?id=${id}`, {
+        method: 'DELETE',
+      });
 
-  document.getElementById('confirmDeleteBtn')?.addEventListener('click', function() {
-    if (selectedDeleteId) {
-      alert('Data dengan ID ' + selectedDeleteId + ' berhasil dihapus!');
-      // @ts-ignore
-      window.closeDeleteModal();
+      if (response.ok) {
+        // Refresh halaman jika berhasil dihapus
+        window.location.reload();
+      } else {
+        alert('Gagal menghapus data dari database.');
+      }
+    } catch (error) {
+      console.error('Terjadi kesalahan:', error);
+      alert('Terjadi kesalahan koneksi.');
     }
-  });
+  };
 </script>
