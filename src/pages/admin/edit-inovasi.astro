@@ -1,63 +1,120 @@
 ---
 import AdminShell from "../../components/admin/AdminShell.astro";
+import { db } from "../../lib/db";
 
-const daftarInovasi = [
-  {
-    id: 10,
-    namaKonten: "KLINIK INVESTASI",
-    isi: "Lokasi strategis pusat kota, fasilitas nyaman (cafe, ruang tamu, CS, TV Display, WiFi) Konsultasi, matchmaking, data ekonomi, forum komunikasi.",
-    foto: "KLINIK-INVESTASI-2025-07-15._0.png",
-    judul: "Klinik Investasi",
-    keterangan: "Inovasi pelayanan investasi terpadu",
-    tags: "klinik-investasi",
-  },
-];
+export const prerender = false;
 
-const dataInovasi = daftarInovasi[0];
+const url = new URL(Astro.request.url);
+const id = url.searchParams.get("id");
+
+if (!id) {
+  return Astro.redirect("/admin/inovasi");
+}
+
+let dataInovasi: any = null;
+let errorMessage = "";
+
+// 1. Ambil data berdasarkan ID yang dikirim dari halaman daftar inovasi
+try {
+  const [rows]: any = await db.query("SELECT * FROM inovasi_layanan WHERE id = ?", [id]);
+  if (rows.length > 0) {
+    dataInovasi = rows[0];
+  }
+} catch (error) {
+  console.error("Gagal mengambil data:", error);
+}
+
+if (!dataInovasi) {
+  return Astro.redirect("/admin/inovasi");
+}
+
+// 2. Handle Update Data (POST Request)
+if (Astro.request.method === "POST") {
+  try {
+    const formData = await Astro.request.formData();
+
+    const nama = formData.get("nama")?.toString() || "";
+    const singkatan = formData.get("singkatan")?.toString() || "";
+    const kategori = formData.get("kategori")?.toString() || "";
+    const deskripsi = formData.get("deskripsi")?.toString() || "";
+    const url_layanan = formData.get("url_layanan")?.toString() || null;
+    const warna = formData.get("warna")?.toString() || "blue";
+    const icon = formData.get("icon")?.toString() || "fa-lightbulb";
+
+    const fileGambar = formData.get("foto") as File;
+    let gambarPath = dataInovasi.gambar || dataInovasi.foto;
+
+    if (fileGambar && fileGambar.name && fileGambar.size > 0) {
+      gambarPath = fileGambar.name;
+    }
+
+    await db.query(
+      `UPDATE inovasi_layanan SET nama = ?, singkatan = ?, kategori = ?, deskripsi = ?, url_layanan = ?, warna = ?, icon = ?, gambar = ? WHERE id = ?`,
+      [nama, singkatan, kategori, deskripsi, url_layanan, warna, icon, gambarPath, id]
+    );
+
+    return Astro.redirect("/admin/inovasi");
+  } catch (error: any) {
+    console.error("Gagal update data:", error);
+    errorMessage = "Gagal menyimpan perubahan: " + error.message;
+  }
+}
 ---
 
 <AdminShell title="" subtitle="" showHeader={false}>
   <div class="page-header-simple">
-    <h2>Edit Inovasi Astro</h2>
+    <h2>Edit Inovasi Astro (ID: {dataInovasi.id})</h2>
   </div>
 
+  {errorMessage && <div style="color: red; margin-bottom: 12px;">{errorMessage}</div>}
+
   <div class="card-form-container">
-    <form action="/admin/inovasi" method="POST">
+    <form method="POST" enctype="multipart/form-data">
       <div class="form-grid">
         <!-- Kolom Kiri -->
         <div class="form-column">
           <div class="form-group">
-            <label for="namaKonten">Nama Konten</label>
-            <input type="text" id="namaKonten" name="namaKonten" value={dataInovasi.namaKonten} required />
+            <label for="nama">Nama Inovasi</label>
+            <input type="text" id="nama" name="nama" value={dataInovasi.nama || ''} required />
           </div>
 
           <div class="form-group">
-            <label for="judul">Judul</label>
-            <input type="text" id="judul" name="judul" value={dataInovasi.judul} required />
+            <label for="singkatan">Singkatan / Kepanjangan</label>
+            <input type="text" id="singkatan" name="singkatan" value={dataInovasi.singkatan || ''} />
           </div>
 
           <div class="form-group">
-            <label for="keterangan">Keterangan</label>
-            <input type="text" id="keterangan" name="keterangan" value={dataInovasi.keterangan} />
+            <label for="kategori">Kategori</label>
+            <input type="text" id="kategori" name="kategori" value={dataInovasi.kategori || ''} />
           </div>
 
           <div class="form-group">
-            <label for="tags">Tags</label>
-            <input type="text" id="tags" name="tags" value={dataInovasi.tags} />
+            <label for="url_layanan">URL Layanan</label>
+            <input type="text" id="url_layanan" name="url_layanan" value={dataInovasi.url_layanan || ''} />
           </div>
         </div>
 
         <!-- Kolom Kanan -->
         <div class="form-column">
           <div class="form-group">
-            <label for="isi">Isi</label>
-            <textarea id="isi" name="isi" required>{dataInovasi.isi}</textarea>
+            <label for="deskripsi">Deskripsi</label>
+            <textarea id="deskripsi" name="deskripsi" required>{dataInovasi.deskripsi || ''}</textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="warna">Warna Aksen</label>
+            <input type="text" id="warna" name="warna" value={dataInovasi.warna || ''} />
+          </div>
+
+          <div class="form-group">
+            <label for="icon">Icon Class</label>
+            <input type="text" id="icon" name="icon" value={dataInovasi.icon || ''} />
           </div>
 
           <div class="form-group">
             <label for="foto">Ganti Foto Inovasi</label>
             <div class="file-info-box">
-              <span class="file-name">File aktif: <b>{dataInovasi.foto}</b></span>
+              <span class="file-name">File aktif: <b>{dataInovasi.gambar || dataInovasi.foto || '-'}</b></span>
               <input type="file" id="foto" name="foto" accept="image/*" />
             </div>
           </div>
@@ -167,7 +224,6 @@ const dataInovasi = daftarInovasi[0];
   color: #475569;
 }
 
-/* Bagian Tombol di Bawah */
 .form-actions {
   display: flex;
   justify-content: flex-end;
