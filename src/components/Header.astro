@@ -1,767 +1,1483 @@
 ---
-const pathname = Astro.url.pathname;
+import { db } from "../lib/db.js";
+
+/*
+|--------------------------------------------------------------------------
+| WEBSITE PENGATURAN
+|--------------------------------------------------------------------------
+*/
+
+const [settingRows] = await db.query(`
+  SELECT
+    nama,
+    logo
+  FROM website_pengaturan
+  WHERE id = 1
+  LIMIT 1
+`);
+
+const setting = settingRows?.[0] || {
+  nama: "DPM-PTSP Surabaya",
+  logo: "https://github.com/arbagasdanangh/pps/blob/main/logo.png?raw=true"
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| AMBIL SEMUA MENU HEADER DARI DATABASE
+|--------------------------------------------------------------------------
+*/
+
+const [allMenuRows] = await db.query(`
+  SELECT
+    id,
+    parent_id,
+    nama,
+    url,
+    urutan,
+    aktif,
+    tipe,
+    tombol_kontak
+  FROM header_menu
+  WHERE aktif = 1
+  ORDER BY
+    COALESCE(parent_id, 0) ASC,
+    urutan ASC,
+    id ASC
+`);
+
+
+/*
+|--------------------------------------------------------------------------
+| BENTUK TREE MENU
+|--------------------------------------------------------------------------
+*/
+
+const menuMap = new Map();
+
+for (const item of allMenuRows) {
+
+  menuMap.set(Number(item.id), {
+    ...item,
+
+    id: Number(item.id),
+
+    parent_id:
+      item.parent_id === null ||
+      Number(item.parent_id) === 0
+        ? null
+        : Number(item.parent_id),
+
+    children: []
+  });
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| MASUKKAN CHILD KE PARENT
+|--------------------------------------------------------------------------
+*/
+
+const menuTree = [];
+
+for (const item of menuMap.values()) {
+
+  if (
+    item.parent_id !== null &&
+    menuMap.has(item.parent_id)
+  ) {
+
+    menuMap
+      .get(item.parent_id)
+      .children
+      .push(item);
+
+  } else {
+
+    menuTree.push(item);
+
+  }
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| SORT REKURSIF
+|--------------------------------------------------------------------------
+*/
+
+const sortMenu = (items) => {
+
+  items.sort(
+    (a, b) => {
+
+      const urutanA = Number(a.urutan || 0);
+      const urutanB = Number(b.urutan || 0);
+
+      if (urutanA !== urutanB) {
+        return urutanA - urutanB;
+      }
+
+      return Number(a.id || 0) - Number(b.id || 0);
+
+    }
+  );
+
+
+  for (const item of items) {
+
+    if (
+      item.children &&
+      item.children.length
+    ) {
+
+      sortMenu(item.children);
+
+    }
+
+  }
+
+};
+
+sortMenu(menuTree);
+
+
+/*
+|--------------------------------------------------------------------------
+| PISAHKAN TOMBOL KONTAK
+|--------------------------------------------------------------------------
+*/
+
+const contactMenus = menuTree.filter(
+  (menu) =>
+    Number(menu.tombol_kontak) === 1
+);
+
+
+const navigationMenus = menuTree.filter(
+  (menu) =>
+    Number(menu.tombol_kontak) !== 1
+);
+
 ---
 
- <header id="site-header" class={`site-header ${pathname === "/" ? "home-header fixed top-0 left-0 right-0 bg-transparent" : "inner-header sticky top-0 bg-[#F7F7F7]"} z-50 animate-slide-in-left`}>
-  <div class="container mx-auto px-4 sm:px-6 md:px-8">
 
-    <!-- ✅ WRAPPER FIX -->
-    <div class="flex items-center justify-between py-3 md:py-4 relative">
+<!-- =========================================================
+     HEADER
+========================================================== -->
 
-      <!-- ✅ LOGO FIX (RESPONSIVE, TANPA -ml) -->
-      <div class="flex items-center z-10">
-        <a href="https://dpm-ptsp.surabaya.go.id/v5/" class="flex items-center space-x-3 ripple">
-          <img 
-            src="https://github.com/arbagasdanangh/pps/blob/main/logo.png?raw=true"
-            alt="Logo"
+<header
+  id="site-header"
+  class="
+    fixed
+    top-0
+    left-0
+    w-full
+
+    z-[9999]
+
+    bg-[#F7F7F7]
+
+    animate-slide-in-left
+  "
+>
+
+  <div
+    class="
+      container
+      mx-auto
+
+      px-4
+      sm:px-6
+      md:px-8
+    "
+  >
+
+    <!-- =====================================================
+         HEADER WRAPPER
+    ====================================================== -->
+
+    <div
+      class="
+        flex
+        items-center
+        justify-between
+
+        py-3
+        md:py-4
+
+        relative
+      "
+    >
+
+
+      <!-- ===================================================
+           LOGO
+      ==================================================== -->
+
+      <div
+        class="
+          flex
+          items-center
+
+          z-10
+        "
+      >
+
+        <a
+          href="/"
+
+          class="
+            flex
+            items-center
+            space-x-3
+
+            ripple
+          "
+        >
+
+          <img
+            src={setting.logo}
+
+            alt={setting.nama}
+
             class="
-              h-8 sm:h-10 md:h-12
+              h-8
+              sm:h-10
+              md:h-12
+
               w-auto
-              max-w-35 sm:max-w-45
+
+              max-w-[140px]
+              sm:max-w-[180px]
+
               object-contain
-              transition duration-300
+
+              transition
+              duration-300
+
               hover:scale-105
             "
           />
+
         </a>
+
       </div>
 
-      <!-- ================= DESKTOP NAV (100% SAMA) ================= -->
-      <nav class="hidden lg:block absolute left-1/2 transform -translate-x-1/2">
-        <ul class="flex items-center space-x-8 stagger-children">
 
-<li>
-  <a
-    href="/"
-    class={`font-semibold transition duration-300 hover-scale-shadow ${
-      pathname === "/"
-        ? "text-[#0900C3]"
-        : "text-gray-700 hover:text-yellow-400"
-    }`}
-  >
-    Beranda
-  </a>
-</li>
+      <!-- ===================================================
+           DESKTOP NAV
+      ==================================================== -->
 
-          <!-- Tentang Kami Dropdown -->
-          <li class="relative group">
-<a
-  href="/Tentang"
-  class={`font-semibold transition duration-300 flex items-center whitespace-nowrap animate-pulse-soft ${
-    pathname.startsWith("/Tentang")
-      ? "text-[#0900C3]"
-      : "text-gray-700 hover:text-yellow-400"
-  }`}
->
-  Tentang Kami <i class="fas fa-chevron-down ml-1 text-xs"></i>
-</a>
-            <div class="absolute left-0 mt-2 w-64 bg-white rounded-b-lg translate-y-5 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 animate-drop-in">
-              <a href="/Tentang" class="block font-medium text-gray-700 px-4 py-3 hover:bg-[#FFD41D]">Gambaran DPM-PTSP</a>
-              <a href="/Tentang#stdjenis-sec" class="block font-medium text-gray-700 px-4 py-3 hover:bg-[#FFD41D]">Visi dan Misi</a>
-              <a href="/Tentang#kontak-sec" class="block font-medium text-gray-700 px-4 py-3 hover:bg-[#FFD41D]">FAQ</a>
-              <a href="/Tentang#kontak-sec" class="block font-medium text-gray-700 rounded-b-lg px-4 py-3 hover:bg-[#FFD41D]">Hubungi Kami</a>
-            </div>
-          </li>
+      <nav
+        class="
+          hidden
+          lg:block
 
-          <!-- Investasi Dropdown -->
-          <li class="relative group">
-<a
-  href="/Investasi"
-  class={`font-semibold transition duration-300 flex items-center ${
-    pathname.startsWith("/Investasi")
-      ? "text-[#0900C3]"
-      : "text-gray-700 hover:text-yellow-400"
-  }`}
->
-  Investasi <i class="fas fa-chevron-down ml-1 text-xs"></i>
-</a>
-            <div class="absolute left-0 mt-2 w-64 bg-white rounded-b-lg translate-y-5 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 animate-drop-in">
-              <a href="/Investasi#Peta" class="block text-gray-700 font-medium px-4 py-3 hover:bg-[#FFD41D]">Mulai Usaha</a>
-              <a href="/Investasi#Panduan" class="block text-gray-700 font-medium px-4 py-3 hover:bg-[#FFD41D]">Link Terkait</a>
-              <a href="/Investasi#Kinerja" class="block text-gray-700 font-medium rounded-b-lg px-4 py-3 hover:bg-[#FFD41D]">Kinerja</a>
-            </div>
-          </li>
+          absolute
 
-          <!-- Aplikasi Dropdown -->
-          <li class="relative group">
-<a
-  href="/Aplikasi"
-  class={`font-semibold transition duration-300 flex items-center ${
-    pathname.startsWith("/Aplikasi")
-      ? "text-[#0900C3]"
-      : "text-gray-700 hover:text-yellow-400"
-  }`}
->
-  Aplikasi <i class="fas fa-chevron-down ml-1 text-xs"></i>
-</a>
-            <div class="absolute left-0 mt-2 w-64 bg-white rounded-b-lg translate-y-5 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 animate-drop-in">
-              <a href="/Aplikasi#ijinusaha-sec" class="block font-medium text-gray-700 px-4 py-3 hover:bg-[#FFD41D]">Aplikasi Ijin Usaha</a>
-              <a href="/Aplikasi#pengaduan-sec" class="block font-medium text-gray-700 px-4 py-3 hover:bg-[#FFD41D]">Aplikasi Pengaduan</a>
-              <a href="https://dpm-ptsp.surabaya.go.id/data-investasi/" target="_blank" class="block font-medium text-gray-700 px-4 py-3 hover:bg-[#FFD41D]">Data Investasi</a>
-              <a href="https://dpm-ptsp.surabaya.go.id/sipintar/" target="_blank" class="block font-medium text-gray-700 px-4 py-3 hover:bg-[#FFD41D]">SIPINTAR</a>
-              <a href="https://mpp.surabaya.go.id/" target="_blank" class="block font-medium text-gray-700 px-4 py-3 hover:bg-[#FFD41D]">MPP</a>
-              <a href="https://skm.surabaya.go.id/" target="_blank" class="block font-medium text-gray-700 rounded-b-lg px-4 py-3 hover:bg-[#FFD41D]">SKM</a>
-            </div>
-          </li>
+          left-1/2
 
-          <!-- Pelayanan Dropdown -->
-          <li class="relative group">
-<a
-  href="/Pelayanan"
-  class={`font-semibold transition duration-300 flex items-center ${
-    pathname.startsWith("/Pelayanan")
-      ? "text-[#0900C3]"
-      : "text-gray-700 hover:text-yellow-400"
-  }`}
->
-  Pelayanan <i class="fas fa-chevron-down ml-1 text-xs"></i>
-</a>
-            <div class="absolute left-0 mt-2 w-64 bg-white rounded-b-lg translate-y-5 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 animate-drop-in">
-              <a href="/Pelayanan#stdjenis-sec" class="block font-medium text-gray-700 px-4 py-3 hover:bg-[#FFD41D]">Standar Pelayanan</a>
-              <a href="/Pelayanan#info-sec" class="block font-medium text-gray-700 px-4 py-3 hover:bg-[#FFD41D]">Keterbukaan Informasi</a>
-              <a href="/regulasi" class="block font-medium text-gray-700 px-4 py-3 hover:bg-[#FFD41D]">Regulasi</a>
-              <a href="/inovasi" class="block font-medium text-gray-700 px-4 py-3 hover:bg-[#FFD41D]">Inovasi</a>
-            </div>
-          </li>
+          transform
+          -translate-x-1/2
+        "
+      >
 
-          <!-- INFORMASI (nested tetap) -->
-          <li class="relative group">
-<div
-  class={`font-semibold flex items-center cursor-pointer ${
-    pathname.startsWith("/lokasi") || pathname.startsWith("/beritalist")
-      ? "text-[#0900C3]"
-      : "text-gray-700"
-  }`}
->
-  Informasi <i class="fas fa-chevron-down ml-1 text-xs"></i>
-</div>
+        <ul
+          class="
+            flex
+            items-center
 
-            <div class="absolute left-0 mt-2 w-64 bg-white rounded-b-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 translate-y-5">
+            space-x-8
 
-              <a href="/lokasi" class="block font-medium text-gray-700 px-4 py-3 hover:bg-[#FFD41D]">Foto</a>
-              <a href="/beritalist" class="block font-medium text-gray-700 px-4 py-3 hover:bg-[#FFD41D]">Berita</a>
+            stagger-children
+          "
+        >
 
-              <div class="relative group/artikel border-t">
-                <div class="font-medium text-gray-700 px-4 py-3 flex justify-between cursor-pointer hover:bg-[#FFD41D]">
-                  Artikel <i class="fas fa-chevron-down text-xs"></i>
-                </div>
+          {
 
-                <div class="opacity-0 invisible max-h-0 group-hover/artikel:opacity-100 group-hover/artikel:visible group-hover/artikel:max-h-40 transition-all overflow-hidden">
-                  <a href="/beritalist" class="block px-4 py-2 pl-8 text-[#001BB7]">Perizinan</a>
-                  <a href="/beritalist" class="block px-4 py-2 pl-8 text-[#001BB7]">Penanaman Modal</a>
-                </div>
-              </div>
+            navigationMenus.map(
+              (menu) => {
 
-            </div>
-          </li>
+                const hasChildren =
+                  menu.children &&
+                  menu.children.length > 0;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | MENU DROPDOWN
+                |--------------------------------------------------------------------------
+                */
+
+                if (hasChildren) {
+
+                  return (
+
+                    <li
+                      class="
+                        relative
+                        group
+                      "
+
+                      key={menu.id}
+                    >
+
+                      <!-- MENU UTAMA -->
+
+                      <a
+                        href={
+                          menu.url &&
+                          menu.url !== "#"
+                            ? menu.url
+                            : "#"
+                        }
+
+                        class="
+                          text-gray-700
+
+                          font-semibold
+
+                          hover:text-yellow-400
+
+                          transition
+                          duration-300
+
+                          flex
+                          items-center
+
+                          whitespace-nowrap
+
+                          animate-pulse-soft
+                        "
+                      >
+
+                        {menu.nama}
+
+                        <i
+                          class="
+                            fas
+                            fa-chevron-down
+
+                            ml-1
+
+                            text-xs
+                          "
+                        ></i>
+
+                      </a>
+
+
+                      <!-- =================================================
+                           DROPDOWN
+                      ================================================== -->
+
+                      <div
+                        class="
+                          absolute
+
+                          left-0
+
+                          mt-2
+
+                          w-64
+
+                          bg-white
+
+                          rounded-b-lg
+
+                          translate-y-5
+
+                          shadow-lg
+
+                          opacity-0
+                          invisible
+
+                          group-hover:opacity-100
+                          group-hover:visible
+
+                          transition-all
+                          duration-300
+
+                          z-[9999]
+
+                          animate-drop-in
+                        "
+                      >
+
+                        {
+
+                          menu.children.map(
+                            (child, childIndex) => {
+
+                              const childHasChildren =
+                                child.children &&
+                                child.children.length > 0;
+
+
+                              /*
+                              |--------------------------------------------------------------------------
+                              | CHILD DENGAN NESTED MENU
+                              |--------------------------------------------------------------------------
+                              */
+
+                              if (childHasChildren) {
+
+                                return (
+
+                                  <div
+                                    class="
+                                      relative
+
+                                      group/artikel
+
+                                      border-t
+                                    "
+
+                                    key={child.id}
+                                  >
+
+                                    <div
+                                      class="
+                                        px-4
+                                        py-3
+
+                                        flex
+                                        justify-between
+
+                                        cursor-pointer
+
+                                        hover:bg-[#FFD41D]
+                                      "
+                                    >
+
+                                      <span>
+                                        {child.nama}
+                                      </span>
+
+                                      <i
+                                        class="
+                                          fas
+                                          fa-chevron-down
+
+                                          text-xs
+                                        "
+                                      ></i>
+
+                                    </div>
+
+
+                                    <!-- NESTED DROPDOWN -->
+
+                                    <div
+                                      class="
+                                        opacity-0
+                                        invisible
+
+                                        max-h-0
+
+                                        group-hover/artikel:opacity-100
+                                        group-hover/artikel:visible
+                                        group-hover/artikel:max-h-40
+
+                                        transition-all
+                                        duration-300
+
+                                        overflow-hidden
+
+                                        bg-white
+                                      "
+                                    >
+
+                                      {
+
+                                        child.children.map(
+                                          (grandchild) => (
+
+                                            <a
+                                              href={
+                                                grandchild.url ||
+                                                "#"
+                                              }
+
+                                              class="
+                                                block
+
+                                                px-4
+                                                py-2
+                                                pl-8
+
+                                                text-[#001BB7]
+
+                                                hover:bg-gray-50
+                                              "
+
+                                              key={
+                                                grandchild.id
+                                              }
+                                            >
+
+                                              {
+                                                grandchild.nama
+                                              }
+
+                                            </a>
+
+                                          )
+                                        )
+
+                                      }
+
+                                    </div>
+
+                                  </div>
+
+                                );
+
+                              }
+
+
+                              /*
+                              |--------------------------------------------------------------------------
+                              | CHILD BIASA
+                              |--------------------------------------------------------------------------
+                              */
+
+                              return (
+
+                                <a
+                                  href={
+                                    child.url ||
+                                    "#"
+                                  }
+
+                                  class={`
+                                    block
+
+                                    font-medium
+                                    text-gray-700
+
+                                    px-4
+                                    py-3
+
+                                    hover:bg-[#FFD41D]
+
+                                    transition
+                                    duration-200
+
+                                    ${
+                                      childIndex ===
+                                      menu.children.length - 1
+                                        ? "rounded-b-lg"
+                                        : ""
+                                    }
+                                  `}
+
+                                  key={
+                                    child.id
+                                  }
+                                >
+
+                                  {child.nama}
+
+                                </a>
+
+                              );
+
+                            }
+                          )
+
+                        }
+
+                      </div>
+
+                    </li>
+
+                  );
+
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | MENU BIASA
+                |--------------------------------------------------------------------------
+                */
+
+                return (
+
+                  <li
+                    key={menu.id}
+                  >
+
+                    <a
+                      href={
+                        menu.url ||
+                        "#"
+                      }
+
+                      class="
+                        text-gray-700
+
+                        font-semibold
+
+                        hover:text-yellow-400
+
+                        transition
+                        duration-300
+
+                        hover-scale-shadow
+
+                        whitespace-nowrap
+                      "
+                    >
+
+                      {menu.nama}
+
+                    </a>
+
+                  </li>
+
+                );
+
+              }
+            )
+
+          }
 
         </ul>
+
       </nav>
 
-      <!-- RIGHT FIX (hapus -mr) -->
-      <div class="hidden lg:flex items-center gap-3 z-10">
-        <a href="/Kontak" class="bg-[#FFD41D] text-[#0900C3] font-bold px-4 py-3 rounded-lg">
-          Kontak & Pengaduan
-        </a>
+
+      <!-- ===================================================
+           TOMBOL KONTAK
+      ==================================================== -->
+
+      <div
+        class="
+          hidden
+          lg:flex
+
+          items-center
+
+          gap-3
+
+          z-10
+
+          shrink-0
+        "
+      >
+
+        {
+
+          contactMenus.map(
+            (menu) => (
+
+              <a
+                href={
+                  menu.url ||
+                  "#"
+                }
+
+                class="
+                  desktop-contact
+
+                  bg-[#FFD41D]
+
+                  text-[#0900C3]
+
+                  font-bold
+
+                  rounded-lg
+
+                  whitespace-nowrap
+
+                  transition-all
+                  duration-300
+
+                  hover:shadow-lg
+
+                  hover:-translate-y-0.5
+                "
+
+                key={menu.id}
+              >
+
+                {menu.nama}
+
+              </a>
+
+            )
+          )
+
+        }
+
       </div>
 
-      <!-- MOBILE BUTTON -->
-      <button id="mobile-menu-button" class="lg:hidden text-blue-600 ml-2">
-        <i class="fas fa-bars text-2xl"></i>
+
+      <!-- ===================================================
+           MOBILE BUTTON
+      ==================================================== -->
+
+      <button
+        id="mobile-menu-button"
+
+        type="button"
+
+        class="
+          lg:hidden
+
+          text-blue-600
+
+          ml-2
+        "
+
+        aria-label="Buka menu"
+      >
+
+        <i
+          class="
+            fas
+            fa-bars
+
+            text-2xl
+          "
+        ></i>
+
       </button>
 
     </div>
 
-    <!-- MOBILE MENU (ASLI) -->
-   <div id="mobile-menu" class="hidden xl:hidden pb-4 border-t mt-2 space-y-2">
 
-  <!-- Beranda -->
-  <a href="/" class="block py-2 font-semibold text-gray-700">
-    Beranda
-  </a>
+    <!-- =====================================================
+         MOBILE MENU
+    ====================================================== -->
 
-  <!-- Tentang -->
-  <div>
-    <button class="mobile-dropdown-btn w-full flex justify-between py-2 font-semibold text-[#0900C3]">
-      Tentang Kami <i class="fas fa-chevron-down text-xs"></i>
-    </button>
-    <div class="hidden pl-4 space-y-1">
-      <a href="/Tentang" class="block py-1">Gambaran DPM-PTSP</a>
-      <a href="/Tentang#stdjenis-sec" class="block py-1">Visi dan Misi</a>
-      <a href="/Tentang#kontak-sec" class="block py-1">FAQ</a>
-      <a href="/Tentang#kontak-sec" class="block py-1">Hubungi Kami</a>
+    <div
+      id="mobile-menu"
+
+      class="
+        hidden
+
+        lg:hidden
+
+        pb-4
+
+        border-t
+
+        mt-2
+
+        space-y-2
+      "
+    >
+
+      {
+
+        navigationMenus.map(
+          (menu) => {
+
+            const hasChildren =
+              menu.children &&
+              menu.children.length > 0;
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | MOBILE DROPDOWN
+            |--------------------------------------------------------------------------
+            */
+
+            if (hasChildren) {
+
+              return (
+
+                <div
+                  key={menu.id}
+                >
+
+                  <button
+                    type="button"
+
+                    class="
+                      mobile-dropdown-btn
+
+                      w-full
+
+                      flex
+                      justify-between
+
+                      py-2
+
+                      font-semibold
+
+                      text-gray-700
+                    "
+                  >
+
+                    <span>
+                      {menu.nama}
+                    </span>
+
+                    <i
+                      class="
+                        fas
+                        fa-chevron-down
+
+                        text-xs
+                      "
+                    ></i>
+
+                  </button>
+
+
+                  <div
+                    class="
+                      hidden
+
+                      pl-4
+
+                      space-y-1
+                    "
+                  >
+
+                    {
+
+                      menu.children.map(
+                        (child) => {
+
+                          const childHasChildren =
+                            child.children &&
+                            child.children.length > 0;
+
+
+                          /*
+                          |--------------------------------------------------------------------------
+                          | MOBILE NESTED
+                          |--------------------------------------------------------------------------
+                          */
+
+                          if (
+                            childHasChildren
+                          ) {
+
+                            return (
+
+                              <div
+                                key={
+                                  child.id
+                                }
+                              >
+
+                                <button
+                                  type="button"
+
+                                  class="
+                                    mobile-dropdown-btn
+
+                                    w-full
+
+                                    flex
+                                    justify-between
+
+                                    py-1
+                                    pl-2
+
+                                    text-sm
+
+                                    text-gray-700
+                                  "
+                                >
+
+                                  <span>
+                                    {child.nama}
+                                  </span>
+
+                                  <i
+                                    class="
+                                      fas
+                                      fa-chevron-down
+
+                                      text-xs
+                                    "
+                                  ></i>
+
+                                </button>
+
+
+                                <div
+                                  class="
+                                    hidden
+
+                                    pl-4
+                                  "
+                                >
+
+                                  {
+
+                                    child.children.map(
+                                      (grandchild) => (
+
+                                        <a
+                                          href={
+                                            grandchild.url ||
+                                            "#"
+                                          }
+
+                                          class="
+                                            block
+
+                                            py-1
+
+                                            text-[#001BB7]
+                                          "
+
+                                          key={
+                                            grandchild.id
+                                          }
+                                        >
+
+                                          {
+                                            grandchild.nama
+                                          }
+
+                                        </a>
+
+                                      )
+                                    )
+
+                                  }
+
+                                </div>
+
+                              </div>
+
+                            );
+
+                          }
+
+
+                          /*
+                          |--------------------------------------------------------------------------
+                          | MOBILE CHILD BIASA
+                          |--------------------------------------------------------------------------
+                          */
+
+                          return (
+
+                            <a
+                              href={
+                                child.url ||
+                                "#"
+                              }
+
+                              class="
+                                block
+
+                                py-1
+
+                                text-gray-700
+
+                                hover:text-yellow-400
+                              "
+
+                              key={
+                                child.id
+                              }
+                            >
+
+                              {child.nama}
+
+                            </a>
+
+                          );
+
+                        }
+                      )
+
+                    }
+
+                  </div>
+
+                </div>
+
+              );
+
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | MOBILE MENU BIASA
+            |--------------------------------------------------------------------------
+            */
+
+            return (
+
+              <a
+                href={
+                  menu.url ||
+                  "#"
+                }
+
+                class="
+                  block
+
+                  py-2
+
+                  font-semibold
+
+                  text-gray-700
+
+                  hover:text-yellow-400
+                "
+
+                key={menu.id}
+              >
+
+                {menu.nama}
+
+              </a>
+
+            );
+
+          }
+        )
+
+      }
+
+
+      <!-- ===================================================
+           MOBILE KONTAK
+      ==================================================== -->
+
+      {
+
+        contactMenus.map(
+          (menu) => (
+
+            <a
+              href={
+                menu.url ||
+                "#"
+              }
+
+              class="
+                block
+
+                py-2
+
+                font-bold
+
+                text-[#0900C3]
+              "
+
+              key={menu.id}
+            >
+
+              {menu.nama}
+
+            </a>
+
+          )
+        )
+
+      }
+
     </div>
-  </div>
-
-  <!-- Investasi -->
-  <div>
-    <button class="mobile-dropdown-btn w-full flex justify-between py-2 font-semibold text-gray-700">
-      Investasi <i class="fas fa-chevron-down text-xs"></i>
-    </button>
-    <div class="hidden pl-4 space-y-1">
-      <a href="/Investasi#Peta" class="block py-1">Mulai Usaha</a>
-      <a href="/Investasi#Panduan" class="block py-1">Link Terkait</a>
-      <a href="/Investasi#Kinerja" class="block py-1">Kinerja</a>
-    </div>
-  </div>
-
-  <!-- Aplikasi -->
-  <div>
-    <button class="mobile-dropdown-btn w-full flex justify-between py-2 font-semibold text-gray-700">
-      Aplikasi <i class="fas fa-chevron-down text-xs"></i>
-    </button>
-    <div class="hidden pl-4 space-y-1">
-      <a href="/Aplikasi#ijinusaha-sec" class="block py-1">Aplikasi Ijin Usaha</a>
-      <a href="/Aplikasi#pengaduan-sec" class="block py-1">Aplikasi Pengaduan</a>
-      <a href="https://dpm-ptsp.surabaya.go.id/data-investasi/" target="_blank" class="block py-1">Data Investasi</a>
-      <a href="https://dpm-ptsp.surabaya.go.id/sipintar/" target="_blank" class="block py-1">SIPINTAR</a>
-      <a href="https://mpp.surabaya.go.id/" target="_blank" class="block py-1">MPP</a>
-      <a href="https://skm.surabaya.go.id/" target="_blank" class="block py-1">SKM</a>
-    </div>
-  </div>
-
-  <!-- Pelayanan -->
-  <div>
-    <button class="mobile-dropdown-btn w-full flex justify-between py-2 font-semibold text-gray-700">
-      Pelayanan <i class="fas fa-chevron-down text-xs"></i>
-    </button>
-    <div class="hidden pl-4 space-y-1">
-      <a href="/Pelayanan#stdjenis-sec" class="block py-1">Standar Pelayanan</a>
-      <a href="/Pelayanan#info-sec" class="block py-1">Keterbukaan Informasi</a>
-      <a href="/regulasi" class="block py-1">Regulasi</a>
-      <a href="/inovasi" class="block py-1">Inovasi</a>
-    </div>
-  </div>
-
-  <!-- Informasi -->
-  <div>
-    <button class="mobile-dropdown-btn w-full flex justify-between py-2 font-semibold text-gray-700">
-      Informasi <i class="fas fa-chevron-down text-xs"></i>
-    </button>
-    <div class="hidden pl-4 space-y-1">
-
-      <a href="/lokasi" class="block py-1">Foto</a>
-      <a href="/beritalist" class="block py-1">Berita</a>
-
-      <!-- Nested Artikel -->
-      <div>
-        <button class="mobile-dropdown-btn w-full flex justify-between py-1 pl-2 text-sm">
-          Artikel <i class="fas fa-chevron-down text-xs"></i>
-        </button>
-        <div class="hidden pl-4">
-          <a href="/beritalist" class="block py-1 text-[#001BB7]">Perizinan</a>
-          <a href="/beritalist" class="block py-1 text-[#001BB7]">Penanaman Modal</a>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Kontak -->
-  <a href="/Kontak" class="block py-2 font-bold text-[#0900C3]">
-    Kontak & Pengaduan
-  </a>
-
-</div>
 
   </div>
+
 </header>
 
+
+<!-- =========================================================
+     SPACER HEADER
+     
+     Karena header fixed keluar dari flow,
+     spacer menjaga konten tidak ketutup header.
+========================================================== -->
+
+<div
+  id="header-spacer"
+  aria-hidden="true"
+></div>
+
+
+<!-- =========================================================
+     STYLE
+========================================================== -->
+
 <style>
-  .home-header {
-    transition: background-color 0.25s ease, box-shadow 0.25s ease;
+
+  /*
+  |--------------------------------------------------------------------------
+  | HEADER FIXED
+  |--------------------------------------------------------------------------
+  */
+
+  #site-header {
+
+    width: 100%;
+
+    left: 0;
+    right: 0;
+
+    transition:
+      box-shadow 0.25s ease;
+
   }
 
-  .home-header:not(.is-scrolled) nav > ul > li > a,
-  .home-header:not(.is-scrolled) nav > ul > li > div,
-  .home-header:not(.is-scrolled) .mobile-dropdown-btn,
-  .home-header:not(.is-scrolled) #mobile-menu-button {
-    color: #ffffff !important;
+
+  /*
+  |--------------------------------------------------------------------------
+  | SPACER
+  |--------------------------------------------------------------------------
+  */
+
+  #header-spacer {
+
+    width: 100%;
+
+    height: 80px;
+
   }
 
-  .home-header:not(.is-scrolled) nav > ul > li > a:hover,
-  .home-header:not(.is-scrolled) nav > ul > li > div:hover,
-  .home-header:not(.is-scrolled) .mobile-dropdown-btn:hover {
-    color: #ffd41d !important;
+
+  /*
+  |--------------------------------------------------------------------------
+  | TOMBOL KONTAK
+  |--------------------------------------------------------------------------
+  */
+
+  .desktop-contact {
+
+    padding: 12px 16px;
+
+    font-size: 14px;
+
   }
 
-  .home-header:not(.is-scrolled) #mobile-menu {
-    background: rgba(15, 23, 42, 0.92);
-    border-color: rgba(255, 255, 255, 0.2);
+
+  /*
+  |--------------------------------------------------------------------------
+  | DROPDOWN
+  |--------------------------------------------------------------------------
+  */
+
+  nav > ul > li > div {
+
+    min-height: 0;
+
   }
 
-  .home-header:not(.is-scrolled) #mobile-menu a,
-  .home-header:not(.is-scrolled) #mobile-menu button {
-    color: #ffffff !important;
-  }
 
-  .home-header:not(.is-scrolled) #mobile-menu a:hover,
-  .home-header:not(.is-scrolled) #mobile-menu button:hover {
-    color: #ffd41d !important;
-  }
+  /*
+  |--------------------------------------------------------------------------
+  | IPAD / TABLET
+  |--------------------------------------------------------------------------
+  */
 
-  .home-header.is-scrolled {
-    background: #ffffff;
-    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.08);
-  }
+  @media (
+    min-width: 1024px
+  ) and (
+    max-width: 1279px
+  ) {
 
-  .home-header.is-scrolled nav > ul > li > a,
-  .home-header.is-scrolled nav > ul > li > div,
-  .home-header.is-scrolled .mobile-dropdown-btn,
-  .home-header.is-scrolled #mobile-menu-button {
-    color: #374151 !important;
-  }
+    .desktop-contact {
 
-  .home-header.is-scrolled nav > ul > li > a:hover,
-  .home-header.is-scrolled nav > ul > li > div:hover,
-  .home-header.is-scrolled .mobile-dropdown-btn:hover {
-    color: #d97706 !important;
-  }
-</style>
+      padding: 10px 12px;
 
-<script is:inline>
-  const siteHeader = document.getElementById('site-header');
+      font-size: 12px;
 
-  function updateHeaderOnScroll() {
-    siteHeader?.classList.toggle('is-scrolled', window.scrollY > 24);
-  }
-
-  updateHeaderOnScroll();
-  window.addEventListener('scroll', updateHeaderOnScroll, { passive: true });
-</script>
-
-    <!-- JavaScript untuk interaksi -->
-     <script is:inline>
-document.addEventListener('DOMContentLoaded', function() {
-
-    // ================= FIX MOBILE MENU =================
-    const mobileBtn = document.getElementById('mobile-menu-button');
-    const mobileMenu = document.getElementById('mobile-menu');
-
-    if (mobileBtn && mobileMenu) {
-        mobileBtn.addEventListener('click', function() {
-            mobileMenu.classList.toggle('hidden');
-        });
     }
 
-    // ================= FIX MOBILE DROPDOWN =================
-    const mobileDropdownBtns = document.querySelectorAll('.mobile-dropdown-btn');
+  }
 
-    mobileDropdownBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const content = this.nextElementSibling;
-            const icon = this.querySelector('i');
+
+  /*
+  |--------------------------------------------------------------------------
+  | IPAD PRO
+  |--------------------------------------------------------------------------
+  */
+
+  @media (
+    min-width: 1100px
+  ) and (
+    max-width: 1279px
+  ) {
+
+    .desktop-contact {
+
+      padding: 10px 13px;
+
+      font-size: 12.5px;
+
+    }
+
+  }
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | DESKTOP NORMAL
+  |--------------------------------------------------------------------------
+  */
+
+  @media (
+    min-width: 1280px
+  ) {
+
+    .desktop-contact {
+
+      padding: 12px 16px;
+
+      font-size: 14px;
+
+    }
+
+  }
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | DESKTOP BESAR
+  |--------------------------------------------------------------------------
+  */
+
+  @media (
+    min-width: 1536px
+  ) {
+
+    .desktop-contact {
+
+      padding: 13px 18px;
+
+      font-size: 14px;
+
+    }
+
+  }
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | MOBILE
+  |--------------------------------------------------------------------------
+  */
+
+  @media (
+    max-width: 1023px
+  ) {
+
+    .desktop-contact {
+
+      display: none;
+
+    }
+
+  }
+
+</style>
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================== -->
+
+<script is:inline>
+
+document.addEventListener(
+  "DOMContentLoaded",
+  function () {
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | HEADER
+    |--------------------------------------------------------------------------
+    */
+
+    const siteHeader =
+      document.getElementById(
+        "site-header"
+      );
+
+
+    const headerSpacer =
+      document.getElementById(
+        "header-spacer"
+      );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ATUR TINGGI SPACER OTOMATIS
+    |--------------------------------------------------------------------------
+    */
+
+    function setHeaderHeight() {
+
+      if (
+        siteHeader &&
+        headerSpacer
+      ) {
+
+        headerSpacer.style.height =
+          siteHeader.offsetHeight + "px";
+
+      }
+
+    }
+
+
+    setHeaderHeight();
+
+
+    window.addEventListener(
+      "resize",
+      setHeaderHeight
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | MOBILE MENU
+    |--------------------------------------------------------------------------
+    */
+
+    const mobileBtn =
+      document.getElementById(
+        "mobile-menu-button"
+      );
+
+
+    const mobileMenu =
+      document.getElementById(
+        "mobile-menu"
+      );
+
+
+    if (
+      mobileBtn &&
+      mobileMenu
+    ) {
+
+      mobileBtn.addEventListener(
+        "click",
+        function () {
+
+          mobileMenu.classList.toggle(
+            "hidden"
+          );
+
+        }
+      );
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | MOBILE DROPDOWN
+    |--------------------------------------------------------------------------
+    */
+
+    const mobileDropdownBtns =
+      document.querySelectorAll(
+        ".mobile-dropdown-btn"
+      );
+
+
+    mobileDropdownBtns.forEach(
+      function (btn) {
+
+        btn.addEventListener(
+          "click",
+          function () {
+
+            const content =
+              this.nextElementSibling;
+
+
+            const icon =
+              this.querySelector(
+                "i"
+              );
+
 
             if (content) {
-                content.classList.toggle('hidden');
+
+              content.classList.toggle(
+                "hidden"
+              );
+
             }
+
 
             if (icon) {
-                icon.classList.toggle('rotate-180');
-            }
-        });
-    });
 
-});
+              icon.classList.toggle(
+                "rotate-180"
+              );
+
+            }
+
+          }
+        );
+
+      }
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | EFEK SHADOW SAAT SCROLL
+    |--------------------------------------------------------------------------
+    |
+    | Navbar TETAP DI ATAS.
+    | Tidak disembunyikan.
+    | Tidak naik turun.
+    |
+    */
+
+    function handleScroll() {
+
+      if (!siteHeader) {
+        return;
+      }
+
+
+      if (window.scrollY > 5) {
+
+        siteHeader.style.boxShadow =
+          "0 4px 18px rgba(0,0,0,0.10)";
+
+      } else {
+
+        siteHeader.style.boxShadow =
+          "none";
+
+      }
+
+    }
+
+
+    window.addEventListener(
+      "scroll",
+      handleScroll,
+      {
+        passive: true
+      }
+    );
+
+
+    handleScroll();
+
+  }
+);
+
 </script>
-    <script is:inline>
-        // Update tahun di footer
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
-        
-        
-        
-        // Tab Navigation Functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const tabButtons = document.querySelectorAll('.tab-btn');
-            const tabContents = document.querySelectorAll('.tab-content');
-            
-            // Show first tab by default
-            if (tabContents.length > 0) {
-                tabContents.forEach((content, index) => {
-                    if (index === 0) {
-                        content.classList.remove('hidden');
-                        content.classList.add('block');
-                        content.classList.add('animate-blur-in');
-                    } else {
-                        content.classList.add('hidden');
-                        content.classList.remove('block');
-                    }
-                });
-            }
-            
-            // Add click event to tab buttons
-            tabButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const tabId = this.getAttribute('data-tab');
-                    
-                    // Update active button styling
-                    tabButtons.forEach(btn => {
-                        btn.classList.remove('bg-blue-600', 'text-white');
-                        btn.classList.add('bg-gray-100', 'hover:bg-blue-50', 'text-gray-700');
-                    });
-                    
-                    this.classList.remove('bg-gray-100', 'hover:bg-blue-50', 'text-gray-700');
-                    this.classList.add('bg-blue-600', 'text-white');
-                    
-                    // Show selected tab content dengan animasi
-                    tabContents.forEach(content => {
-                        content.classList.add('hidden');
-                        content.classList.remove('block', 'animate-blur-in');
-                    });
-                    
-                    const selectedTab = document.getElementById(tabId);
-                    if (selectedTab) {
-                        selectedTab.classList.remove('hidden');
-                        selectedTab.classList.add('block');
-                        // Delay sedikit untuk trigger animation
-                        setTimeout(() => {
-                            selectedTab.classList.add('animate-blur-in');
-                        }, 10);
-                    } else {
-                        // Jika tab tidak ditemukan, tampilkan default
-                        const defaultTab = document.getElementById('default-tab');
-                        defaultTab.classList.remove('hidden');
-                        defaultTab.classList.add('block');
-                        setTimeout(() => {
-                            defaultTab.classList.add('animate-blur-in');
-                        }, 10);
-                    }
-                });
-            });
-            
-            // FAQ Accordion Functionality
-            const accordionButtons = document.querySelectorAll('.accordion-button');
-            
-            accordionButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const targetId = this.getAttribute('data-target');
-                    const targetContent = document.getElementById(targetId);
-                    const icon = this.querySelector('i.fa-chevron-down');
-                    
-                    // Tutup semua accordion lainnya
-                    accordionButtons.forEach(btn => {
-                        if (btn !== this) {
-                            const otherTargetId = btn.getAttribute('data-target');
-                            const otherContent = document.getElementById(otherTargetId);
-                            const otherIcon = btn.querySelector('i.fa-chevron-down');
-                            
-                            if (otherContent && !otherContent.classList.contains('hidden')) {
-                                otherContent.classList.add('hidden');
-                                otherIcon.style.transform = 'rotate(0deg)';
-                            }
-                        }
-                    });
-                    
-                    // Toggle content visibility dengan animasi
-                    if (targetContent.classList.contains('hidden')) {
-                        targetContent.classList.remove('hidden');
-                        targetContent.classList.add('animate-fold-unfold');
-                        icon.style.transform = 'rotate(180deg)';
-                        
-                        // Hapus class animasi setelah selesai
-                        setTimeout(() => {
-                            targetContent.classList.remove('animate-fold-unfold');
-                        }, 600);
-                    } else {
-                        targetContent.classList.add('hidden');
-                        icon.style.transform = 'rotate(0deg)';
-                    }
-                });
-            });
-            
-            // Scroll animations
-            function animateOnScroll() {
-                const elements = document.querySelectorAll('.animate-fade-up, .animate-scale-in, .animate-slide-in-left, .animate-slide-in-right');
-                
-                elements.forEach(element => {
-                    const elementPosition = element.getBoundingClientRect().top;
-                    const screenPosition = window.innerHeight / 1.2;
-                    
-                    if (elementPosition < screenPosition) {
-                        element.classList.add('animate__animated');
-                        if (element.classList.contains('animate-fade-up')) {
-                            element.style.animationPlayState = 'running';
-                        }
-                    }
-                });
-            }
-            
-            // Run animations on scroll
-            window.addEventListener('scroll', animateOnScroll);
-            window.addEventListener('load', () => {
-                animateOnScroll();
-                // Trigger initial animations
-                setTimeout(() => {
-                    document.querySelectorAll('.stagger-children > *').forEach((child, index) => {
-                        child.style.animationDelay = `${index * 0.1}s`;
-                        child.style.animationPlayState = 'running';
-                    });
-                }, 300);
-            });
-            
-            // Inisialisasi slideshow
-            initSlideshow();
-            
-            // Tambahkan animasi pada load
-            document.body.classList.add('loaded');
-            
-            // Mobile dropdown functionality
-            const mobileDropdownBtns = document.querySelectorAll('.mobile-dropdown-btn');
-            mobileDropdownBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const content = this.nextElementSibling;
-                    const icon = this.querySelector('i');
-                    
-                    if (content.classList.contains('hidden')) {
-                        content.classList.remove('hidden');
-                        icon.style.transform = 'rotate(180deg)';
-                    } else {
-                        content.classList.add('hidden');
-                        icon.style.transform = 'rotate(0deg)';
-                    }
-                });
-            });
-        });
-
-        // Fungsi universal untuk zoom gambar
-        function openImageZoom(imageSrc, title = '') {
-            const modal = document.getElementById('universal-image-modal');
-            const zoomedImg = document.getElementById('universal-zoomed-image');
-            const imageTitle = document.getElementById('image-title');
-            
-            // Set gambar dan judul
-            zoomedImg.src = imageSrc;
-            zoomedImg.alt = title + ' - Zoom View';
-            imageTitle.textContent = title;
-            
-            // Tampilkan modal dengan animasi
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            document.body.style.overflow = 'hidden';
-            
-            // Tambahkan animasi
-            setTimeout(() => {
-                modal.classList.add('animate-blur-in');
-            }, 10);
-        }
-
-        // Fungsi untuk menutup zoom
-        function closeImageZoom() {
-            const modal = document.getElementById('universal-image-modal');
-            modal.classList.remove('animate-blur-in', 'flex');
-            modal.classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        }
-
-        // Tutup modal ketika klik di luar gambar
-        document.getElementById('universal-image-modal').addEventListener('click', function(e) {
-            if (e.target.id === 'universal-image-modal') {
-                closeImageZoom();
-            }
-        });
-
-        // Tutup dengan tombol ESC
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeImageZoom();
-            }
-        });
-
-        // VARIABEL DAN FUNGSI SLIDESHOW
-        let slideIntervalId;
-        const slideInterval = 7000;
-        let currentSlide = 0;
-
-        // Fungsi untuk menampilkan slide berdasarkan index
-        function showSlideByIndex(index) {
-            const slides = document.querySelectorAll('.main-slide');
-            const dots = document.querySelectorAll('.slide-dot');
-            
-            if (index < 0 || index >= slides.length) return;
-            
-            // Animasi fade out untuk slide saat ini
-            slides.forEach(slide => {
-                slide.style.transition = 'opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1)';
-                slide.style.opacity = '0';
-                slide.style.zIndex = '1';
-            });
-            
-            // Animasi fade in untuk slide baru
-            slides[index].style.transition = 'opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1)';
-            slides[index].style.opacity = '1';
-            slides[index].style.zIndex = '2';
-            
-            // Update dot aktif dengan animasi
-            dots.forEach(dot => {
-                dot.classList.remove('bg-white');
-                dot.classList.add('bg-white/50');
-                dot.classList.remove('scale-125');
-            });
-            if (dots[index]) {
-                dots[index].classList.remove('bg-white/50');
-                dots[index].classList.add('bg-white');
-                dots[index].classList.add('scale-125');
-            }
-            
-            currentSlide = index;
-            
-            // Reset interval
-            clearInterval(slideIntervalId);
-            slideIntervalId = setInterval(nextSlide, slideInterval);
-            
-            // Tambahkan efek visual pada gambar kecil yang diklik
-            const smallImages = document.querySelectorAll('[data-slide-index]');
-            smallImages.forEach(img => {
-                const parentDiv = img.closest('div');
-                const imgIndex = parseInt(img.getAttribute('data-slide-index'));
-                if (!isNaN(imgIndex) && imgIndex === index) {
-                    // Tambahkan efek highlight dengan animasi
-                    parentDiv.classList.add('ring-4', 'ring-yellow-400', 'ring-offset-2', 'scale-110');
-                    parentDiv.classList.add('animate-jelly');
-                    
-                    // Kembalikan ke normal setelah 1 detik
-                    setTimeout(() => {
-                        parentDiv.classList.remove('ring-4', 'ring-yellow-400', 'ring-offset-2', 'scale-110', 'animate-jelly');
-                    }, 1000);
-                } else {
-                    parentDiv.classList.remove('ring-4', 'ring-yellow-400', 'ring-offset-2', 'scale-110', 'animate-jelly');
-                }
-            });
-        }
-
-        // Fungsi untuk slide berikutnya
-        function nextSlide() {
-            const slides = document.querySelectorAll('.main-slide');
-            let nextIndex = currentSlide + 1;
-            if (nextIndex >= slides.length) {
-                nextIndex = 0;
-            }
-            showSlideByIndex(nextIndex);
-        }
-
-        // Fungsi untuk inisialisasi slideshow
-        function initSlideshow() {
-            const slides = document.querySelectorAll('.main-slide');
-            const dots = document.querySelectorAll('.slide-dot');
-            
-            if (slides.length === 0) return;
-            
-            // Tampilkan slide pertama dengan animasi
-            setTimeout(() => {
-                showSlideByIndex(0);
-            }, 500);
-            
-            // Tambahkan event listener untuk dots
-            dots.forEach(dot => {
-                dot.addEventListener('click', function() {
-                    const index = parseInt(this.getAttribute('data-index'));
-                    if (!isNaN(index)) {
-                        showSlideByIndex(index);
-                    }
-                });
-            });
-            
-            // Mulai slideshow otomatis
-            slideIntervalId = setInterval(nextSlide, slideInterval);
-            
-            // Pause slideshow saat hover
-            const slideshowContainer = document.getElementById('main-slideshow');
-            if (slideshowContainer) {
-                slideshowContainer.addEventListener('mouseenter', function() {
-                    clearInterval(slideIntervalId);
-                });
-                
-                slideshowContainer.addEventListener('mouseleave', function() {
-                    slideIntervalId = setInterval(nextSlide, slideInterval);
-                });
-            }
-        }
-
-        // Artikel Nested Dropdown (Desktop)
-        const artikelWrapper = document.querySelector('.artikel-wrapper');
-        const artikelContent = document.querySelector('.artikel-content');
-        const artikelChevron = document.querySelector('.artikel-chevron');
-
-        if (artikelWrapper && artikelContent) {
-            artikelWrapper.addEventListener('mouseenter', () => {
-                artikelContent.style.maxHeight = '200px';
-                artikelContent.style.opacity = '1';
-                if (artikelChevron) {
-                    artikelChevron.style.transform = 'rotate(180deg)';
-                }
-            });
-
-            artikelWrapper.addEventListener('mouseleave', () => {
-                artikelContent.style.maxHeight = '0px';
-                artikelContent.style.opacity = '0';
-                if (artikelChevron) {
-                    artikelChevron.style.transform = 'rotate(0deg)';
-                }
-            });
-        }
-
-        // Smooth scroll untuk anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                const href = this.getAttribute('href');
-                
-                if (href !== '#' && href.startsWith('#')) {
-                    e.preventDefault();
-                    const targetId = href.substring(1);
-                    const targetElement = document.getElementById(targetId);
-                    
-                    if (targetElement) {
-                        window.scrollTo({
-                            top: targetElement.offsetTop - 80,
-                            behavior: 'smooth'
-                        });
-                    }
-                }
-            });
-        });
-
-        // Tambahkan efek ripple pada semua tombol dengan class ripple
-        document.querySelectorAll('.ripple').forEach(button => {
-            button.addEventListener('click', function(e) {
-                const x = e.clientX - e.target.getBoundingClientRect().left;
-                const y = e.clientY - e.target.getBoundingClientRect().top;
-                
-                const ripple = document.createElement('span');
-                ripple.style.left = `${x}px`;
-                ripple.style.top = `${y}px`;
-                ripple.classList.add('ripple-effect');
-                
-                this.appendChild(ripple);
-                
-                setTimeout(() => {
-                    ripple.remove();
-                }, 600);
-            });
-        });
-
-        // Tambahkan style untuk ripple effect
-        const style = document.createElement('style');
-        style.textContent = `
-            .ripple-effect {
-                position: absolute;
-                border-radius: 50%;
-                background: rgba(255, 255, 255, 0.6);
-                transform: scale(0);
-                animation: ripple 0.6s linear;
-                pointer-events: none;
-            }
-            
-            @keyframes ripple {
-                to {
-                    transform: scale(4);
-                    opacity: 0;
-                }
-            }
-            
-            .ripple {
-                position: relative;
-                overflow: hidden;
-            }
-        `;
-        document.head.appendChild(style);
-    </script>

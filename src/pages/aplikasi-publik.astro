@@ -1,0 +1,851 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import { db } from "../lib/db.js";
+
+let aplikasi = [];
+
+try {
+  const [rows] = await db.execute(`
+    SELECT
+      id,
+      nama,
+      deskripsi,
+      url,
+      icon,
+      target
+    FROM aplikasi_publik
+    WHERE active = 'Y'
+    ORDER BY urutan ASC, id ASC
+  `);
+
+  aplikasi = rows;
+} catch (error) {
+  console.error("Aplikasi Publik DB Error:", error);
+}
+---
+
+<MainLayout title="Aplikasi Publik - DPMPTSP Kota Surabaya">
+<section class="relative overflow-hidden gradient-flow bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600">
+            <div class="absolute inset-0 z-0">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-yellow-400 rounded-full opacity-10 -translate-y-32 translate-x-32 animate-pulse-soft"></div>
+                <div class="absolute bottom-0 left-0 w-96 h-96 bg-blue-600 rounded-full opacity-10 -translate-x-64 translate-y-64 animate-pulse-soft"></div>
+                <div class="absolute top-1/2 left-1/4 w-48 h-48 bg-white rounded-full opacity-5 animate-float-subtle"></div>
+            </div>
+            <div class="container mx-auto px-4 py-20 relative z-10">
+                <div class="text-center text-white animate-fade-in-scale">
+                    <h1 class="text-5xl md:text-6xl font-bold mb-6 animate-text-reveal">
+                        Aplikasi DPM-PTSP Surabaya
+                    </h1>
+                    <p class="text-xl opacity-90 max-w-3xl mx-auto animate-slide-in-left">
+                        Informasi Visi Misi Sambutan Maklumat dan Organisasi
+                    </p>
+                    <div class="mt-8 flex justify-center">
+                        <div class="animate-bounce-soft">
+                            <i class="fas fa-chevron-down text-2xl text-yellow-400"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+  <section class="apps-page">
+
+    <div class="apps-container">
+
+      <!-- HEADER -->
+      <div class="apps-header">
+
+        <div class="apps-heading">
+
+          <span class="section-eyebrow">
+            APLIKASI PUBLIK
+          </span>
+
+          <h1>
+            Akses cepat ke
+            <span>layanan digital</span>
+          </h1>
+
+          <p>
+            Daftar aplikasi resmi DPMPTSP Surabaya —
+            perizinan, investasi, pengaduan,
+            hingga layanan publik.
+          </p>
+
+        </div>
+
+        <a
+          href="/"
+          class="apps-back"
+        >
+          <span>Kembali ke Beranda</span>
+          <strong>←</strong>
+        </a>
+
+      </div>
+
+
+      <!-- GRID -->
+
+      {aplikasi.length > 0 ? (
+
+        <div class="apps-grid">
+
+          {aplikasi.map((item, index) => (
+
+            <a
+              href={item.url || "#"}
+              class="app-card"
+              target={item.target || "_self"}
+              rel={
+                item.target === "_blank"
+                  ? "noopener noreferrer"
+                  : undefined
+              }
+              style={`--delay:${index * 70}ms`}
+            >
+
+              <div class="app-number">
+                {String(index + 1).padStart(2, "0")}
+              </div>
+
+              <div class="app-icon">
+                {item.icon || "▣"}
+              </div>
+
+              <div class="app-info">
+
+                <strong>
+                  {item.nama}
+                </strong>
+
+                <small>
+                  {item.deskripsi}
+                </small>
+
+              </div>
+
+              <span class="app-arrow">
+                →
+              </span>
+
+            </a>
+
+          ))}
+
+        </div>
+
+      ) : (
+
+        <div class="apps-empty">
+
+          <div class="empty-icon">
+            ▣
+          </div>
+
+          <div>
+            <strong>
+              Belum ada aplikasi
+            </strong>
+
+            <p>
+              Daftar aplikasi publik belum tersedia.
+            </p>
+          </div>
+
+        </div>
+
+      )}
+
+    </div>
+
+  </section>
+
+</MainLayout>
+
+
+<style>
+
+/* =====================================================
+   PAGE
+===================================================== */
+
+.apps-page {
+
+  position: relative;
+
+  min-height: 100vh;
+
+  padding: 100px 20px;
+
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at 5% 15%,
+      rgba(8,120,201,.10),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 95% 85%,
+      rgba(245,196,0,.09),
+      transparent 25%
+    ),
+    #f5f8fc;
+
+}
+
+
+.apps-page::before {
+
+  content: "";
+
+  position: absolute;
+
+  width: 600px;
+  height: 600px;
+
+  right: -330px;
+  top: -300px;
+
+  border:
+    1px solid rgba(8,64,130,.07);
+
+  border-radius: 50%;
+
+  box-shadow:
+    0 0 0 70px rgba(8,64,130,.025),
+    0 0 0 140px rgba(8,64,130,.018),
+    0 0 0 210px rgba(8,64,130,.012);
+
+}
+
+
+.apps-container {
+
+  position: relative;
+
+  z-index: 2;
+
+  width: 100%;
+
+  max-width: 1200px;
+
+  margin: auto;
+
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.apps-header {
+
+  display: flex;
+
+  align-items: flex-end;
+
+  justify-content: space-between;
+
+  gap: 40px;
+
+  margin-bottom: 45px;
+
+}
+
+
+.apps-heading {
+
+  max-width: 720px;
+
+}
+
+
+.section-eyebrow {
+
+  display: inline-block;
+
+  margin-bottom: 14px;
+
+  color: #0878c9;
+
+  font-size: 11px;
+
+  font-weight: 900;
+
+  letter-spacing: 2px;
+
+}
+
+
+.apps-heading h1 {
+
+  margin: 0;
+
+  color: #082b57;
+
+  font-size:
+    clamp(38px, 5vw, 58px);
+
+  line-height: .98;
+
+  letter-spacing: -2.5px;
+
+}
+
+
+.apps-heading h1 span {
+
+  color: #0878c9;
+
+}
+
+
+.apps-heading p {
+
+  max-width: 650px;
+
+  margin: 18px 0 0;
+
+  color: #718096;
+
+  font-size: 14px;
+
+  line-height: 1.8;
+
+}
+
+
+/* =====================================================
+   BACK BUTTON
+===================================================== */
+
+.apps-back {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 12px;
+
+  min-width: 205px;
+
+  padding: 14px 20px;
+
+  border-radius: 12px;
+
+  background: #082b57;
+
+  color: #fff;
+
+  text-decoration: none;
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+  white-space: nowrap;
+
+  transition: .3s;
+
+}
+
+
+.apps-back strong {
+
+  font-size: 19px;
+
+  font-weight: 400;
+
+  transition: .3s;
+
+}
+
+
+.apps-back:hover {
+
+  background: #f5c400;
+
+  color: #082b57;
+
+  transform: translateY(-4px);
+
+  box-shadow:
+    0 15px 30px rgba(245,196,0,.20);
+
+}
+
+
+.apps-back:hover strong {
+
+  transform: translateX(-5px);
+
+}
+
+
+/* =====================================================
+   GRID
+===================================================== */
+
+.apps-grid {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 16px;
+
+}
+
+
+/* =====================================================
+   CARD
+===================================================== */
+
+.app-card {
+
+  position: relative;
+
+  display: grid;
+
+  grid-template-columns:
+    35px
+    58px
+    minmax(0,1fr)
+    35px;
+
+  align-items: center;
+
+  gap: 15px;
+
+  min-height: 105px;
+
+  padding: 20px 22px;
+
+  overflow: hidden;
+
+  border:
+    1px solid #e1e9f1;
+
+  border-radius: 17px;
+
+  background:
+    rgba(255,255,255,.90);
+
+  box-shadow:
+    0 8px 28px rgba(7,48,90,.055);
+
+  color: inherit;
+
+  text-decoration: none;
+
+  opacity: 0;
+
+  transform:
+    translateY(18px);
+
+  animation:
+    appIn .6s
+    var(--delay)
+    ease forwards;
+
+  transition:
+    transform .3s ease,
+    box-shadow .3s ease,
+    border-color .3s ease;
+
+}
+
+
+@keyframes appIn {
+
+  to {
+
+    opacity: 1;
+
+    transform: translateY(0);
+
+  }
+
+}
+
+
+.app-card::before {
+
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  top: 0;
+
+  width: 4px;
+  height: 100%;
+
+  background:
+    linear-gradient(
+      #0878c9,
+      #f5c400
+    );
+
+  transform:
+    scaleY(0);
+
+  transform-origin:
+    center;
+
+  transition:
+    transform .3s ease;
+
+}
+
+
+.app-card:hover {
+
+  transform:
+    translateY(-5px);
+
+  border-color:
+    rgba(8,120,201,.20);
+
+  box-shadow:
+    0 18px 42px rgba(7,48,90,.11);
+
+}
+
+
+.app-card:hover::before {
+
+  transform:
+    scaleY(1);
+
+}
+
+
+/* =====================================================
+   NUMBER
+===================================================== */
+
+.app-number {
+
+  color: #b8c5d3;
+
+  font-size: 12px;
+
+  font-weight: 900;
+
+  letter-spacing: 1px;
+
+}
+
+
+/* =====================================================
+   ICON
+===================================================== */
+
+.app-icon {
+
+  width: 55px;
+  height: 55px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 15px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #edf7ff,
+      #dceeff
+    );
+
+  color: #0878c9;
+
+  font-size: 23px;
+
+  font-weight: 800;
+
+  box-shadow:
+    inset 0 0 0 1px
+    rgba(8,120,201,.07);
+
+  transition: .3s;
+
+}
+
+
+.app-card:hover .app-icon {
+
+  background: #0878c9;
+
+  color: #fff;
+
+  transform:
+    scale(1.05)
+    rotate(-3deg);
+
+}
+
+
+/* =====================================================
+   INFO
+===================================================== */
+
+.app-info {
+
+  min-width: 0;
+
+}
+
+
+.app-info strong {
+
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #082b57;
+
+  font-size: 16px;
+
+  line-height: 1.4;
+
+  font-weight: 800;
+
+}
+
+
+.app-info small {
+
+  display: block;
+
+  color: #718096;
+
+  font-size: 12px;
+
+  line-height: 1.5;
+
+}
+
+
+/* =====================================================
+   ARROW
+===================================================== */
+
+.app-arrow {
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 35px;
+  height: 35px;
+
+  border-radius: 9px;
+
+  background: #f4f7fa;
+
+  color: #0878c9;
+
+  font-size: 19px;
+
+  transition: .3s;
+
+}
+
+
+.app-card:hover .app-arrow {
+
+  background: #f5c400;
+
+  color: #082b57;
+
+  transform:
+    translateX(4px);
+
+}
+
+
+/* =====================================================
+   EMPTY
+===================================================== */
+
+.apps-empty {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 20px;
+
+  padding: 35px;
+
+  border:
+    1px dashed #ccd8e4;
+
+  border-radius: 18px;
+
+  background: #fff;
+
+}
+
+
+.empty-icon {
+
+  width: 55px;
+  height: 55px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 15px;
+
+  background: #edf4fa;
+
+  color: #0878c9;
+
+  font-size: 25px;
+
+}
+
+
+.apps-empty strong {
+
+  color: #082b57;
+
+  font-size: 15px;
+
+}
+
+
+.apps-empty p {
+
+  margin: 5px 0 0;
+
+  color: #718096;
+
+  font-size: 12px;
+
+}
+
+
+/* =====================================================
+   TABLET
+===================================================== */
+
+@media (max-width: 850px) {
+
+  .apps-page {
+
+    padding: 75px 18px;
+
+  }
+
+  .apps-header {
+
+    align-items: flex-start;
+
+    flex-direction: column;
+
+  }
+
+  .apps-back {
+
+    width: fit-content;
+
+  }
+
+  .apps-grid {
+
+    grid-template-columns: 1fr;
+
+  }
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 560px) {
+
+  .apps-page {
+
+    padding: 60px 15px;
+
+  }
+
+  .apps-heading h1 {
+
+    font-size: 38px;
+
+  }
+
+  .apps-heading p {
+
+    font-size: 13px;
+
+  }
+
+  .apps-back {
+
+    width: 100%;
+
+  }
+
+  .app-card {
+
+    grid-template-columns:
+      32px
+      48px
+      minmax(0,1fr)
+      32px;
+
+    gap: 11px;
+
+    padding: 16px;
+
+  }
+
+  .app-icon {
+
+    width: 48px;
+    height: 48px;
+
+    font-size: 20px;
+
+  }
+
+  .app-info strong {
+
+    font-size: 14px;
+
+  }
+
+  .app-info small {
+
+    font-size: 11px;
+
+  }
+
+  .app-arrow {
+
+    width: 32px;
+    height: 32px;
+
+    font-size: 17px;
+
+  }
+
+}
+
+</style>
