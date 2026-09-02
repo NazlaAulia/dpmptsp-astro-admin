@@ -1,0 +1,3555 @@
+---
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import "@dpmptsp/ui/styles/global.css";
+
+const inovasi = [
+  {
+    id: 1,
+    slug: "takon-sobat",
+    nama: "TAKON SOBAT",
+    singkatan:
+      "Tanya Konsultasi Perizinan Solusi Dijawab melalui WhatsApp",
+    kategori: "Perizinan",
+    deskripsi:
+      "Layanan konsultasi perizinan melalui WhatsApp yang memberikan akses informasi secara mudah, cepat dan realtime.",
+    tujuan:
+      "Menjadi sarana masyarakat untuk berkonsultasi dan memperoleh informasi perizinan secara langsung.",
+    manfaat:
+      "Kemudahan akses, penghematan waktu, peningkatan transparansi informasi dan efisiensi pelayanan.",
+    hasil:
+      "Sejak diluncurkan, sebanyak 3.481 pemohon telah berkonsultasi melalui TAKON SOBAT dan seluruh permasalahan terselesaikan.",
+    tahun: 2024,
+    jenis: "Digital",
+    gambar: "/gambar/TAKON-SOBATapik.png",
+    url: "https://api.whatsapp.com/send/?phone=6285234982434&text=Pertanyaan+dari+sumber+website&type=phone_number&app_absent=0",
+    urlLabel: "Konsultasi Sekarang",
+    icon: "fa-comments",
+    warna: "blue",
+  },
+
+  {
+    id: 2,
+    slug: "soto-panas",
+    nama: "SOTO PANAS",
+    singkatan:
+      "Sistem Online Terpadu Laporan Pengaduan Masyarakat",
+    kategori: "Pengaduan",
+    deskripsi:
+      "Sistem online terpadu untuk mengakomodir dan mengintegrasikan laporan pengaduan masyarakat.",
+    tujuan:
+      "Melakukan monitoring pengaduan, mengetahui penanggung jawab, melakukan standardisasi data dan menghasilkan dokumentasi digital maupun fisik.",
+    manfaat:
+      "Pengaduan dapat disampaikan secara online, koordinasi menjadi lebih baik, respon lebih tepat waktu dan manajemen pengaduan lebih tertib.",
+    hasil:
+      "Pengaduan masyarakat dapat disampaikan melalui sistem online terpadu yang terintegrasi dengan unit pelayanan.",
+    tahun: 2024,
+    jenis: "Digital",
+    gambar: "/gambar/sotopanas.png",
+    url: null,
+    urlLabel: null,
+    icon: "fa-triangle-exclamation",
+    warna: "yellow",
+  },
+
+  {
+    id: 3,
+    slug: "pesona-buaya",
+    nama: "PESONA BUAYA",
+    singkatan:
+      "Pendampingan Sinergi dan Sosialisasi Perizinan Berusaha untuk UMK Surabaya",
+    kategori: "UMK",
+    deskripsi:
+      "Pendampingan dan sosialisasi perizinan berusaha bagi pelaku UMK di Surabaya.",
+    tujuan:
+      "Memberikan kemudahan perizinan kepada pelaku UMK secara cepat dan tepat serta mendukung pengembangan usaha melalui upgrading skill.",
+    manfaat:
+      "Mendorong pelaku usaha memiliki legalitas dan kompetensi serta mendukung pertumbuhan ekonomi kerakyatan.",
+    hasil:
+      "Tahun 2021 sebanyak 295 peserta, 2022 sebanyak 4.432 peserta, 2023 sebanyak 7.300 peserta dan 2024 sebanyak 7.713 peserta.",
+    tahun: 2024,
+    jenis: "Digital",
+    gambar: "/gambar/PESONA-BUAYA.png",
+    url: "https://www.instagram.com/pesonabuaya/",
+    urlLabel: "Kunjungi Layanan",
+    icon: "fa-handshake",
+    warna: "green",
+  },
+
+  {
+    id: 4,
+    slug: "wani-ngurus-izin",
+    nama: "WANI NGURUS IZIN",
+    singkatan: "Wani Ngurus Izin",
+    kategori: "Perizinan",
+    deskripsi:
+      "Inovasi yang mendorong masyarakat agar berani dan mudah dalam mengurus perizinan.",
+    tujuan:
+      "Meningkatkan kemudahan dan keberanian masyarakat dalam mengurus perizinan secara benar.",
+    manfaat:
+      "Masyarakat mendapatkan informasi dan pendampingan sehingga proses pengurusan izin menjadi lebih mudah.",
+    hasil: null,
+    tahun: 2024,
+    jenis: "Digital",
+    gambar: "/gambar/Wani-Ngurus-Izin.jpeg",
+    url: null,
+    urlLabel: null,
+    icon: "fa-file-signature",
+    warna: "indigo",
+  },
+
+  {
+    id: 5,
+    slug: "workshop-pelayanan-prima",
+    nama: "WORKSHOP PELAYANAN PRIMA",
+    singkatan: "Workshop Pelayanan Prima",
+    kategori: "Pelayanan",
+    deskripsi:
+      "Pengembangan kompetensi petugas dalam memberikan pelayanan publik yang prima.",
+    tujuan:
+      "Meningkatkan kompetensi dan kualitas pelayanan petugas.",
+    manfaat:
+      "Petugas memiliki pemahaman dan kemampuan pelayanan yang lebih baik.",
+    hasil: null,
+    tahun: 2024,
+    jenis: "Non Digital",
+    gambar: null,
+    url: null,
+    urlLabel: null,
+    icon: "fa-graduation-cap",
+    warna: "purple",
+  },
+
+  {
+    id: 6,
+    slug: "mpp-virtual",
+    nama: "MPP VIRTUAL",
+    singkatan: "Mal Pelayanan Publik Virtual",
+    kategori: "Digital",
+    deskripsi:
+      "Media pelayanan publik virtual yang memberikan akses layanan secara digital.",
+    tujuan:
+      "Memberikan kemudahan akses masyarakat terhadap informasi dan pelayanan publik.",
+    manfaat:
+      "Pelayanan lebih mudah dijangkau tanpa harus selalu datang langsung.",
+    hasil: null,
+    tahun: 2024,
+    jenis: "Digital",
+    gambar:
+      "https://mpp.surabaya.go.id/mppvirtual/skin/Image_7DB3C373_7065_34DE_41BA_CF5206137DED.png?v=1696700959324",
+    url: "https://mpp.surabaya.go.id/",
+    urlLabel: "Buka MPP Virtual",
+    icon: "fa-laptop",
+    warna: "cyan",
+  },
+
+  {
+    id: 7,
+    slug: "peta-potensi-investasi",
+    nama: "PETA POTENSI INVESTASI",
+    singkatan: "Peta Potensi Investasi",
+    kategori: "Investasi",
+    deskripsi:
+      "Media informasi potensi investasi yang membantu memberikan gambaran peluang investasi di Kota Surabaya.",
+    tujuan:
+      "Meningkatkan akses informasi potensi investasi dan menarik minat investor.",
+    manfaat:
+      "Investor mendapatkan informasi awal mengenai peluang dan potensi investasi.",
+    hasil: null,
+    tahun: 2024,
+    jenis: "Digital",
+    gambar: null,
+    url: null,
+    urlLabel: null,
+    icon: "fa-map-location-dot",
+    warna: "orange",
+  },
+
+  {
+    id: 8,
+    slug: "lapis-lupis",
+    nama: "LAPIS LUPIS",
+    singkatan: "Layanan Perizinan Investasi",
+    kategori: "Investasi",
+    deskripsi:
+      "Inovasi layanan yang mendukung kemudahan proses dan informasi terkait investasi.",
+    tujuan:
+      "Memberikan kemudahan akses layanan investasi.",
+    manfaat:
+      "Informasi dan pelayanan investasi menjadi lebih mudah diakses.",
+    hasil: null,
+    tahun: 2024,
+    jenis: "Digital",
+    gambar:
+      "https://epmal.surabaya.go.id/simpedal/assets2/lapis_lupis_baru.png",
+    url: "https://epmal.surabaya.go.id/simpedal/",
+    urlLabel: "Buka Layanan",
+    icon: "fa-chart-line",
+    warna: "emerald",
+  },
+
+  {
+    id: 9,
+    slug: "ais",
+    nama: "AIS",
+    singkatan: "Aplikasi Informasi dan Sistem",
+    kategori: "Digital",
+    deskripsi:
+      "Inovasi berbasis sistem informasi untuk mendukung pelayanan dan pengelolaan data.",
+    tujuan:
+      "Meningkatkan efektivitas dan efisiensi pelayanan melalui teknologi informasi.",
+    manfaat:
+      "Pengelolaan informasi dan pelayanan menjadi lebih terstruktur.",
+    hasil: null,
+    tahun: 2024,
+    jenis: "Digital",
+    gambar: null,
+    url: null,
+    urlLabel: null,
+    icon: "fa-robot",
+    warna: "violet",
+  },
+
+  {
+    id: 10,
+    slug: "klinik-investasi",
+    nama: "KLINIK INVESTASI",
+    singkatan: "Klinik Investasi",
+    kategori: "Investasi",
+    deskripsi:
+      "Layanan konsultasi dan pendampingan bagi calon investor maupun pelaku usaha.",
+    tujuan:
+      "Memberikan pendampingan dan solusi terhadap kebutuhan investasi.",
+    manfaat:
+      "Investor mendapatkan konsultasi yang lebih terarah dan mudah.",
+    hasil: null,
+    tahun: 2024,
+    jenis: "Digital",
+    gambar: null,
+    url: null,
+    urlLabel: null,
+    icon: "fa-stethoscope",
+    warna: "rose",
+  },
+];
+
+const categories = [
+  "Semua",
+  "Perizinan",
+  "Pengaduan",
+  "UMK",
+  "Pelayanan",
+  "Digital",
+  "Investasi",
+];
+
+const totalInovasi = inovasi.length;
+
+const totalDigital = inovasi.filter(
+  (item) => item.jenis === "Digital"
+).length;
+
+const totalInvestasi = inovasi.filter(
+  (item) => item.kategori === "Investasi"
+).length;
+
+const totalPerizinan = inovasi.filter(
+  (item) => item.kategori === "Perizinan"
+).length;
+---
+
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+
+  <title>Inovasi Pelayanan | DPMPTSP Kota Surabaya</title>
+
+  <meta
+    name="description"
+    content="Inovasi pelayanan publik DPMPTSP Kota Surabaya."
+  />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  />
+
+  <meta name="theme-color" content="#1d4ed8" />
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  />
+</head>
+
+<body>
+
+  <Header />
+
+  <main>
+
+    <!-- =================================================
+         HERO
+    ================================================== -->
+
+    <section class="innovation-hero">
+
+      <div class="hero-decoration hero-decoration-1"></div>
+      <div class="hero-decoration hero-decoration-2"></div>
+
+      <div class="container">
+
+        <div class="hero-inner">
+
+          <div class="hero-badge">
+            <i class="fa-solid fa-lightbulb"></i>
+            INOVASI PELAYANAN PUBLIK
+          </div>
+
+          <h1>
+            Inovasi Layanan
+            <span>DPMPTSP Surabaya</span>
+          </h1>
+
+          <p>
+            Berbagai terobosan pelayanan untuk menghadirkan
+            pelayanan publik yang lebih mudah, cepat,
+            transparan dan dekat dengan masyarakat.
+          </p>
+
+          <div class="hero-buttons">
+
+            <a
+              href="#daftar-inovasi"
+              class="hero-btn hero-btn-primary"
+            >
+              <i class="fa-solid fa-rocket"></i>
+              Jelajahi Inovasi
+            </a>
+
+            <a
+              href="#cari-layanan"
+              class="hero-btn hero-btn-outline"
+            >
+              <i class="fa-solid fa-magnifying-glass"></i>
+              Cari Layanan
+            </a>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================================
+         STATISTIK
+    ================================================== -->
+
+    <section class="statistics">
+
+      <div class="container">
+
+        <div class="statistics-grid">
+
+          <div class="statistics-card">
+
+            <div class="statistics-icon blue">
+              <i class="fa-solid fa-lightbulb"></i>
+            </div>
+
+            <div>
+              <strong>{totalInovasi}+</strong>
+              <span>Inovasi Layanan</span>
+            </div>
+
+          </div>
+
+
+          <div class="statistics-card">
+
+            <div class="statistics-icon green">
+              <i class="fa-solid fa-globe"></i>
+            </div>
+
+            <div>
+              <strong>{totalDigital}</strong>
+              <span>Layanan Digital</span>
+            </div>
+
+          </div>
+
+
+          <div class="statistics-card">
+
+            <div class="statistics-icon orange">
+              <i class="fa-solid fa-chart-line"></i>
+            </div>
+
+            <div>
+              <strong>{totalInvestasi}</strong>
+              <span>Layanan Investasi</span>
+            </div>
+
+          </div>
+
+
+          <div class="statistics-card">
+
+            <div class="statistics-icon purple">
+              <i class="fa-solid fa-file-circle-check"></i>
+            </div>
+
+            <div>
+              <strong>{totalPerizinan}</strong>
+              <span>Layanan Perizinan</span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================================
+         SEARCH
+    ================================================== -->
+
+    <section
+      id="cari-layanan"
+      class="search-section"
+    >
+
+      <div class="container">
+
+        <div class="search-panel">
+
+          <div class="search-title">
+
+            <div class="search-title-icon">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+
+            <div>
+
+              <h2>
+                Cari Layanan yang Anda Butuhkan
+              </h2>
+
+              <p>
+                Cari berdasarkan nama inovasi,
+                kategori atau jenis layanan.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="search-input">
+
+            <i class="fa-solid fa-search"></i>
+
+            <input
+              id="searchInput"
+              type="search"
+              placeholder="Contoh: izin usaha, pengaduan, investasi..."
+              autocomplete="off"
+            />
+
+            <button
+              type="button"
+              id="clearSearch"
+              aria-label="Hapus pencarian"
+            >
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================================
+         DAFTAR INOVASI
+    ================================================== -->
+
+    <section
+      id="daftar-inovasi"
+      class="innovation-section"
+    >
+
+      <div class="container">
+
+        <div class="section-header">
+
+          <div>
+
+            <span class="section-kicker">
+              <i class="fa-solid fa-star"></i>
+              INOVASI UNGGULAN
+            </span>
+
+            <h2>
+              Jelajahi Inovasi
+              <span>Layanan</span>
+            </h2>
+
+          </div>
+
+          <p>
+            Temukan berbagai inovasi yang dirancang
+            untuk memberikan pengalaman pelayanan
+            yang lebih baik.
+          </p>
+
+        </div>
+
+
+        <!-- FILTER -->
+
+        <div class="filter-row">
+
+          <div class="filters">
+
+            {
+              categories.map((category, index) => (
+                <button
+                  type="button"
+                  class:list={[
+                    "filter-button",
+                    { active: index === 0 },
+                  ]}
+                  data-category={category}
+                >
+                  {category}
+                </button>
+              ))
+            }
+
+          </div>
+
+          <div class="result-total">
+            <span id="resultCount">
+              {totalInovasi}
+            </span>
+            inovasi
+          </div>
+
+        </div>
+
+
+        <!-- GRID -->
+
+        <div
+          id="innovationGrid"
+          class="innovation-grid"
+        >
+
+          {
+            inovasi.map((item) => (
+              <article
+                class="innovation-card"
+                data-category={item.kategori}
+                data-search={`${item.nama} ${item.singkatan} ${item.kategori} ${item.jenis} ${item.deskripsi}`}
+              >
+
+                <div class="card-image">
+
+                  {
+                    item.gambar ? (
+                      <img
+                        src={item.gambar}
+                        alt={item.nama}
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div
+                        class:list={[
+                          "card-placeholder",
+                          item.warna,
+                        ]}
+                      >
+                        <i class={`fa-solid ${item.icon}`}></i>
+                      </div>
+                    )
+                  }
+
+                  <span class="card-category">
+                    {item.kategori}
+                  </span>
+
+                  <span class="card-type">
+                    {item.jenis}
+                  </span>
+
+                </div>
+
+
+                <div class="card-content">
+
+                  <div class="card-meta">
+                    <span>
+                      <i class="fa-regular fa-calendar"></i>
+                      {item.tahun}
+                    </span>
+                  </div>
+
+                  <h3>
+                    {item.nama}
+                  </h3>
+
+                  <div class="card-subtitle">
+                    {item.singkatan}
+                  </div>
+
+                  <p>
+                    {item.deskripsi}
+                  </p>
+
+
+                  <div class="card-bottom">
+
+                    <button
+                      type="button"
+                      class="detail-button"
+                      data-detail={item.slug}
+                    >
+                      Lihat Detail
+                      <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+
+                    {
+                      item.url && (
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="external-button"
+                          aria-label={`Buka ${item.nama}`}
+                        >
+                          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                      )
+                    }
+
+                  </div>
+
+                </div>
+
+              </article>
+            ))
+          }
+
+        </div>
+
+
+        <!-- EMPTY -->
+
+        <div
+          id="emptyState"
+          class="empty-state hidden"
+        >
+
+          <div class="empty-icon">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </div>
+
+          <h3>
+            Inovasi Tidak Ditemukan
+          </h3>
+
+          <p>
+            Coba gunakan kata kunci lain
+            atau pilih kategori berbeda.
+          </p>
+
+          <button
+            type="button"
+            id="resetSearch"
+          >
+            Reset Pencarian
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================================
+         CTA
+    ================================================== -->
+
+    <section class="cta-section">
+
+      <div class="container">
+
+        <div class="cta-box">
+
+          <div class="cta-icon">
+            <i class="fa-solid fa-headset"></i>
+          </div>
+
+          <div class="cta-content">
+
+            <span>
+              MEMBUTUHKAN BANTUAN?
+            </span>
+
+            <h2>
+              Tidak menemukan layanan yang Anda cari?
+            </h2>
+
+            <p>
+              Konsultasikan kebutuhan perizinan dan
+              pelayanan Anda kepada DPMPTSP Kota Surabaya.
+            </p>
+
+          </div>
+
+          <a
+            href="/kontak"
+            class="cta-button"
+          >
+            Hubungi Kami
+            <i class="fa-solid fa-arrow-right"></i>
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =================================================
+       MODAL
+  ================================================== -->
+
+  <div
+    id="innovationModal"
+    class="innovation-modal"
+    aria-hidden="true"
+  >
+
+    <div
+      id="modalOverlay"
+      class="modal-overlay"
+    ></div>
+
+
+    <div
+      class="modal-container"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalTitle"
+    >
+
+      <button
+        id="closeModal"
+        type="button"
+        class="modal-close"
+        aria-label="Tutup"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+
+      <div
+        id="modalScroll"
+        class="modal-scroll"
+      >
+
+        <div id="modalContent"></div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <Footer />
+
+
+  <!-- =================================================
+       JAVASCRIPT
+  ================================================== -->
+
+  <script define:vars={{ inovasi }}>
+
+    const searchInput =
+      document.getElementById("searchInput");
+
+    const clearSearch =
+      document.getElementById("clearSearch");
+
+    const resetSearch =
+      document.getElementById("resetSearch");
+
+    const resultCount =
+      document.getElementById("resultCount");
+
+    const emptyState =
+      document.getElementById("emptyState");
+
+    const cards =
+      document.querySelectorAll(".innovation-card");
+
+    const filterButtons =
+      document.querySelectorAll(".filter-button");
+
+    const modal =
+      document.getElementById("innovationModal");
+
+    const modalContent =
+      document.getElementById("modalContent");
+
+    const closeModal =
+      document.getElementById("closeModal");
+
+    const modalOverlay =
+      document.getElementById("modalOverlay");
+
+    let activeCategory = "Semua";
+
+
+    /* =================================================
+       FILTER
+    ================================================= */
+
+    function filterCards() {
+
+      const keyword =
+        searchInput.value
+          .toLowerCase()
+          .trim();
+
+      let visible = 0;
+
+      cards.forEach((card) => {
+
+        const category =
+          card.dataset.category || "";
+
+        const text =
+          card.dataset.search
+            .toLowerCase();
+
+        const categoryMatch =
+          activeCategory === "Semua" ||
+          category === activeCategory;
+
+        const searchMatch =
+          keyword === "" ||
+          text.includes(keyword);
+
+        if (categoryMatch && searchMatch) {
+
+          card.classList.remove(
+            "hidden-card"
+          );
+
+          visible++;
+
+        } else {
+
+          card.classList.add(
+            "hidden-card"
+          );
+
+        }
+
+      });
+
+      resultCount.textContent =
+        visible;
+
+      emptyState.classList.toggle(
+        "hidden",
+        visible !== 0
+      );
+
+    }
+
+
+    filterButtons.forEach((button) => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          filterButtons.forEach(
+            (item) => {
+              item.classList.remove("active");
+            }
+          );
+
+          button.classList.add("active");
+
+          activeCategory =
+            button.dataset.category;
+
+          filterCards();
+
+        }
+      );
+
+    });
+
+
+    searchInput.addEventListener(
+      "input",
+      filterCards
+    );
+
+
+    clearSearch.addEventListener(
+      "click",
+      () => {
+
+        searchInput.value = "";
+
+        filterCards();
+
+        searchInput.focus();
+
+      }
+    );
+
+
+    resetSearch.addEventListener(
+      "click",
+      () => {
+
+        searchInput.value = "";
+
+        activeCategory = "Semua";
+
+        filterButtons.forEach(
+          (button) => {
+            button.classList.remove("active");
+          }
+        );
+
+        filterButtons[0].classList.add("active");
+
+        filterCards();
+
+      }
+    );
+
+
+    /* =================================================
+       ESCAPE HTML
+    ================================================= */
+
+    function escapeHtml(value) {
+
+      if (
+        value === null ||
+        value === undefined
+      ) {
+        return "";
+      }
+
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+    }
+
+
+    /* =================================================
+       MODAL
+    ================================================= */
+
+    function openModal(slug) {
+
+      const item =
+        inovasi.find(
+          (data) => data.slug === slug
+        );
+
+      if (!item) {
+        return;
+      }
+
+
+      let imageHTML = "";
+
+      if (item.gambar) {
+
+        imageHTML = `
+          <div class="modal-image">
+            <img
+              src="${escapeHtml(item.gambar)}"
+              alt="${escapeHtml(item.nama)}"
+            />
+          </div>
+        `;
+
+      } else {
+
+        imageHTML = `
+          <div class="modal-image">
+            <div class="modal-placeholder ${escapeHtml(item.warna)}">
+              <i class="fa-solid ${escapeHtml(item.icon)}"></i>
+            </div>
+          </div>
+        `;
+
+      }
+
+
+      const actionHTML =
+        item.url
+          ? `
+            <div class="modal-actions">
+
+              <a
+                href="${escapeHtml(item.url)}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="modal-action"
+              >
+
+                <span class="modal-action-icon">
+                  <i class="fa-solid fa-rocket"></i>
+                </span>
+
+                <span>
+                  ${escapeHtml(
+                    item.urlLabel || "Gunakan Layanan"
+                  )}
+                </span>
+
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+
+              </a>
+
+            </div>
+          `
+          : "";
+
+
+      modalContent.innerHTML = `
+
+        ${imageHTML}
+
+
+        <div class="modal-body">
+
+          <div class="modal-heading">
+
+            <div class="modal-tags">
+
+              <span class="modal-tag primary">
+                <i class="fa-solid fa-layer-group"></i>
+                ${escapeHtml(item.kategori)}
+              </span>
+
+              <span class="modal-tag">
+                ${escapeHtml(item.jenis)}
+              </span>
+
+              <span class="modal-tag">
+                <i class="fa-regular fa-calendar"></i>
+                ${item.tahun}
+              </span>
+
+            </div>
+
+
+            <h2
+              id="modalTitle"
+              class="modal-title"
+            >
+              ${escapeHtml(item.nama)}
+            </h2>
+
+
+            <p class="modal-subtitle">
+              ${escapeHtml(item.singkatan || "")}
+            </p>
+
+          </div>
+
+
+          <div class="modal-info main-info">
+
+            <div class="info-icon blue">
+              <i class="fa-solid fa-circle-info"></i>
+            </div>
+
+            <div>
+
+              <h3>
+                Tentang Inovasi
+              </h3>
+
+              <p>
+                ${escapeHtml(
+                  item.deskripsi ||
+                  "Informasi belum tersedia."
+                )}
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="modal-info">
+
+            <div class="info-icon indigo">
+              <i class="fa-solid fa-bullseye"></i>
+            </div>
+
+            <div>
+
+              <h3>
+                Tujuan
+              </h3>
+
+              <p>
+                ${escapeHtml(
+                  item.tujuan ||
+                  "Informasi belum tersedia."
+                )}
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="modal-info">
+
+            <div class="info-icon green">
+              <i class="fa-solid fa-star"></i>
+            </div>
+
+            <div>
+
+              <h3>
+                Manfaat
+              </h3>
+
+              <p>
+                ${escapeHtml(
+                  item.manfaat ||
+                  "Informasi belum tersedia."
+                )}
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="modal-info">
+
+            <div class="info-icon orange">
+              <i class="fa-solid fa-chart-line"></i>
+            </div>
+
+            <div>
+
+              <h3>
+                Hasil / Dampak
+              </h3>
+
+              <p>
+                ${escapeHtml(
+                  item.hasil ||
+                  "Informasi hasil belum tersedia."
+                )}
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        ${actionHTML}
+
+      `;
+
+
+      modal.classList.add("show");
+
+      modal.setAttribute(
+        "aria-hidden",
+        "false"
+      );
+
+      document.body.classList.add(
+        "modal-open"
+      );
+
+
+      const modalScroll =
+        document.getElementById("modalScroll");
+
+      if (modalScroll) {
+        modalScroll.scrollTop = 0;
+      }
+
+
+      setTimeout(() => {
+        closeModal.focus();
+      }, 50);
+
+    }
+
+
+    function closeInnovationModal() {
+
+      modal.classList.remove("show");
+
+      modal.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+
+      document.body.classList.remove(
+        "modal-open"
+      );
+
+    }
+
+
+    document
+      .querySelectorAll(".detail-button")
+      .forEach((button) => {
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            openModal(
+              button.dataset.detail
+            );
+
+          }
+        );
+
+      });
+
+
+    closeModal.addEventListener(
+      "click",
+      closeInnovationModal
+    );
+
+
+    modalOverlay.addEventListener(
+      "click",
+      closeInnovationModal
+    );
+
+
+    document.addEventListener(
+      "keydown",
+      (event) => {
+
+        if (
+          event.key === "Escape" &&
+          modal.classList.contains("show")
+        ) {
+
+          closeInnovationModal();
+
+        }
+
+      }
+    );
+
+  </script>
+
+</body>
+</html>
+
+
+<style>
+
+/* =====================================================
+   BASE
+===================================================== */
+
+.container {
+  width: min(1180px, calc(100% - 32px));
+  margin-inline: auto;
+}
+
+
+/* =====================================================
+   HERO
+===================================================== */
+
+.innovation-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 90px 0 115px;
+  color: white;
+
+  background:
+    radial-gradient(
+      circle at 15% 20%,
+      rgba(59, 130, 246, 0.45),
+      transparent 35%
+    ),
+    linear-gradient(
+      135deg,
+      #0f2f87 0%,
+      #1d4ed8 55%,
+      #2563eb 100%
+    );
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 850px;
+  margin: auto;
+  text-align: center;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 16px;
+
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 999px;
+
+  background: rgba(255,255,255,.1);
+
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .07em;
+}
+
+.hero-inner h1 {
+  margin: 22px 0 0;
+  font-size: clamp(38px, 6vw, 64px);
+  line-height: 1.05;
+  font-weight: 900;
+}
+
+.hero-inner h1 span {
+  display: block;
+  color: #facc15;
+}
+
+.hero-inner p {
+  max-width: 720px;
+  margin: 25px auto 0;
+
+  color: rgba(255,255,255,.86);
+
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.hero-buttons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.hero-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  padding: 14px 22px;
+
+  border-radius: 13px;
+
+  text-decoration: none;
+  font-weight: 800;
+
+  transition: .25s ease;
+}
+
+.hero-btn-primary {
+  background: #facc15;
+  color: #172554;
+}
+
+.hero-btn-primary:hover {
+  background: #fde047;
+  transform: translateY(-2px);
+}
+
+.hero-btn-outline {
+  border: 1px solid rgba(255,255,255,.3);
+
+  background: rgba(255,255,255,.1);
+
+  color: white;
+}
+
+.hero-btn-outline:hover {
+  background: white;
+  color: #1d4ed8;
+}
+
+.hero-decoration {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,.07);
+}
+
+.hero-decoration-1 {
+  width: 400px;
+  height: 400px;
+  left: -180px;
+  top: -180px;
+}
+
+.hero-decoration-2 {
+  width: 500px;
+  height: 500px;
+  right: -240px;
+  bottom: -300px;
+}
+
+
+/* =====================================================
+   STATISTICS
+===================================================== */
+
+.statistics {
+  position: relative;
+  z-index: 5;
+  margin-top: -52px;
+}
+
+.statistics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.statistics-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  padding: 22px;
+
+  background: white;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+
+  box-shadow:
+    0 15px 40px rgba(15,23,42,.08);
+}
+
+.statistics-card strong {
+  display: block;
+  color: #172554;
+
+  font-size: 26px;
+  line-height: 1;
+  font-weight: 900;
+}
+
+.statistics-card span {
+  display: block;
+  margin-top: 6px;
+
+  color: #64748b;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.statistics-icon {
+  width: 52px;
+  height: 52px;
+
+  flex-shrink: 0;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 15px;
+
+  font-size: 20px;
+}
+
+.statistics-icon.blue {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.statistics-icon.green {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.statistics-icon.orange {
+  background: #ffedd5;
+  color: #ea580c;
+}
+
+.statistics-icon.purple {
+  background: #f3e8ff;
+  color: #9333ea;
+}
+
+
+/* =====================================================
+   SEARCH
+===================================================== */
+
+.search-section {
+  padding: 80px 0 30px;
+}
+
+.search-panel {
+  padding: 28px;
+
+  background: white;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 23px;
+
+  box-shadow:
+    0 10px 35px rgba(15,23,42,.05);
+}
+
+.search-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.search-title-icon {
+  width: 50px;
+  height: 50px;
+
+  flex-shrink: 0;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 14px;
+
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.search-title h2 {
+  margin: 0;
+
+  color: #172554;
+
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.search-title p {
+  margin: 5px 0 0;
+
+  color: #64748b;
+
+  font-size: 13px;
+}
+
+.search-input {
+  position: relative;
+}
+
+.search-input > i {
+  position: absolute;
+
+  left: 19px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  color: #64748b;
+}
+
+.search-input input {
+  width: 100%;
+  height: 58px;
+
+  padding: 0 55px;
+
+  border: 2px solid #e2e8f0;
+  border-radius: 14px;
+
+  outline: none;
+
+  color: #172554;
+
+  font-size: 14px;
+
+  transition: .2s;
+}
+
+.search-input input:focus {
+  border-color: #2563eb;
+
+  box-shadow:
+    0 0 0 4px rgba(37,99,235,.1);
+}
+
+.search-input button {
+  position: absolute;
+
+  right: 14px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  width: 35px;
+  height: 35px;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #94a3b8;
+
+  cursor: pointer;
+}
+
+
+/* =====================================================
+   SECTION HEADER
+===================================================== */
+
+.innovation-section {
+  padding: 40px 0 85px;
+}
+
+.section-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+
+  gap: 30px;
+
+  margin-bottom: 30px;
+}
+
+.section-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  color: #2563eb;
+
+  font-size: 11px;
+  font-weight: 900;
+
+  letter-spacing: .1em;
+}
+
+.section-header h2 {
+  margin: 8px 0 0;
+
+  color: #172554;
+
+  font-size: 34px;
+  font-weight: 900;
+}
+
+.section-header h2 span {
+  color: #2563eb;
+}
+
+.section-header > p {
+  max-width: 380px;
+
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 14px;
+  line-height: 1.7;
+
+  text-align: right;
+}
+
+
+/* =====================================================
+   FILTER
+===================================================== */
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 25px;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-button {
+  padding: 9px 16px;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+
+  background: white;
+  color: #475569;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: .2s;
+}
+
+.filter-button:hover {
+  border-color: #93c5fd;
+  color: #2563eb;
+}
+
+.filter-button.active {
+  border-color: #2563eb;
+
+  background: #2563eb;
+  color: white;
+}
+
+.result-total {
+  flex-shrink: 0;
+
+  color: #64748b;
+
+  font-size: 13px;
+}
+
+.result-total span {
+  color: #172554;
+  font-weight: 900;
+}
+
+
+/* =====================================================
+   CARD
+===================================================== */
+
+.innovation-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.innovation-card {
+  overflow: hidden;
+
+  background: white;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+
+  box-shadow:
+    0 7px 25px rgba(15,23,42,.04);
+
+  transition:
+    transform .3s ease,
+    box-shadow .3s ease,
+    border-color .3s ease;
+}
+
+.innovation-card:hover {
+  transform: translateY(-6px);
+
+  border-color: #bfdbfe;
+
+  box-shadow:
+    0 20px 45px rgba(30,64,175,.12);
+}
+
+.hidden-card {
+  display: none !important;
+}
+
+.card-image {
+  position: relative;
+
+  height: 205px;
+
+  overflow: hidden;
+
+  background: #eff6ff;
+}
+
+.card-image img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  transition: transform .45s ease;
+}
+
+.innovation-card:hover .card-image img {
+  transform: scale(1.05);
+}
+
+.card-placeholder {
+  width: 100%;
+  height: 100%;
+
+  display: grid;
+  place-items: center;
+
+  font-size: 55px;
+}
+
+.card-placeholder.blue,
+.modal-placeholder.blue {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.card-placeholder.yellow,
+.modal-placeholder.yellow {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.card-placeholder.green,
+.modal-placeholder.green {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.card-placeholder.indigo,
+.modal-placeholder.indigo {
+  background: #e0e7ff;
+  color: #4f46e5;
+}
+
+.card-placeholder.purple,
+.modal-placeholder.purple {
+  background: #f3e8ff;
+  color: #9333ea;
+}
+
+.card-placeholder.cyan,
+.modal-placeholder.cyan {
+  background: #cffafe;
+  color: #0891b2;
+}
+
+.card-placeholder.orange,
+.modal-placeholder.orange {
+  background: #ffedd5;
+  color: #ea580c;
+}
+
+.card-placeholder.emerald,
+.modal-placeholder.emerald {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.card-placeholder.violet,
+.modal-placeholder.violet {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+.card-placeholder.rose,
+.modal-placeholder.rose {
+  background: #ffe4e6;
+  color: #e11d48;
+}
+
+.card-category,
+.card-type {
+  position: absolute;
+
+  top: 13px;
+
+  padding: 6px 10px;
+
+  border-radius: 999px;
+
+  background: rgba(15,23,42,.72);
+
+  color: white;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  backdrop-filter: blur(8px);
+}
+
+.card-category {
+  left: 13px;
+}
+
+.card-type {
+  right: 13px;
+}
+
+.card-content {
+  padding: 21px;
+}
+
+.card-meta {
+  color: #64748b;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.card-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.card-content h3 {
+  margin: 12px 0 5px;
+
+  color: #172554;
+
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.card-subtitle {
+  min-height: 36px;
+
+  color: #2563eb;
+
+  font-size: 11px;
+  line-height: 1.5;
+
+  font-weight: 700;
+}
+
+.card-content > p {
+  min-height: 65px;
+
+  margin: 10px 0 0;
+
+  color: #64748b;
+
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: 18px;
+  padding-top: 16px;
+
+  border-top: 1px solid #f1f5f9;
+}
+
+.detail-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 0;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #2563eb;
+
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.detail-button i {
+  transition: .2s;
+}
+
+.detail-button:hover i {
+  transform: translateX(4px);
+}
+
+.external-button {
+  width: 38px;
+  height: 38px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 10px;
+
+  background: #eff6ff;
+  color: #2563eb;
+
+  text-decoration: none;
+
+  transition: .2s;
+}
+
+.external-button:hover {
+  background: #2563eb;
+  color: white;
+}
+
+
+/* =====================================================
+   EMPTY
+===================================================== */
+
+.empty-state {
+  padding: 70px 20px;
+
+  text-align: center;
+}
+
+.empty-state.hidden {
+  display: none;
+}
+
+.empty-icon {
+  width: 70px;
+  height: 70px;
+
+  margin: auto;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background: #e2e8f0;
+  color: #64748b;
+
+  font-size: 24px;
+}
+
+.empty-state h3 {
+  margin: 18px 0 7px;
+
+  color: #172554;
+
+  font-size: 22px;
+}
+
+.empty-state p {
+  color: #64748b;
+}
+
+.empty-state button {
+  margin-top: 12px;
+
+  padding: 11px 18px;
+
+  border: 0;
+  border-radius: 10px;
+
+  background: #2563eb;
+  color: white;
+
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+
+/* =====================================================
+   CTA
+===================================================== */
+
+.cta-section {
+  padding: 20px 0 90px;
+}
+
+.cta-box {
+  display: flex;
+  align-items: center;
+
+  gap: 24px;
+
+  padding: 34px;
+
+  border-radius: 25px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #172554,
+      #1d4ed8
+    );
+
+  color: white;
+}
+
+.cta-icon {
+  width: 62px;
+  height: 62px;
+
+  flex-shrink: 0;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 17px;
+
+  background: rgba(255,255,255,.12);
+
+  font-size: 24px;
+}
+
+.cta-content {
+  flex: 1;
+}
+
+.cta-content span {
+  color: #facc15;
+
+  font-size: 10px;
+  font-weight: 900;
+
+  letter-spacing: .12em;
+}
+
+.cta-content h2 {
+  margin: 5px 0;
+
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.cta-content p {
+  margin: 0;
+
+  color: rgba(255,255,255,.75);
+
+  font-size: 13px;
+}
+
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+
+  padding: 13px 20px;
+
+  border-radius: 12px;
+
+  background: #facc15;
+  color: #172554;
+
+  text-decoration: none;
+
+  font-weight: 900;
+
+  white-space: nowrap;
+
+  transition: .2s;
+}
+
+.cta-button:hover {
+  background: #fde047;
+  transform: translateY(-2px);
+}
+
+
+/* =====================================================
+   MODAL
+===================================================== */
+
+.innovation-modal {
+  position: fixed;
+  inset: 0;
+
+  z-index: 99999;
+
+  display: none;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+}
+
+.innovation-modal.show {
+  display: flex;
+}
+
+
+/* OVERLAY */
+
+.modal-overlay {
+  position: absolute;
+  inset: 0;
+
+  background: rgba(15,23,42,.72);
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+
+/* CONTAINER */
+
+.modal-container {
+  position: relative;
+  z-index: 2;
+
+  width: min(820px, 100%);
+
+  max-height: 88vh;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  background: #ffffff;
+
+  border: 1px solid rgba(226,232,240,.95);
+
+  border-radius: 24px;
+
+  box-shadow:
+    0 30px 80px rgba(15,23,42,.30),
+    0 8px 25px rgba(15,23,42,.15);
+
+  animation: innovationModalIn .22s ease-out;
+}
+
+@keyframes innovationModalIn {
+
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+}
+
+
+/* CLOSE */
+
+.modal-close {
+  position: absolute;
+  z-index: 50;
+
+  top: 16px;
+  right: 16px;
+
+  width: 44px;
+  height: 44px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid rgba(255,255,255,.4);
+  border-radius: 50%;
+
+  background: rgba(15,23,42,.72);
+
+  color: white;
+
+  font-size: 17px;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 8px 25px rgba(0,0,0,.2);
+
+  transition:
+    background .2s ease,
+    transform .2s ease;
+}
+
+.modal-close:hover {
+  background: #dc2626;
+  transform: rotate(90deg);
+}
+
+
+/* SCROLL */
+
+.modal-scroll {
+  width: 100%;
+
+  max-height: 88vh;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.modal-scroll::-webkit-scrollbar {
+  width: 7px;
+}
+
+.modal-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 20px;
+}
+
+
+/* =====================================================
+   MODAL IMAGE
+===================================================== */
+
+.modal-image {
+  position: relative;
+
+  width: 100%;
+
+  height: 270px;
+
+  overflow: hidden;
+
+  background: #f1f5f9;
+}
+
+.modal-image::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(15,23,42,.02),
+      rgba(15,23,42,.20)
+    );
+
+  pointer-events: none;
+}
+
+.modal-image img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+}
+
+.modal-placeholder {
+  width: 100%;
+  height: 100%;
+
+  display: grid;
+  place-items: center;
+
+  font-size: 70px;
+}
+
+
+/* =====================================================
+   MODAL BODY
+===================================================== */
+
+.modal-body {
+  padding: 30px 32px 28px;
+}
+
+
+/* =====================================================
+   MODAL HEADING
+===================================================== */
+
+.modal-heading {
+  padding-bottom: 24px;
+
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-tags {
+  display: flex;
+  flex-wrap: wrap;
+
+  align-items: center;
+
+  gap: 7px;
+
+  margin-bottom: 14px;
+}
+
+.modal-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 7px 11px;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+
+  background: #f8fafc;
+  color: #64748b;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  line-height: 1;
+}
+
+.modal-tag.primary {
+  border-color: #bfdbfe;
+
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.modal-title {
+  margin: 0;
+
+  color: #0f172a;
+
+  font-size: clamp(27px, 4vw, 36px);
+
+  line-height: 1.15;
+
+  font-weight: 900;
+
+  letter-spacing: -.025em;
+}
+
+.modal-subtitle {
+  max-width: 680px;
+
+  margin: 9px 0 0;
+
+  color: #64748b;
+
+  font-size: 13px;
+
+  line-height: 1.7;
+}
+
+
+/* =====================================================
+   MODAL INFO
+===================================================== */
+
+.modal-info {
+  display: grid;
+
+  grid-template-columns: 44px minmax(0, 1fr);
+
+  gap: 14px;
+
+  margin-top: 14px;
+
+  padding: 17px 18px;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 15px;
+
+  background: #fff;
+
+  transition:
+    border-color .2s ease,
+    background .2s ease;
+}
+
+.modal-info:hover {
+  border-color: #dbeafe;
+
+  background: #f8fbff;
+}
+
+.modal-info.main-info {
+  margin-top: 20px;
+
+  border-color: #dbeafe;
+
+  background: #f8fbff;
+}
+
+.info-icon {
+  width: 44px;
+  height: 44px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 12px;
+
+  font-size: 16px;
+}
+
+.info-icon.blue {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.info-icon.indigo {
+  background: #e0e7ff;
+  color: #4f46e5;
+}
+
+.info-icon.green {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.info-icon.orange {
+  background: #ffedd5;
+  color: #ea580c;
+}
+
+.modal-info h3 {
+  margin: 2px 0 6px;
+
+  color: #0f172a;
+
+  font-size: 14px;
+
+  line-height: 1.3;
+
+  font-weight: 900;
+}
+
+.modal-info p {
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 13px;
+
+  line-height: 1.75;
+
+  white-space: pre-line;
+}
+
+
+/* =====================================================
+   ACTION
+===================================================== */
+
+.modal-actions {
+  position: sticky;
+
+  bottom: 0;
+
+  z-index: 10;
+
+  padding: 14px 24px;
+
+  border-top: 1px solid #e2e8f0;
+
+  background: rgba(255,255,255,.95);
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.modal-action {
+  width: 100%;
+  min-height: 50px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  padding: 0 16px;
+
+  border-radius: 12px;
+
+  background: #2563eb;
+
+  color: white;
+
+  text-decoration: none;
+
+  font-size: 13px;
+  font-weight: 800;
+
+  box-shadow:
+    0 8px 20px rgba(37,99,235,.18);
+
+  transition:
+    background .2s ease,
+    transform .2s ease,
+    box-shadow .2s ease;
+}
+
+.modal-action:hover {
+  background: #1d4ed8;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 12px 25px rgba(37,99,235,.25);
+}
+
+.modal-action > span:nth-child(2) {
+  flex: 1;
+}
+
+.modal-action-icon {
+  width: 34px;
+  height: 34px;
+
+  flex-shrink: 0;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 9px;
+
+  background: rgba(255,255,255,.15);
+
+  font-size: 13px;
+}
+
+
+/* =====================================================
+   BODY LOCK
+===================================================== */
+
+body.modal-open {
+  overflow: hidden;
+}
+
+
+/* =====================================================
+   TABLET
+===================================================== */
+
+@media (max-width: 1000px) {
+
+  .statistics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .innovation-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 700px) {
+
+  .container {
+    width: calc(100% - 24px);
+  }
+
+  .innovation-hero {
+    padding: 65px 0 90px;
+  }
+
+  .hero-inner h1 {
+    font-size: 40px;
+  }
+
+  .hero-inner p {
+    font-size: 14px;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+  }
+
+  .hero-btn {
+    width: 100%;
+  }
+
+  .statistics {
+    margin-top: -35px;
+  }
+
+  .statistics-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 9px;
+  }
+
+  .statistics-card {
+    padding: 14px;
+    gap: 10px;
+  }
+
+  .statistics-icon {
+    width: 40px;
+    height: 40px;
+
+    border-radius: 11px;
+
+    font-size: 15px;
+  }
+
+  .statistics-card strong {
+    font-size: 20px;
+  }
+
+  .statistics-card span {
+    font-size: 10px;
+  }
+
+  .search-section {
+    padding-top: 50px;
+  }
+
+  .search-panel {
+    padding: 20px;
+  }
+
+  .search-title h2 {
+    font-size: 17px;
+  }
+
+  .search-title p {
+    font-size: 11px;
+  }
+
+  .section-header {
+    display: block;
+  }
+
+  .section-header h2 {
+    font-size: 28px;
+  }
+
+  .section-header > p {
+    margin-top: 10px;
+    text-align: left;
+  }
+
+  .filter-row {
+    display: block;
+  }
+
+  .result-total {
+    margin-top: 14px;
+  }
+
+  .innovation-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card-image {
+    height: 220px;
+  }
+
+  .cta-box {
+    flex-direction: column;
+    align-items: flex-start;
+
+    padding: 25px;
+  }
+
+  .cta-content h2 {
+    font-size: 20px;
+  }
+
+  .cta-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+
+  /* MODAL */
+
+  .innovation-modal {
+    padding: 12px;
+  }
+
+  .modal-container {
+    width: 100%;
+
+    max-height: 94vh;
+
+    border-radius: 20px;
+  }
+
+  .modal-scroll {
+    max-height: 94vh;
+  }
+
+  .modal-image {
+    height: 220px;
+  }
+
+  .modal-body {
+    padding: 23px 20px 22px;
+  }
+
+  .modal-heading {
+    padding-bottom: 20px;
+  }
+
+  .modal-title {
+    font-size: 25px;
+  }
+
+  .modal-subtitle {
+    font-size: 12px;
+  }
+
+  .modal-info {
+    grid-template-columns: 40px minmax(0, 1fr);
+
+    gap: 11px;
+
+    padding: 15px;
+  }
+
+  .info-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .modal-info h3 {
+    font-size: 13px;
+  }
+
+  .modal-info p {
+    font-size: 12px;
+    line-height: 1.7;
+  }
+
+  .modal-actions {
+    padding: 12px 15px;
+
+    padding-bottom:
+      calc(
+        12px + env(safe-area-inset-bottom)
+      );
+  }
+
+  .modal-close {
+    top: 12px;
+    right: 12px;
+
+    width: 40px;
+    height: 40px;
+  }
+
+}
+
+
+/* =====================================================
+   VERY SMALL MOBILE
+===================================================== */
+
+@media (max-width: 420px) {
+
+  .statistics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .statistics-card {
+    padding: 15px;
+  }
+
+  .innovation-modal {
+    padding: 0;
+  }
+
+  .modal-container {
+    height: 100%;
+    max-height: 100%;
+
+    border-radius: 0;
+  }
+
+  .modal-scroll {
+    max-height: 100%;
+  }
+
+  .modal-image {
+    height: 190px;
+  }
+
+  .modal-body {
+    padding: 20px 15px;
+  }
+
+  .modal-title {
+    font-size: 23px;
+  }
+
+  .modal-tags {
+    gap: 5px;
+  }
+
+  .modal-tag {
+    padding: 5px 8px;
+    font-size: 9px;
+  }
+
+  .modal-info {
+    padding: 14px;
+    border-radius: 13px;
+  }
+
+  .modal-info p {
+    font-size: 12px;
+  }
+
+}
+
+</style>
+<style is:global>
+/* =====================================================
+   FIX MODAL - GLOBAL
+   Konten modal dibuat via innerHTML
+===================================================== */
+
+.innovation-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+
+  display: none;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+}
+
+.innovation-modal.show {
+  display: flex;
+}
+
+.innovation-modal .modal-overlay {
+  position: absolute;
+  inset: 0;
+
+  background: rgba(15, 23, 42, 0.72);
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.innovation-modal .modal-container {
+  position: relative;
+  z-index: 2;
+
+  width: min(820px, 100%);
+  max-height: min(88vh, 820px);
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  background: #fff;
+
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 24px;
+
+  box-shadow:
+    0 30px 80px rgba(15, 23, 42, 0.28),
+    0 8px 25px rgba(15, 23, 42, 0.12);
+
+  animation: innovationModalIn 0.22s ease-out;
+}
+
+@keyframes innovationModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* CLOSE */
+
+.innovation-modal .modal-close {
+  position: absolute;
+  z-index: 20;
+
+  top: 16px;
+  right: 16px;
+
+  width: 42px;
+  height: 42px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+
+  background: rgba(15, 23, 42, 0.68);
+  color: #fff;
+
+  font-size: 16px;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 5px 18px rgba(0, 0, 0, 0.18);
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.innovation-modal .modal-close:hover {
+  background: #dc2626;
+  transform: rotate(90deg);
+}
+
+/* SCROLL */
+
+.innovation-modal .modal-scroll {
+  width: 100%;
+
+  max-height: min(88vh, 820px);
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.innovation-modal .modal-scroll::-webkit-scrollbar {
+  width: 7px;
+}
+
+.innovation-modal .modal-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.innovation-modal .modal-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 20px;
+}
+
+/* IMAGE */
+
+.innovation-modal .modal-image {
+  position: relative;
+
+  width: 100%;
+  height: 260px;
+
+  overflow: hidden;
+
+  background: #f1f5f9;
+}
+
+.innovation-modal .modal-image::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(15, 23, 42, 0.02),
+      rgba(15, 23, 42, 0.18)
+    );
+
+  pointer-events: none;
+}
+
+.innovation-modal .modal-image img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+}
+
+.innovation-modal .modal-placeholder {
+  width: 100%;
+  height: 100%;
+
+  display: grid;
+  place-items: center;
+
+  font-size: 70px;
+}
+
+/* PLACEHOLDER COLORS */
+
+.innovation-modal .modal-placeholder.blue {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.innovation-modal .modal-placeholder.yellow {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.innovation-modal .modal-placeholder.green {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.innovation-modal .modal-placeholder.indigo {
+  background: #e0e7ff;
+  color: #4f46e5;
+}
+
+.innovation-modal .modal-placeholder.purple {
+  background: #f3e8ff;
+  color: #9333ea;
+}
+
+.innovation-modal .modal-placeholder.cyan {
+  background: #cffafe;
+  color: #0891b2;
+}
+
+.innovation-modal .modal-placeholder.orange {
+  background: #ffedd5;
+  color: #ea580c;
+}
+
+.innovation-modal .modal-placeholder.emerald {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.innovation-modal .modal-placeholder.violet {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+.innovation-modal .modal-placeholder.rose {
+  background: #ffe4e6;
+  color: #e11d48;
+}
+
+/* BODY */
+
+.innovation-modal .modal-body {
+  padding: 30px 32px 28px;
+}
+
+/* HEADING */
+
+.innovation-modal .modal-heading {
+  padding-bottom: 24px;
+
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.innovation-modal .modal-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+
+  gap: 7px;
+
+  margin-bottom: 14px;
+}
+
+.innovation-modal .modal-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 6px 10px;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+
+  background: #f8fafc;
+  color: #64748b;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  line-height: 1;
+}
+
+.innovation-modal .modal-tag.primary {
+  border-color: #bfdbfe;
+
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.innovation-modal .modal-title {
+  margin: 0;
+
+  color: #0f172a;
+
+  font-size: clamp(26px, 4vw, 34px);
+
+  line-height: 1.15;
+  font-weight: 900;
+
+  letter-spacing: -0.025em;
+}
+
+.innovation-modal .modal-subtitle {
+  max-width: 680px;
+
+  margin: 9px 0 0;
+
+  color: #64748b;
+
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* INFO BOX */
+
+.innovation-modal .modal-info {
+  display: grid;
+
+  grid-template-columns: 44px minmax(0, 1fr);
+
+  gap: 14px;
+
+  margin-top: 14px;
+
+  padding: 17px 18px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 15px;
+
+  background: #fff;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.innovation-modal .modal-info:hover {
+  border-color: #dbeafe;
+  background: #f8fbff;
+}
+
+.innovation-modal .modal-info.main-info {
+  margin-top: 20px;
+
+  border-color: #dbeafe;
+
+  background: #f8fbff;
+}
+
+/* ICON INFO */
+
+.innovation-modal .info-icon {
+  width: 44px;
+  height: 44px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 12px;
+
+  font-size: 16px;
+}
+
+.innovation-modal .info-icon.blue {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.innovation-modal .info-icon.indigo {
+  background: #e0e7ff;
+  color: #4f46e5;
+}
+
+.innovation-modal .info-icon.green {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.innovation-modal .info-icon.orange {
+  background: #ffedd5;
+  color: #ea580c;
+}
+
+/* TEXT */
+
+.innovation-modal .modal-info h3 {
+  margin: 2px 0 6px;
+
+  color: #0f172a;
+
+  font-size: 14px;
+  line-height: 1.3;
+
+  font-weight: 900;
+}
+
+.innovation-modal .modal-info p {
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 13px;
+
+  line-height: 1.75;
+
+  white-space: pre-line;
+}
+
+/* ACTION */
+
+.innovation-modal .modal-actions {
+  position: sticky;
+
+  bottom: 0;
+  z-index: 10;
+
+  padding: 14px 24px;
+
+  border-top: 1px solid #e2e8f0;
+
+  background: rgba(255, 255, 255, 0.94);
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.innovation-modal .modal-action {
+  width: 100%;
+  min-height: 50px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  padding: 0 16px;
+
+  border-radius: 12px;
+
+  background: #2563eb;
+  color: #fff;
+
+  text-decoration: none;
+
+  font-size: 13px;
+  font-weight: 800;
+
+  box-shadow:
+    0 8px 20px rgba(37, 99, 235, 0.18);
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.innovation-modal .modal-action:hover {
+  background: #1d4ed8;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 12px 25px rgba(37, 99, 235, 0.25);
+}
+
+.innovation-modal .modal-action > span:nth-child(2) {
+  flex: 1;
+}
+
+.innovation-modal .modal-action-icon {
+  width: 34px;
+  height: 34px;
+
+  flex-shrink: 0;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 9px;
+
+  background: rgba(255, 255, 255, 0.15);
+
+  font-size: 13px;
+}
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+  .innovation-modal {
+    padding: 12px;
+  }
+
+  .innovation-modal .modal-container {
+    width: 100%;
+    max-height: 94vh;
+
+    border-radius: 20px;
+  }
+
+  .innovation-modal .modal-scroll {
+    max-height: 94vh;
+  }
+
+  .innovation-modal .modal-image {
+    height: 220px;
+  }
+
+  .innovation-modal .modal-body {
+    padding: 23px 20px 22px;
+  }
+
+  .innovation-modal .modal-heading {
+    padding-bottom: 20px;
+  }
+
+  .innovation-modal .modal-title {
+    font-size: 25px;
+  }
+
+  .innovation-modal .modal-subtitle {
+    font-size: 12px;
+  }
+
+  .innovation-modal .modal-info {
+    grid-template-columns: 40px minmax(0, 1fr);
+
+    gap: 11px;
+
+    padding: 15px;
+  }
+
+  .innovation-modal .info-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .innovation-modal .modal-info h3 {
+    font-size: 13px;
+  }
+
+  .innovation-modal .modal-info p {
+    font-size: 12px;
+    line-height: 1.7;
+  }
+
+  .innovation-modal .modal-actions {
+    padding: 12px 15px;
+
+    padding-bottom:
+      calc(12px + env(safe-area-inset-bottom));
+  }
+
+  .innovation-modal .modal-close {
+    top: 12px;
+    right: 12px;
+
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* VERY SMALL */
+
+@media (max-width: 420px) {
+  .innovation-modal {
+    padding: 0;
+  }
+
+  .innovation-modal .modal-container {
+    height: 100%;
+    max-height: 100%;
+
+    border-radius: 0;
+  }
+
+  .innovation-modal .modal-scroll {
+    max-height: 100%;
+  }
+
+  .innovation-modal .modal-image {
+    height: 190px;
+  }
+
+  .innovation-modal .modal-body {
+    padding: 20px 15px;
+  }
+
+  .innovation-modal .modal-title {
+    font-size: 23px;
+  }
+
+  .innovation-modal .modal-tags {
+    gap: 5px;
+  }
+
+  .innovation-modal .modal-tag {
+    padding: 5px 8px;
+    font-size: 9px;
+  }
+
+  .innovation-modal .modal-info {
+    padding: 14px;
+    border-radius: 13px;
+  }
+
+  .innovation-modal .modal-info p {
+    font-size: 12px;
+  }
+}
+</style>

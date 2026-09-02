@@ -1,0 +1,2184 @@
+---
+import { MEDIA_BASE_URL } from "../lib/media";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import "@dpmptsp/ui/styles/global.css";
+
+const {
+  title = "Kontak DPMPTSP Kota Surabaya",
+  description =
+    "Kontak dan layanan pengaduan Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kota Surabaya",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="id" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+
+    <title>{title}</title>
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1"
+    />
+
+    <meta
+      name="description"
+      content={description}
+    />
+
+    <meta
+      name="author"
+      content="DPMPTSP Kota Surabaya"
+    />
+
+    <meta
+      name="theme-color"
+      content="#1e40af"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+  </head>
+
+  <body class="font-sans bg-gray-50 text-gray-800 antialiased">
+
+    <Header />
+
+    <main>
+
+      <!-- =====================================================
+           HERO
+      ====================================================== -->
+
+      <section
+        class="relative overflow-hidden bg-blue-800 py-16 md:py-20"
+      >
+
+        <div
+          class="absolute -top-24 -left-24 w-72 h-72 bg-yellow-400 rounded-full opacity-20"
+        ></div>
+
+        <div
+          class="absolute -bottom-32 -right-24 w-96 h-96 bg-yellow-400 rounded-full opacity-20"
+        ></div>
+
+        <div
+          class="relative z-10 container mx-auto px-4"
+        >
+
+          <div class="max-w-4xl">
+
+            <div
+              class="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white px-4 py-2 rounded-full mb-5"
+            >
+
+              <i class="fas fa-headset"></i>
+
+              <span>Hubungi Kami</span>
+
+            </div>
+
+            <h1
+              class="text-3xl md:text-5xl font-bold text-white mb-4"
+            >
+              Kontak & Pengaduan
+            </h1>
+
+            <p
+              class="text-base md:text-lg text-white/90 max-w-3xl leading-relaxed"
+            >
+              Sampaikan pertanyaan, saran, konsultasi, atau pengaduan
+              terkait layanan DPMPTSP Kota Surabaya.
+            </p>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =====================================================
+           CONTENT
+      ====================================================== -->
+
+      <section class="py-12 md:py-16 bg-gray-50">
+
+        <div class="container mx-auto px-4">
+
+          <div
+            class="grid grid-cols-1 lg:grid-cols-12 gap-8"
+          >
+
+            <!-- =================================================
+                 LEFT
+            ================================================== -->
+
+            <div
+              class="lg:col-span-8 space-y-8"
+            >
+
+              <!-- TAKON SOBAT -->
+
+              <div
+                class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden"
+              >
+
+                <a
+                  href="https://wa.me/6285234982434?text=Pertanyaan%20dari%20sumber%20website"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="block"
+                >
+
+                  <img
+                    src={`${MEDIA_BASE_URL}/tentangfile/TAKONSOBAT.jpg`}
+                    alt="TAKON SOBAT DPMPTSP Kota Surabaya"
+                    class="w-full h-auto block"
+                  />
+
+                </a>
+
+              </div>
+
+
+              <!-- =================================================
+                   STRUKTUR PENGADUAN
+              ================================================== -->
+
+              <div
+                class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 md:p-6"
+              >
+
+                <div class="mb-5">
+
+                  <div
+                    class="flex items-center gap-3"
+                  >
+
+                    <div
+                      class="w-11 h-11 shrink-0 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center"
+                    >
+                      <i class="fas fa-sitemap"></i>
+                    </div>
+
+                    <div>
+
+                      <h2
+                        class="text-xl md:text-2xl font-bold text-blue-800"
+                      >
+                        Struktur Pengaduan
+                      </h2>
+
+                      <p class="text-sm text-gray-500">
+                        Struktur pengelolaan pengaduan DPMPTSP Kota Surabaya
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+                <div
+                  class="rounded-xl overflow-hidden border border-gray-100 bg-gray-50"
+                >
+
+                  <img
+                    src={`${MEDIA_BASE_URL}/tentangfile/struktur-pengaduan-2024.jpeg`}
+                    alt="Struktur Pengaduan DPMPTSP Kota Surabaya"
+                    class="w-full h-auto block"
+                  />
+
+                </div>
+
+              </div>
+
+
+              <!-- =================================================
+                   PENANGGUNG JAWAB
+              ================================================== -->
+
+              <div
+                class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 md:p-6"
+              >
+
+                <div class="mb-5">
+
+                  <div
+                    class="flex items-center gap-3"
+                  >
+
+                    <div
+                      class="w-11 h-11 shrink-0 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center"
+                    >
+                      <i class="fas fa-user-tie"></i>
+                    </div>
+
+                    <div>
+
+                      <h2
+                        class="text-xl md:text-2xl font-bold text-blue-800"
+                      >
+                        Penanggung Jawab Pengaduan
+                      </h2>
+
+                      <p class="text-sm text-gray-500">
+                        Informasi penanggung jawab pengaduan
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+                <div
+                  class="rounded-xl overflow-hidden border border-gray-100 bg-gray-50"
+                >
+
+                  <img
+                    src={`${MEDIA_BASE_URL}/tentangfile/penanggungjawab-pengaduan-2026.jpeg`}
+                    alt="Penanggung Jawab Pengaduan DPMPTSP Kota Surabaya"
+                    class="w-full h-auto block"
+                  />
+
+                </div>
+
+              </div>
+
+
+              <!-- =================================================
+                   FORM PENGADUAN
+              ================================================== -->
+
+              <div
+                id="pengaduan-sec"
+                class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8"
+              >
+
+                <!-- HEADER -->
+
+                <div class="mb-7">
+
+                  <div
+                    class="flex items-center gap-3 mb-2"
+                  >
+
+                    <div
+                      class="w-11 h-11 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center"
+                    >
+                      <i class="fas fa-envelope"></i>
+                    </div>
+
+                    <h2
+                      class="text-2xl md:text-3xl font-bold text-blue-800"
+                    >
+                      Kirim Pesan / Pengaduan
+                    </h2>
+
+                  </div>
+
+                  <p class="text-gray-500">
+                    Silakan isi formulir berikut untuk menyampaikan
+                    pertanyaan, saran, konsultasi, atau pengaduan.
+                  </p>
+
+                </div>
+
+
+                <!-- INFO -->
+
+                <div
+                  class="mb-6 rounded-xl border border-green-200 bg-green-50 p-4"
+                >
+
+                  <div
+                    class="flex items-start gap-3"
+                  >
+
+                    <div
+                      class="w-10 h-10 shrink-0 rounded-full bg-green-100 text-green-700 flex items-center justify-center"
+                    >
+                      <i class="fab fa-whatsapp text-lg"></i>
+                    </div>
+
+                    <div>
+
+                      <p class="font-bold text-green-800">
+                        Pengaduan dikirim otomatis ke sistem
+                      </p>
+
+                      <p
+                        class="text-sm text-green-700 mt-1"
+                      >
+                        Setelah formulir berhasil disimpan,
+                        sistem akan meneruskan pengaduan ke
+                        WhatsApp Admin melalui server.
+                      </p>
+
+                      <p
+                        class="text-sm font-semibold text-green-800 mt-2"
+                      >
+                        08xx-xxxx-xxxx
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+
+                <!-- FORM -->
+
+                <form
+                  id="formPengaduan"
+                  class="space-y-5"
+                >
+
+                  <!-- NAMA + TELEPON -->
+
+                  <div
+                    class="grid grid-cols-1 md:grid-cols-2 gap-5"
+                  >
+
+                    <div>
+
+                      <label
+                        for="nama"
+                        class="block text-sm font-semibold text-gray-700 mb-2"
+                      >
+                        Nama
+                        <span class="text-red-500">*</span>
+                      </label>
+
+                      <input
+                        id="nama"
+                        name="nama"
+                        type="text"
+                        required
+                        maxlength="100"
+                        autocomplete="name"
+                        placeholder="Nama lengkap"
+                        class="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                      />
+
+                    </div>
+
+
+                    <div>
+
+                      <label
+                        for="telepon"
+                        class="block text-sm font-semibold text-gray-700 mb-2"
+                      >
+                        Nomor Telepon / WhatsApp
+                        <span class="text-red-500">*</span>
+                      </label>
+
+                      <input
+                        id="telepon"
+                        name="telepon"
+                        type="tel"
+                        required
+                        maxlength="20"
+                        autocomplete="tel"
+                        inputmode="tel"
+                        placeholder="Contoh: 08xxxxxxxx"
+                        class="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                      />
+
+                      <p class="text-xs text-gray-500 mt-2">
+                        Nomor ini digunakan apabila petugas perlu
+                        menghubungi Anda.
+                      </p>
+
+                    </div>
+
+                  </div>
+
+
+                  <!-- KATEGORI -->
+
+                  <div>
+
+                    <label
+                      for="kategori"
+                      class="block text-sm font-semibold text-gray-700 mb-2"
+                    >
+                      Kategori 
+                      <span class="text-red-500">*</span>
+                    </label>
+
+                    <select
+                      id="kategori"
+                      name="kategori"
+                      required
+                      class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    >
+
+                      <option value="">
+                        -- Pilih Kategori --
+                      </option>
+
+                      <option value="Pengaduan Pelayanan">
+                        Pengaduan Pelayanan
+                      </option>
+
+                      <option value="Perizinan">
+                        Perizinan
+                      </option>
+
+                      <option value="Non-Perizinan">
+                        Non-Perizinan
+                      </option>
+
+                      <option value="Informasi Pelayanan">
+                        Informasi Pelayanan
+                      </option>
+
+                      <option value="Konsultasi">
+                        Konsultasi
+                      </option>
+
+                      <option value="Saran dan Masukan">
+                        Saran dan Masukan
+                      </option>
+
+                      <option value="Kendala Sistem/Aplikasi">
+                        Kendala Sistem / Aplikasi
+                      </option>
+
+                      <option value="LKPM">
+                        LKPM
+                      </option>
+
+                      <option value="Pengaduan Petugas">
+                        Pengaduan Petugas
+                      </option>
+
+                      <option value="Lainnya">
+                        Lainnya
+                      </option>
+
+                    </select>
+
+                  </div>
+
+
+                  <!-- EMAIL -->
+
+                  <div>
+
+                    <label
+                      for="email"
+                      class="block text-sm font-semibold text-gray-700 mb-2"
+                    >
+                      Email
+                      <span class="text-red-500">*</span>
+                    </label>
+
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      required
+                      maxlength="150"
+                      autocomplete="email"
+                      placeholder="Alamat email"
+                      class="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    />
+
+                  </div>
+
+
+                  <!-- SUBJEK -->
+
+                  <div>
+
+                    <label
+                      for="subjek"
+                      class="block text-sm font-semibold text-gray-700 mb-2"
+                    >
+                      Subjek
+                      <span class="text-red-500">*</span>
+                    </label>
+
+                    <input
+                      id="subjek"
+                      name="subjek"
+                      type="text"
+                      required
+                      maxlength="200"
+                      placeholder="Subjek pesan"
+                      class="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    />
+
+                  </div>
+
+
+                  <!-- PESAN -->
+
+                  <div>
+
+                    <label
+                      for="pesan"
+                      class="block text-sm font-semibold text-gray-700 mb-2"
+                    >
+                      Pesan / Pengaduan
+                      <span class="text-red-500">*</span>
+                    </label>
+
+                    <textarea
+                      id="pesan"
+                      name="pesan"
+                      rows="7"
+                      required
+                      maxlength="5000"
+                      placeholder="Tuliskan pesan atau pengaduan Anda..."
+                      class="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none resize-y transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    ></textarea>
+
+                    <p class="text-xs text-gray-500 mt-2">
+                      Maksimal 5.000 karakter.
+                    </p>
+
+                  </div>
+
+
+                  <!-- PERSETUJUAN -->
+
+                  <div
+                    class="rounded-xl bg-gray-50 border border-gray-200 p-4"
+                  >
+
+                    <label
+                      class="flex items-start gap-3 cursor-pointer"
+                    >
+
+                      <input
+                        id="persetujuan"
+                        type="checkbox"
+                        required
+                        class="mt-1 w-4 h-4 rounded border-gray-300 text-blue-700 focus:ring-blue-500"
+                      />
+
+                      <span
+                        class="text-sm text-gray-600 leading-relaxed"
+                      >
+                        Saya menyatakan bahwa informasi yang saya
+                        sampaikan adalah benar dan dapat
+                        dipertanggungjawabkan.
+                      </span>
+
+                    </label>
+
+                  </div>
+
+
+                  <!-- BUTTON -->
+
+                  <div class="flex flex-wrap gap-3">
+
+                    <button
+                      id="btnKirim"
+                      type="submit"
+                      class="inline-flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold px-6 py-3 rounded-xl transition"
+                    >
+
+                      <i class="fas fa-paper-plane"></i>
+
+                      Kirim Pengaduan
+
+                    </button>
+
+
+                    <button
+                      type="reset"
+                      class="inline-flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-6 py-3 rounded-xl transition"
+                    >
+
+                      <i class="fas fa-rotate-left"></i>
+
+                      Reset
+
+                    </button>
+
+                  </div>
+
+                </form>
+
+
+                <!-- =================================================
+                     HASIL TIKET
+                ================================================== -->
+
+                <div
+                  id="hasilTiket"
+                  class="hidden mt-7"
+                >
+
+                  <div
+                    class="rounded-2xl border border-green-200 bg-green-50 p-5 md:p-6"
+                  >
+
+                    <div
+                      class="flex items-start gap-4"
+                    >
+
+                      <div
+                        class="w-12 h-12 shrink-0 rounded-full bg-green-100 text-green-700 flex items-center justify-center"
+                      >
+
+                        <i
+                          class="fas fa-circle-check text-xl"
+                        ></i>
+
+                      </div>
+
+
+                      <div class="flex-1">
+
+                        <h3
+                          class="text-lg md:text-xl font-bold text-green-800"
+                        >
+                          Pengaduan berhasil dikirim
+                        </h3>
+
+                        <p
+                          class="text-sm text-green-700 mt-1"
+                        >
+                          Pengaduan sudah diterima sistem.
+                          Simpan nomor tiket berikut.
+                        </p>
+
+
+                        <div
+                          class="mt-4 flex flex-col sm:flex-row gap-3"
+                        >
+
+                          <div
+                            class="flex-1 rounded-xl bg-white border border-green-200 px-4 py-3"
+                          >
+
+                            <p
+                              class="text-xs text-gray-500 mb-1"
+                            >
+                              Nomor Tiket
+                            </p>
+
+                            <strong
+                              id="nomorTiket"
+                              class="text-lg md:text-xl font-bold text-blue-800 tracking-wide"
+                            ></strong>
+
+                          </div>
+
+
+                          <button
+                            id="copyTiket"
+                            type="button"
+                            class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white border border-green-200 text-green-700 font-semibold hover:bg-green-100 transition"
+                          >
+
+                            <i class="fas fa-copy"></i>
+
+                            Salin Tiket
+
+                          </button>
+
+                        </div>
+
+
+                        <div
+                          id="statusPengiriman"
+                          class="mt-4 text-sm text-green-700"
+                        ></div>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <!-- =================================================
+                   TRACKING
+              ================================================== -->
+
+              <div
+                id="tracking-sec"
+                class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8"
+              >
+
+                <div class="mb-6">
+
+                  <div
+                    class="flex items-center gap-3 mb-2"
+                  >
+
+                    <div
+                      class="w-11 h-11 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center"
+                    >
+                      <i class="fas fa-magnifying-glass"></i>
+                    </div>
+
+                    <h2
+                      class="text-2xl md:text-3xl font-bold text-blue-800"
+                    >
+                      Tracking Pengaduan
+                    </h2>
+
+                  </div>
+
+                  <p class="text-gray-500">
+                    Masukkan nomor tiket pengaduan untuk melihat
+                    status pengaduan Anda.
+                  </p>
+
+                </div>
+
+
+                <form
+                  id="formTracking"
+                  class="flex flex-col sm:flex-row gap-3"
+                >
+
+                  <input
+                    id="inputTracking"
+                    type="text"
+                    placeholder="Contoh: DPMPTSP-20260822-AB12"
+                    autocomplete="off"
+                    class="flex-1 rounded-xl border border-gray-300 px-4 py-3 uppercase outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  />
+
+                  <button
+                    type="submit"
+                    class="inline-flex items-center justify-center gap-2 bg-indigo-700 hover:bg-indigo-800 text-white font-semibold px-6 py-3 rounded-xl transition"
+                  >
+
+                    <i class="fas fa-search"></i>
+
+                    Lacak Tiket
+
+                  </button>
+
+                </form>
+
+
+                <div
+                  id="hasilTracking"
+                  class="hidden mt-6"
+                ></div>
+
+              </div>
+
+
+              <!-- =================================================
+                   INFORMASI
+              ================================================== -->
+
+              <div
+                class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8"
+              >
+
+                <div
+                  class="flex items-center gap-3 mb-6"
+                >
+
+                  <div
+                    class="w-11 h-11 shrink-0 rounded-full bg-yellow-100 text-yellow-700 flex items-center justify-center"
+                  >
+                    <i class="fas fa-circle-info"></i>
+                  </div>
+
+                  <h2
+                    class="text-2xl md:text-3xl font-bold text-blue-800"
+                  >
+                    Yang Perlu Diketahui
+                  </h2>
+
+                </div>
+
+
+                <div class="space-y-4">
+
+                  <div
+                    class="flex items-start gap-4 rounded-xl bg-gray-50 p-4"
+                  >
+
+                    <div
+                      class="w-9 h-9 shrink-0 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center"
+                    >
+                      <i class="fas fa-user-secret"></i>
+                    </div>
+
+                    <div>
+
+                      <h3 class="font-bold text-gray-800">
+                        Identitas Pelapor
+                      </h3>
+
+                      <p
+                        class="text-sm text-gray-600 mt-1 leading-relaxed"
+                      >
+                        Identitas pelapor dijamin kerahasiaannya.
+                      </p>
+
+                    </div>
+
+                  </div>
+
+
+                  <div
+                    class="flex items-start gap-4 rounded-xl bg-gray-50 p-4"
+                  >
+
+                    <div
+                      class="w-9 h-9 shrink-0 rounded-full bg-green-100 text-green-700 flex items-center justify-center"
+                    >
+                      <i class="fas fa-ticket"></i>
+                    </div>
+
+                    <div>
+
+                      <h3 class="font-bold text-gray-800">
+                        Nomor Tiket
+                      </h3>
+
+                      <p
+                        class="text-sm text-gray-600 mt-1 leading-relaxed"
+                      >
+                        Setiap pengaduan diberikan nomor tiket
+                        untuk tracking.
+                      </p>
+
+                    </div>
+
+                  </div>
+
+
+                  <div
+                    class="flex items-start gap-4 rounded-xl bg-gray-50 p-4"
+                  >
+
+                    <div
+                      class="w-9 h-9 shrink-0 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center"
+                    >
+                      <i class="fas fa-clock"></i>
+                    </div>
+
+                    <div>
+
+                      <h3 class="font-bold text-gray-800">
+                        Tindak Lanjut
+                      </h3>
+
+                      <p
+                        class="text-sm text-gray-600 mt-1 leading-relaxed"
+                      >
+                        Tindak lanjut sesuai SLA pelayanan DPMPTSP.
+                      </p>
+
+                    </div>
+
+                  </div>
+
+
+                  <div
+                    class="flex items-start gap-4 rounded-xl bg-gray-50 p-4"
+                  >
+
+                    <div
+                      class="w-9 h-9 shrink-0 rounded-full bg-red-100 text-red-700 flex items-center justify-center"
+                    >
+                      <i class="fas fa-ban"></i>
+                    </div>
+
+                    <div>
+
+                      <h3 class="font-bold text-gray-800">
+                        Pengaduan Tidak Benar
+                      </h3>
+
+                      <p
+                        class="text-sm text-gray-600 mt-1 leading-relaxed"
+                      >
+                        Pengaduan tidak benar dapat ditolak /
+                        diarsipkan.
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 SIDEBAR
+            ================================================== -->
+
+            <aside
+              id="kontak-sec"
+              class="lg:col-span-4"
+            >
+
+              <div
+                class="lg:sticky lg:top-24 space-y-6"
+              >
+
+                <!-- ALAMAT -->
+
+                <div
+                  class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6"
+                >
+
+                  <div
+                    class="flex items-center gap-3 mb-5"
+                  >
+
+                    <div
+                      class="w-11 h-11 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center"
+                    >
+                      <i class="fas fa-location-dot"></i>
+                    </div>
+
+                    <h2
+                      class="text-xl font-bold text-blue-800"
+                    >
+                      Alamat Dinas
+                    </h2>
+
+                  </div>
+
+                  <div
+                    class="text-gray-600 leading-relaxed"
+                  >
+
+                    <p>
+                      Mal Pelayanan Publik Lt. 3
+                      <br />
+                      Jl. Tunjungan No. 1-3
+                      <br />
+                      Genteng, Surabaya
+                      <br />
+                      Jawa Timur 60275
+                    </p>
+
+                  </div>
+
+                  <a
+                    href="https://goo.gl/maps/8a6YTNssyXU2"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="mt-5 inline-flex items-center gap-2 text-blue-700 font-semibold hover:text-blue-900"
+                  >
+
+                    <i class="fas fa-map-location-dot"></i>
+
+                    Lihat Lokasi Gedung Siola
+
+                  </a>
+
+                </div>
+
+
+                <!-- JAM -->
+
+                <div
+                  class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6"
+                >
+
+                  <div
+                    class="flex items-center gap-3 mb-5"
+                  >
+
+                    <div
+                      class="w-11 h-11 rounded-full bg-yellow-100 text-yellow-700 flex items-center justify-center"
+                    >
+                      <i class="fas fa-clock"></i>
+                    </div>
+
+                    <h2
+                      class="text-xl font-bold text-blue-800"
+                    >
+                      Jam Pelayanan
+                    </h2>
+
+                  </div>
+
+                  <div
+                    class="space-y-3 text-gray-600"
+                  >
+
+                    <div
+                      class="flex justify-between gap-4 border-b border-gray-100 pb-3"
+                    >
+
+                      <span>Senin–Kamis</span>
+
+                      <strong class="text-gray-800">
+                        07.30–16.00
+                      </strong>
+
+                    </div>
+
+                    <div
+                      class="flex justify-between gap-4"
+                    >
+
+                      <span>Jumat</span>
+
+                      <strong class="text-gray-800">
+                        07.30–15.00
+                      </strong>
+
+                    </div>
+
+                  </div>
+
+                  <p
+                    class="text-sm text-gray-500 mt-4"
+                  >
+                    Waktu Indonesia Barat (WIB)
+                  </p>
+
+                </div>
+
+
+                <!-- KONTAK -->
+
+                <div
+                  class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6"
+                >
+
+                  <div
+                    class="flex items-center gap-3 mb-6"
+                  >
+
+                    <div
+                      class="w-11 h-11 rounded-full bg-green-100 text-green-700 flex items-center justify-center"
+                    >
+                      <i class="fas fa-address-book"></i>
+                    </div>
+
+                    <h2
+                      class="text-xl font-bold text-blue-800"
+                    >
+                      Kontak Kami
+                    </h2>
+
+                  </div>
+
+
+                  <div class="space-y-5">
+
+                    <a
+                      href="tel:+623199001785"
+                      class="flex gap-4 group"
+                    >
+
+                      <div
+                        class="w-10 h-10 shrink-0 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center"
+                      >
+                        <i class="fas fa-phone"></i>
+                      </div>
+
+                      <div>
+
+                        <p class="text-sm text-gray-500">
+                          Telepon
+                        </p>
+
+                        <p
+                          class="font-semibold text-gray-800 group-hover:text-blue-700"
+                        >
+                          +62 (031) 99001785
+                        </p>
+
+                      </div>
+
+                    </a>
+
+
+                    <a
+                      href="mailto:dpm-ptsp@surabaya.go.id"
+                      class="flex gap-4 group"
+                    >
+
+                      <div
+                        class="w-10 h-10 shrink-0 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center"
+                      >
+                        <i class="fas fa-envelope"></i>
+                      </div>
+
+                      <div>
+
+                        <p class="text-sm text-gray-500">
+                          Email
+                        </p>
+
+                        <p
+                          class="font-semibold text-gray-800 break-all group-hover:text-blue-700"
+                        >
+                          dpm-ptsp@surabaya.go.id
+                        </p>
+
+                      </div>
+
+                    </a>
+
+
+                    <a
+                      href="https://wa.me/6282298112795"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="flex gap-4 group"
+                    >
+
+                      <div
+                        class="w-10 h-10 shrink-0 rounded-lg bg-green-50 text-green-600 flex items-center justify-center"
+                      >
+                        <i class="fab fa-whatsapp"></i>
+                      </div>
+
+                      <div>
+
+                        <p class="text-sm text-gray-500">
+                          WhatsApp Admin Pengaduan
+                        </p>
+
+                        <p
+                          class="font-semibold text-gray-800 group-hover:text-green-600"
+                        >
+                          0822-9811-2795
+                        </p>
+
+                      </div>
+
+                    </a>
+
+
+                    <a
+                      href="https://wa.me/6285234982434?text=Pertanyaan%20dari%20sumber%20website"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="flex gap-4 group"
+                    >
+
+                      <div
+                        class="w-10 h-10 shrink-0 rounded-lg bg-green-50 text-green-600 flex items-center justify-center"
+                      >
+                        <i class="fab fa-whatsapp"></i>
+                      </div>
+
+                      <div>
+
+                        <p class="text-sm text-gray-500">
+                          WhatsApp · Takon Sobat
+                        </p>
+
+                        <p
+                          class="font-semibold text-gray-800 group-hover:text-green-600"
+                        >
+                          Konsultasi via WhatsApp
+                        </p>
+
+                      </div>
+
+                    </a>
+
+
+                    <a
+                      href="https://wa.me/6285158117872?text=Pertanyaan%20dari%20sumber%20website"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="flex gap-4 group"
+                    >
+
+                      <div
+                        class="w-10 h-10 shrink-0 rounded-lg bg-green-50 text-green-600 flex items-center justify-center"
+                      >
+                        <i class="fab fa-whatsapp"></i>
+                      </div>
+
+                      <div>
+
+                        <p class="text-sm text-gray-500">
+                          WhatsApp LKPM
+                        </p>
+
+                        <p
+                          class="font-semibold text-gray-800 group-hover:text-green-600"
+                        >
+                          LAPIS-LUPIS
+                        </p>
+
+                      </div>
+
+                    </a>
+
+                  </div>
+
+                </div>
+
+
+                <!-- KOORDINATOR -->
+
+                <div
+                  class="bg-blue-800 rounded-2xl p-6 text-white"
+                >
+
+                  <div
+                    class="flex items-start gap-4"
+                  >
+
+                    <div
+                      class="w-11 h-11 shrink-0 rounded-full bg-white/15 flex items-center justify-center"
+                    >
+                      <i class="fas fa-user-shield"></i>
+                    </div>
+
+                    <div>
+
+                      <h3
+                        class="font-bold text-lg mb-2"
+                      >
+                        Koordinator Pengaduan
+                      </h3>
+
+                      <p
+                        class="text-white/80 text-sm leading-relaxed mb-4"
+                      >
+                        Jika mengalami kendala dalam layanan
+                        perizinan, silakan menghubungi:
+                      </p>
+
+                      <p class="font-bold">
+                        Yohanes Franklin, S.H
+                      </p>
+
+                      <a
+                        href="https://wa.me/628165454218?text=Pertanyaan%20dari%20sumber%20website"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-flex items-center gap-2 mt-2 text-yellow-300 font-semibold hover:text-yellow-200"
+                      >
+
+                        <i class="fab fa-whatsapp"></i>
+
+                        0816-5454-218
+
+                      </a>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+
+                <!-- TRACKING -->
+
+                <div
+                  class="bg-indigo-700 rounded-2xl p-6 text-white"
+                >
+
+                  <div
+                    class="flex items-center gap-3 mb-4"
+                  >
+
+                    <div
+                      class="w-11 h-11 rounded-full bg-white/15 flex items-center justify-center"
+                    >
+                      <i class="fas fa-ticket"></i>
+                    </div>
+
+                    <h3 class="font-bold text-lg">
+                      Tracking Pengaduan
+                    </h3>
+
+                  </div>
+
+                  <p
+                    class="text-white/80 text-sm leading-relaxed mb-4"
+                  >
+                    Sudah memiliki nomor tiket?
+                    Lacak status pengaduan Anda.
+                  </p>
+
+                  <a
+                    href="#tracking-sec"
+                    class="inline-flex items-center gap-2 bg-white text-indigo-700 font-semibold px-5 py-3 rounded-xl hover:bg-indigo-50 transition"
+                  >
+
+                    <i class="fas fa-magnifying-glass"></i>
+
+                    Lacak Tiket
+
+                  </a>
+
+                </div>
+
+              </div>
+
+            </aside>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =====================================================
+           MEDIA SOSIAL
+      ====================================================== -->
+
+      <section
+        class="py-14 bg-white border-t border-gray-100"
+      >
+
+        <div class="container mx-auto px-4">
+
+          <div
+            class="text-center max-w-2xl mx-auto"
+          >
+
+            <div
+              class="w-12 h-12 mx-auto rounded-full bg-blue-100 text-blue-700 flex items-center justify-center mb-4"
+            >
+              <i class="fas fa-share-nodes"></i>
+            </div>
+
+            <h2
+              class="text-2xl md:text-3xl font-bold text-blue-800 mb-3"
+            >
+              Media Sosial
+            </h2>
+
+            <p class="text-gray-500 mb-7">
+              Ikuti informasi dan layanan terbaru DPMPTSP Kota Surabaya.
+            </p>
+
+            <div
+              class="flex flex-wrap justify-center gap-3"
+            >
+
+              <a
+                href="https://wa.me/6282298112795"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-green-50 text-green-700 font-semibold hover:bg-green-100 transition"
+              >
+
+                <i class="fab fa-whatsapp text-lg"></i>
+
+                WhatsApp
+
+              </a>
+
+
+              <a
+                href="https://www.instagram.com/dpmptspsby/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-pink-50 text-pink-700 font-semibold hover:bg-pink-100 transition"
+              >
+
+                <i class="fab fa-instagram text-lg"></i>
+
+                Instagram
+
+              </a>
+
+
+              <a
+                href="https://www.facebook.com/dpmptsp.surabaya"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-blue-50 text-blue-700 font-semibold hover:bg-blue-100 transition"
+              >
+
+                <i class="fab fa-facebook text-lg"></i>
+
+                Facebook
+
+              </a>
+
+
+              <a
+                href="https://www.youtube.com/@dpmptspkotasurabaya"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-red-50 text-red-700 font-semibold hover:bg-red-100 transition"
+              >
+
+                <i class="fab fa-youtube text-lg"></i>
+
+                YouTube
+
+              </a>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+
+    <Footer />
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+         SATU SCRIPT SAJA
+    ====================================================== -->
+
+    <script is:inline>
+      const formPengaduan =
+        document.getElementById("formPengaduan");
+
+      const hasilTiket =
+        document.getElementById("hasilTiket");
+
+      const nomorTiketElement =
+        document.getElementById("nomorTiket");
+
+      const copyTiket =
+        document.getElementById("copyTiket");
+
+      const statusPengiriman =
+        document.getElementById("statusPengiriman");
+
+      const formTracking =
+        document.getElementById("formTracking");
+
+      const inputTracking =
+        document.getElementById("inputTracking");
+
+      const hasilTracking =
+        document.getElementById("hasilTracking");
+
+
+      /* =====================================================
+         SUBMIT PENGADUAN
+      ====================================================== */
+
+      formPengaduan?.addEventListener(
+        "submit",
+        async (event) => {
+
+          event.preventDefault();
+
+          const button =
+            document.getElementById("btnKirim");
+
+          const nama =
+            document.getElementById("nama")
+              ?.value
+              .trim() || "";
+
+          const telepon =
+            document.getElementById("telepon")
+              ?.value
+              .trim() || "";
+
+          const kategori =
+            document.getElementById("kategori")
+              ?.value || "";
+
+          const email =
+            document.getElementById("email")
+              ?.value
+              .trim() || "";
+
+          const subjek =
+            document.getElementById("subjek")
+              ?.value
+              .trim() || "";
+
+          const pesan =
+            document.getElementById("pesan")
+              ?.value
+              .trim() || "";
+
+
+          /* VALIDASI */
+
+          if (
+            !nama ||
+            !telepon ||
+            !kategori ||
+            !email ||
+            !subjek ||
+            !pesan
+          ) {
+
+            alert(
+              "Mohon lengkapi seluruh data pengaduan."
+            );
+
+            return;
+          }
+
+
+          /* LOADING */
+
+          if (button) {
+
+            button.disabled = true;
+
+            button.innerHTML =
+              '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
+
+          }
+
+
+          if (statusPengiriman) {
+
+            statusPengiriman.textContent =
+              "Sedang menyimpan pengaduan...";
+
+          }
+
+
+          try {
+
+            /*
+             * PENTING
+             *
+             * Tidak ada:
+             *
+             * wa.me
+             * whatsapp.com
+             * window.open()
+             * location.href
+             *
+             * Pengiriman dilakukan oleh SERVER
+             */
+
+            const response =
+              await fetch(
+                "/api/kontak",
+                {
+                  method: "POST",
+
+                  headers: {
+                    "Content-Type":
+                      "application/json",
+
+                    "Accept":
+                      "application/json"
+                  },
+
+                  body: JSON.stringify({
+                    nama,
+                    telepon,
+                    kategori,
+                    email,
+                    subjek,
+                    pesan
+                  })
+                }
+              );
+
+
+            let result = null;
+
+            try {
+
+              result =
+                await response.json();
+
+            } catch {
+
+              result = null;
+
+            }
+
+
+            /* ERROR */
+
+            if (!response.ok) {
+
+              throw new Error(
+                result?.message ||
+                "Terjadi kesalahan saat menyimpan pengaduan."
+              );
+
+            }
+
+
+            /* TIKET */
+
+            const tiket =
+              result?.tiket ||
+              result?.data?.tiket ||
+              "";
+
+
+            if (!tiket) {
+
+              throw new Error(
+                "Pengaduan tersimpan tetapi nomor tiket tidak diterima dari server."
+              );
+
+            }
+
+
+            /* TAMPILKAN TIKET */
+
+            if (nomorTiketElement) {
+
+              nomorTiketElement.textContent =
+                tiket;
+
+            }
+
+
+            /* STATUS */
+
+            if (statusPengiriman) {
+
+              statusPengiriman.innerHTML =
+                '<i class="fas fa-circle-check mr-1"></i> Pengaduan berhasil diterima sistem.';
+
+            }
+
+
+            /* HASIL */
+
+            if (hasilTiket) {
+
+              hasilTiket.classList.remove(
+                "hidden"
+              );
+
+            }
+
+
+            /* RESET */
+
+            formPengaduan.reset();
+
+
+            /* SCROLL */
+
+            hasilTiket?.scrollIntoView({
+              behavior: "smooth",
+              block: "center"
+            });
+
+
+          } catch (error) {
+
+            console.error(
+              "ERROR PENGADUAN:",
+              error
+            );
+
+
+            if (statusPengiriman) {
+
+              statusPengiriman.innerHTML =
+                '<span class="text-red-600"><i class="fas fa-circle-xmark mr-1"></i> Pengaduan gagal dikirim.</span>';
+
+            }
+
+
+            alert(
+              error instanceof Error
+                ? error.message
+                : "Terjadi kesalahan saat mengirim pengaduan."
+            );
+
+
+          } finally {
+
+            if (button) {
+
+              button.disabled = false;
+
+              button.innerHTML =
+                '<i class="fas fa-paper-plane"></i> Kirim Pengaduan';
+
+            }
+
+          }
+
+        }
+      );
+
+
+      /* =====================================================
+         COPY TIKET
+      ====================================================== */
+
+      copyTiket?.addEventListener(
+        "click",
+        async () => {
+
+          const tiket =
+            nomorTiketElement
+              ?.textContent
+              ?.trim();
+
+
+          if (!tiket) {
+
+            return;
+
+          }
+
+
+          try {
+
+            await navigator.clipboard.writeText(
+              tiket
+            );
+
+
+            copyTiket.innerHTML =
+              '<i class="fas fa-check"></i> Tersalin';
+
+
+            setTimeout(
+              () => {
+
+                copyTiket.innerHTML =
+                  '<i class="fas fa-copy"></i> Salin Tiket';
+
+              },
+              2000
+            );
+
+
+          } catch {
+
+            alert(
+              "Nomor tiket: " + tiket
+            );
+
+          }
+
+        }
+      );
+
+
+      /* =====================================================
+         TRACKING
+      ====================================================== */
+
+      formTracking?.addEventListener(
+        "submit",
+        async (event) => {
+
+          event.preventDefault();
+
+
+          const tiket =
+            inputTracking
+              ?.value
+              ?.trim()
+              .toUpperCase();
+
+
+          if (!tiket) {
+
+            tampilkanTrackingError(
+              "Silakan masukkan nomor tiket."
+            );
+
+            return;
+
+          }
+
+
+          hasilTracking?.classList.remove(
+            "hidden"
+          );
+
+
+          if (hasilTracking) {
+
+            hasilTracking.innerHTML = `
+              <div class="rounded-xl border border-blue-200 bg-blue-50 p-4 text-blue-800">
+                <div class="flex items-center gap-3">
+                  <i class="fas fa-spinner fa-spin"></i>
+                  <span>Memeriksa tiket...</span>
+                </div>
+              </div>
+            `;
+
+          }
+
+
+          try {
+
+            const response =
+              await fetch(
+                "/api/kontak?tiket=" +
+                encodeURIComponent(tiket),
+                {
+                  method: "GET",
+
+                  headers: {
+                    "Accept":
+                      "application/json"
+                  }
+                }
+              );
+
+
+            let result = null;
+
+            try {
+
+              result =
+                await response.json();
+
+            } catch {
+
+              result = null;
+
+            }
+
+
+            if (!response.ok) {
+
+              throw new Error(
+                result?.message ||
+                "Tiket tidak ditemukan."
+              );
+
+            }
+
+
+            const data =
+              result?.data ||
+              result;
+
+
+            if (!data?.tiket) {
+
+              throw new Error(
+                "Data tiket tidak ditemukan."
+              );
+
+            }
+
+
+            let tanggal = "-";
+
+
+            if (data.tanggal) {
+
+              const parsedDate =
+                new Date(
+                  data.tanggal
+                );
+
+
+              if (
+                !Number.isNaN(
+                  parsedDate.getTime()
+                )
+              ) {
+
+                tanggal =
+                  parsedDate.toLocaleString(
+                    "id-ID",
+                    {
+                      dateStyle:
+                        "long",
+
+                      timeStyle:
+                        "short"
+                    }
+                  );
+
+              }
+
+            }
+
+
+            if (hasilTracking) {
+
+              hasilTracking.innerHTML = `
+
+                <div class="rounded-2xl border border-blue-200 bg-blue-50 p-5 md:p-6">
+
+                  <div class="flex items-start gap-4">
+
+                    <div class="w-11 h-11 shrink-0 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center">
+
+                      <i class="fas fa-ticket"></i>
+
+                    </div>
+
+
+                    <div class="flex-1">
+
+                      <div class="flex flex-wrap items-center justify-between gap-3">
+
+                        <div>
+
+                          <p class="text-xs text-gray-500">
+                            Nomor Tiket
+                          </p>
+
+                          <h3 class="text-lg font-bold text-blue-800">
+                            ${escapeHtml(data.tiket)}
+                          </h3>
+
+                        </div>
+
+
+                        <span class="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-yellow-100 text-yellow-800 text-sm font-semibold">
+
+                          <i class="fas fa-clock"></i>
+
+                          ${escapeHtml(
+                            data.status ||
+                            "Diterima"
+                          )}
+
+                        </span>
+
+                      </div>
+
+
+                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5">
+
+
+                        <div class="rounded-xl bg-white p-4 border border-blue-100">
+
+                          <p class="text-xs text-gray-500">
+                            Nama Pelapor
+                          </p>
+
+                          <p class="font-semibold text-gray-800 mt-1">
+                            ${escapeHtml(data.nama)}
+                          </p>
+
+                        </div>
+
+
+                        <div class="rounded-xl bg-white p-4 border border-blue-100">
+
+                          <p class="text-xs text-gray-500">
+                            Nomor Telepon / WhatsApp
+                          </p>
+
+                          <p class="font-semibold text-gray-800 mt-1">
+                            ${escapeHtml(data.telepon)}
+                          </p>
+
+                        </div>
+
+
+                        <div class="rounded-xl bg-white p-4 border border-blue-100">
+
+                          <p class="text-xs text-gray-500">
+                            Kategori
+                          </p>
+
+                          <p class="font-semibold text-gray-800 mt-1">
+                            ${escapeHtml(
+                              data.kategori ||
+                              "-"
+                            )}
+                          </p>
+
+                        </div>
+
+
+                        <div class="rounded-xl bg-white p-4 border border-blue-100">
+
+                          <p class="text-xs text-gray-500">
+                            Subjek
+                          </p>
+
+                          <p class="font-semibold text-gray-800 mt-1">
+                            ${escapeHtml(
+                              data.subjek
+                            )}
+                          </p>
+
+                        </div>
+
+
+                        <div class="rounded-xl bg-white p-4 border border-blue-100 sm:col-span-2">
+
+                          <p class="text-xs text-gray-500">
+                            Tanggal Pengaduan
+                          </p>
+
+                          <p class="font-semibold text-gray-800 mt-1">
+                            ${escapeHtml(tanggal)}
+                          </p>
+
+                        </div>
+
+
+                      </div>
+
+
+                      <div class="mt-4 rounded-xl bg-white p-4 border border-blue-100">
+
+                        <p class="text-xs text-gray-500">
+                          Pesan
+                        </p>
+
+                        <p class="text-gray-700 mt-1 leading-relaxed whitespace-pre-line">
+                          ${escapeHtml(
+                            data.pesan
+                          )}
+                        </p>
+
+                      </div>
+
+
+                      <p class="text-xs text-gray-500 mt-4">
+
+                        Status akan diperbarui sesuai proses
+                        tindak lanjut pengaduan.
+
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              `;
+
+            }
+
+
+          } catch (error) {
+
+            console.error(
+              "ERROR TRACKING:",
+              error
+            );
+
+
+            tampilkanTrackingError(
+              error instanceof Error
+                ? error.message
+                : "Tiket tidak ditemukan."
+            );
+
+          }
+
+        }
+      );
+
+
+      /* =====================================================
+         ERROR TRACKING
+      ====================================================== */
+
+      function tampilkanTrackingError(
+        message
+      ) {
+
+        if (!hasilTracking) {
+
+          return;
+
+        }
+
+
+        hasilTracking.classList.remove(
+          "hidden"
+        );
+
+
+        hasilTracking.innerHTML = `
+
+          <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">
+
+            <div class="flex items-start gap-3">
+
+              <i class="fas fa-circle-xmark mt-1"></i>
+
+              <div>
+
+                <p class="font-bold">
+                  Tiket tidak ditemukan
+                </p>
+
+                <p class="text-sm mt-1">
+                  ${escapeHtml(message)}
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        `;
+
+      }
+
+
+      /* =====================================================
+         ESCAPE HTML
+      ====================================================== */
+
+      function escapeHtml(
+        value
+      ) {
+
+        return String(
+          value ?? ""
+        )
+          .replaceAll(
+            "&",
+            "&amp;"
+          )
+          .replaceAll(
+            "<",
+            "&lt;"
+          )
+          .replaceAll(
+            ">",
+            "&gt;"
+          )
+          .replaceAll(
+            '"',
+            "&quot;"
+          )
+          .replaceAll(
+            "'",
+            "&#039;"
+          );
+
+      }
+    </script>
+
+  </body>
+</html>

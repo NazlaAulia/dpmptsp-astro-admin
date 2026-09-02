@@ -1,0 +1,11 @@
+---
+// Entry point for /admin. Authentication is handled by src/middleware.ts, so
+// this only has to decide where an authenticated visitor lands.
+//
+// The previous version re-implemented the cookie check inline, including a
+// fallback that substring-matched the raw Cookie header for "admin-auth=true"
+// — which also accepted a cookie named "not-admin-auth".
+export const prerender = false;
+
+return Astro.redirect("/admin/dashboard");
+---

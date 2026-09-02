@@ -1,0 +1,49 @@
+# Rendered by nginx:alpine's built-in envsubst hook at container start.
+
+upstream web_upstream   { server web:3000;   keepalive 16; }
+upstream admin_upstream { server admin:3000; keepalive 16; }
+
+include /etc/nginx/includes/realip.conf;
+
+# The admin access policy defines $admin_ip_ok. Selected by
+# docker-entrypoint.d/40-admin-policy.sh from ADMIN_ACCESS.
+include /etc/nginx/conf.d/admin-policy.inc;
+
+map $uri $is_cms_path {
+    default                 0;
+    ~^/admin                1;
+    ~^/api                  1;
+}
+
+server {
+    listen 80 default_server;
+    server_name _;
+
+    client_max_body_size 25m;
+
+    location / {
+        proxy_pass http://web_upstream;
+        include /etc/nginx/includes/proxy.conf;
+    }
+}
+
+server {
+    listen 81;
+    server_name _;
+
+    client_max_body_size 25m;
+
+    # Per-path access policy.
+    #
+    # The CMS is restricted, but /kepegawaian stays reachable with application
+    # auth so employees can check in from a phone rather than only from the
+    # office network. Restricting the whole app would take that away; leaving
+    # the whole app open would expose the CMS.
+    location / {
+        if ($is_cms_path) { set $deny_cms $admin_ip_ok; }
+        if ($deny_cms = 0) { return 403; }
+
+        proxy_pass http://admin_upstream;
+        include /etc/nginx/includes/proxy.conf;
+    }
+}

@@ -1,0 +1,147 @@
+---
+import Sidebar from "./Sidebar.astro";
+import Navbar from "./Navbar.astro";
+import AdminDocument from "../../layouts/AdminDocument.astro";
+
+const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih terarah.", actionLabel = "Tambah Artikel", actionHref = "/admin/tambah-artikel", showHeader = true } = Astro.props;
+---
+
+<AdminDocument title={title}>
+
+<div class="admin-shell">
+  <Sidebar />
+
+  <div class="main-panel">
+    <Navbar />
+
+<main class="content">
+
+  {showHeader && (
+    <section class="page-header">
+      <div>
+        <p class="eyebrow">Panel Administrasi</p>
+        <h1>{title}</h1>
+        <p class="subtitle">{subtitle}</p>
+      </div>
+
+      <div class="page-actions">
+        <!-- Tombol "Kelola Konten" sudah dihapus dari sini -->
+        <a href={actionHref} class="primary-action">+ {actionLabel}</a>
+      </div>
+    </section>
+  )}
+
+  <slot />
+
+</main>
+  </div>
+</div>
+
+<style>
+.admin-shell {
+  display: flex;
+  min-height: 100vh;
+  background: #f4f7fb;
+  color: #0f172a;
+}
+
+.main-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  min-height: 0;
+}
+
+.content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: 24px 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+:global(.content > .box),
+:global(.content > .table-box),
+:global(.content > .table-container) {
+  flex: 1;
+  min-height: 0;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 22px;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid #e5eaf2;
+  box-shadow: 0 8px 24px rgba(15,23,42,0.04);
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #2563eb;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 1.45rem;
+  font-weight: 800;
+}
+
+.subtitle {
+  margin: 6px 0 0;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.page-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.page-actions a {
+  text-decoration: none;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.page-actions a:hover {
+  transform: translateY(-1px);
+}
+
+.primary-action {
+  background: linear-gradient(90deg, #2563eb 0%, #06b6d4 100%);
+  color: white;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.14);
+}
+
+@media (max-width: 900px) {
+  .admin-shell {
+    flex-direction: column;
+  }
+
+  .content {
+    padding: 18px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+</style>
+
+</AdminDocument>

@@ -1,0 +1,21 @@
+# Host build artefacts must never enter the image. pnpm's isolated node_modules
+# is a tree of symlinks into a store at the workspace root; copying the host's
+# copy in puts absolute host paths inside the container and pnpm then refuses to
+# run with a dependency-status error.
+node_modules
+**/node_modules
+dist
+**/dist
+.astro
+**/.astro
+.vercel
+
+.git
+.github
+graphify-out
+.env
+.env.*
+!.env.example
+
+*.sql
+cookies.txt

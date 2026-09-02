@@ -1,0 +1,411 @@
+---
+import { MEDIA_BASE_URL } from "../lib/media";
+import MainLayout from "../layouts/MainLayout.astro";
+import "@dpmptsp/ui/styles/global.css";
+import { getPerformanceDocs } from "../lib/services/content.service";
+
+// Data access lives in src/lib/services.
+const twdata = await getPerformanceDocs();
+---
+
+<MainLayout title="DPMPTSP Kota Surabaya">
+   <section class="relative overflow-hidden gradient-flow bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600">
+            <div class="absolute inset-0 z-0">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-yellow-400 rounded-full opacity-10 -translate-y-32 translate-x-32 animate-pulse-soft"></div>
+                <div class="absolute bottom-0 left-0 w-96 h-96 bg-blue-600 rounded-full opacity-10 -translate-x-64 translate-y-64 animate-pulse-soft"></div>
+                <div class="absolute top-1/2 left-1/4 w-48 h-48 bg-white rounded-full opacity-5 animate-float-subtle"></div>
+            </div>
+            <div class="container mx-auto px-4 py-20 relative z-10">
+                <div class="text-center text-white animate-fade-in-scale">
+                    <h1 class="text-5xl md:text-6xl font-bold mb-6 animate-text-reveal">
+                        Kinerja DPM-PTSP Surabaya
+                    </h1>
+                    <p class="text-xl opacity-90 max-w-3xl mx-auto animate-slide-in-left">
+                        Informasi Kinerja
+                    </p>
+                    <div class="mt-8 flex justify-center">
+                        <div class="animate-bounce-soft">
+                            <i class="fas fa-chevron-down text-2xl text-yellow-400"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    <!-- Hero Section 
+  <section class="relative overflow-hidden bg-blue-800 py-20">
+    
+    <div class="absolute -top-20 -left-16 w-64 h-64 bg-yellow-400 rounded-full opacity-30 animate-pulse-slow"></div>
+    <div class="absolute -bottom-16 -right-24 w-96 h-96 bg-yellow-400 rounded-full opacity-20 animate-pulse-slow"></div>
+
+    <div class="container mx-auto px-4 text-center relative z-10 text-white">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">Kinerja DPM-PTSP Surabaya</h1>
+      <p class="text-xl opacity-90 max-w-3xl mx-auto">
+        Informasi Visi Misi Sambutan Maklumat dan Organisasi
+      </p>
+    </div>
+  </section>-->
+
+ 
+    <!-- Peta Potensi Section -->
+    <section id="Peta" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="animate-fadeInUp">
+                    <h2 class="text-3xl font-bold text-blue-800 mb-6">Peta Potensi Investasi Surabaya</h2>
+                    <p class="text-gray-700 mb-6">
+                        Temukan peluang investasi di berbagai sektor unggulan Kota Surabaya melalui peta interaktif kami. Surabaya menawarkan berbagai potensi investasi dari sektor industri, perdagangan, jasa, hingga pariwisata.
+                    </p>
+                    <p class="text-gray-700 mb-8">
+                        Rencana Strategis 2021-2026 kami dirancang untuk memberikan panduan investasi yang komprehensif dan informasi sektor unggulan di setiap kawasan tertentu.
+                    </p>
+                    <a href="https://dpm-ptsp.surabaya.go.id/petapotensiinvestasi/html/interaktif/kecamatan.html" target="_blank" class="inline-flex items-center bg-blue-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300">
+                        Jelajahi Peta Interaktif <i class="fas fa-external-link-alt ml-2"></i>
+                    </a>
+                </div>
+                
+                <div class="relative animate-fadeInUp">
+                    <div class="bg-gradient-to-br from-blue-600 to-yellow-400 p-1 rounded-2xl shadow-custom">
+                        <div class="bg-white p-2 rounded-xl">
+                            <div class="h-96 bg-gradient-to-r from-blue-500 to-blue-700 rounded-lg flex flex-col items-center justify-center p-8">
+                                <a href="https://dpm-ptsp.surabaya.go.id/petapotensiinvestasi/html/interaktif/kecamatan.php" target="_blank">
+                                    <img src={`${MEDIA_BASE_URL}/images/PetaPotensi.png`}></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Decorative elements -->
+                    <div class="absolute -top-4 -right-4 w-20 h-20 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg">
+                        <i class="fas fa-location-dot text-blue-800 text-2xl"></i>
+                    </div>
+                    <div class="absolute -bottom-4 -left-4 w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center shadow-lg">
+                        <i class="fas fa-chart-pie text-white text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Aplikasi DPM-PTSP Section -->
+    <section class="py-16 bg-gradient-to-b from-gray-50 to-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-blue-800 mb-4">Aplikasi DPM-PTSP</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Dukung investasi dan kemudahan berusaha dengan aplikasi terintegrasi kami</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Aplikasi 1 -->
+                <div class="bg-white rounded-2xl p-6 shadow-custom card-hover">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa fa-briefcase text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-blue-800 mb-4">Lapor.go.id</h3>
+                    <p class="text-gray-700 mb-6">Aplikasi pengaduan masyarakat berbasis mobile dan web untuk mengakomodir kebutuhan masyarakat Surabaya.</p>
+                    <a href="https://lapor.go.id" target="_blank" class="text-blue-600 font-medium inline-flex items-center">
+                        Akses Aplikasi <i class="fas fa-external-link-alt ml-2"></i>
+                    </a>
+                </div>
+                
+                <!-- Aplikasi 2 -->
+                <div class="bg-white rounded-2xl p-6 shadow-custom card-hover">
+                    <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa fa-pie-chart text-yellow-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-blue-800 mb-4">Wargaku</h3>
+                    <p class="text-gray-700 mb-6">Aplikasi layanan warga Surabaya berbasis mobile dan web untuk mengakomodir kebutuhan masyarakat.</p>
+                    <a href="https://wargaku.surabaya.go.id/" target="_blank" class="text-blue-600 font-medium inline-flex items-center">
+                        Akses Aplikasi <i class="fas fa-external-link-alt ml-2"></i>
+                    </a>
+                </div>
+                
+                <!-- Aplikasi 3 -->
+                <div class="bg-white rounded-2xl p-6 shadow-custom card-hover">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa fa-file text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-blue-800 mb-4">SIPPN</h3>
+                    <p class="text-gray-700 mb-6">Sistem Informasi Pengelolaan Pengaduan Nasional untuk pelayanan pengaduan masyarakat yang terintegrasi.</p>
+                    <a href="https://sippn.menpan.go.id/" target="_blank" class="text-blue-600 font-medium inline-flex items-center">
+                        Akses Aplikasi <i class="fas fa-external-link-alt ml-2"></i>
+                    </a>
+                </div>
+                
+                <!-- Aplikasi 4 -->
+                <div class="bg-white rounded-2xl p-6 shadow-custom card-hover">
+                    <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa fa-university text-yellow-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-blue-800 mb-4">Lapor (Android)</h3>
+                    <p class="text-gray-700 mb-6">Aplikasi mobile untuk pengaduan masyarakat dengan fitur yang lengkap dan mudah digunakan.</p>
+                    <a href="#" class="hidden text-blue-600 font-medium inline-flex items-center">
+                        Download Aplikasi <i class="fas fa-download ml-2"></i>
+                    </a>
+                </div>
+                
+                <!-- Aplikasi 5 -->
+                <div class="bg-white rounded-2xl p-6 shadow-custom card-hover">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa fa-line-chart text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-blue-800 mb-4">SSW</h3>
+                    <p class="text-gray-700 mb-6">Surabaya Single Window - sistem terpadu untuk perizinan dan pelayanan investasi di Kota Surabaya.</p>
+                    <a href="https://sswalfa.surabaya.go.id/" target="_blank" class="text-blue-600 font-medium inline-flex items-center">
+                        Akses Aplikasi <i class="fas fa-external-link-alt ml-2"></i>
+                    </a>
+                </div>
+                
+                <!-- Aplikasi 6 -->
+                <div class="bg-white rounded-2xl p-6 shadow-custom card-hover">
+                    <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa fa-leaf text-yellow-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-blue-800 mb-4">OSS</h3>
+                    <p class="text-gray-700 mb-6">Online Single Submission - sistem perizinan berusaha terintegrasi secara nasional.</p>
+                    <a href="https://oss.go.id/" target="_blank" class="text-blue-600 font-medium inline-flex items-center">
+                        Akses Aplikasi <i class="fas fa-external-link-alt ml-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+  <!-- Kinerja Investasi Section -->
+  <section id="Kinerja" class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-blue-800 mb-4">
+          Kinerja Investasi
+        </h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">
+          Pantau perkembangan dan capaian investasi di Kota Surabaya
+        </p>
+      </div>
+
+      <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-custom p-8 mb-8">
+          <div class="flex items-center mb-6">
+            <div class="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center mr-4">
+              <i class="fas fa-chart-line text-blue-800 text-xl"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-blue-800">
+              Laporan Kinerja Investasi
+            </h3>
+          </div>
+
+          <p class="text-gray-700 mb-6">
+            Pilih periode Triwulan untuk melihat laporan kinerja investasi di Kota Surabaya.
+          </p>
+
+          <!-- COMBOBOX -->
+          <div class="flex flex-col md:flex-row items-center mb-8">
+            <label class="text-gray-700 font-medium mb-2 md:mb-0 md:mr-4">
+              Pilih Triwulan:
+            </label>
+
+            <div class="relative w-full md:w-64">
+              <select
+                id="kinerjaSelect"
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none text-gray-700"
+              >
+                <option value="">Pilih Periode Triwulan</option>
+
+                {twdata.map((item) => (
+                  <option value={item.file_path}>
+                    {item.tw_option}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <!-- KETERANGAN -->
+          <div
+            id="keteranganKinerja"
+            class="bg-blue-50 p-4 rounded-lg mb-6"
+          >
+            <p class="text-blue-800 font-medium flex items-center">
+              <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+              <span>Silakan pilih periode Triwulan.</span>
+            </p>
+          </div>
+
+          <!-- PDF VIEWER -->
+          <div id="pdfViewerContainer" class="hidden">
+            <div class="flex justify-between items-center mb-4">
+              <h4 class="text-lg font-bold text-blue-800">
+                Laporan Kinerja Investasi
+              </h4>
+
+              <a
+                id="downloadPdf"
+                href="#"
+                target="_blank"
+                class="inline-flex items-center bg-yellow-400 text-blue-800 font-medium px-4 py-2 rounded-lg hover:bg-yellow-300 transition"
+              >
+                <i class="fas fa-download mr-2"></i>
+                Download PDF
+              </a>
+            </div>
+
+            <object
+              id="pdfViewer"
+              type="application/pdf"
+              width="100%"
+              height="780px"
+              class="rounded-lg"
+            ></object>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl p-6 text-white">
+              <div class="flex items-center mb-4">
+                  <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-4">
+                      <i class="fas fa-building text-white text-xl"></i>
+                  </div>
+                  <div>
+                      <p class="text-sm opacity-80">Investasi PMDN</p>
+                      <h4 class="text-2xl font-bold">Rp 15,2 T</h4>
+                  </div>
+              </div>
+              <p class="text-sm opacity-90">TW III 2024</p>
+          </div>
+                    
+          <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-2xl p-6 text-blue-800">
+              <div class="flex items-center mb-4">
+                  <div class="w-12 h-12 bg-blue-800 bg-opacity-20 rounded-full flex items-center justify-center mr-4">
+                      <i class="fas fa-globe text-blue-800 text-xl"></i>
+                  </div>
+                  <div>
+                      <p class="text-sm opacity-80">Investasi PMA</p>
+                      <h4 class="text-2xl font-bold">USD 850 Jt</h4>
+                  </div>
+              </div>
+              <p class="text-sm opacity-90">TW III 2024</p>
+          </div>
+                    
+          <div class="bg-gradient-to-r from-blue-700 to-blue-900 rounded-2xl p-6 text-white">
+              <div class="flex items-center mb-4">
+                  <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-4">
+                      <i class="fas fa-briefcase text-white text-xl"></i>
+                  </div>
+                  <div>
+                      <p class="text-sm opacity-80">Proyek Investasi</p>
+                      <h4 class="text-2xl font-bold">1.850+</h4>
+                  </div>
+              </div>
+              <p class="text-sm opacity-90">TW III 2024</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+    <section id="Panduan" class="py-16 bg-gradient-to-b from-white to-gray-50">
+        <div class="container mx-auto px-4">
+
+            <!-- Judul -->
+            <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-blue-800 mb-4">
+                Panduan & Dokumen Investasi
+            </h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">
+                Dokumen resmi untuk memulai dan mengelola kegiatan investasi di Surabaya
+            </p>
+            </div>
+
+            <!-- Grid Dokumen -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+
+            <!-- Buku Panduan Investasi -->
+            <div class="bg-white rounded-2xl shadow-custom overflow-hidden card-hover">
+                
+                <!-- Gambar -->
+                <div class="w-full bg-gray-100 flex items-center justify-center py-6">
+                    <img src={`${MEDIA_BASE_URL}/images/bukuinvestasi.jpeg`}
+                        alt="Buku Panduan Investasi"
+                        class="w-[280px] md:w-[320px] lg:w-[360px] aspect-square object-contain rounded-lg shadow">
+                </div>
+
+                <!-- Konten -->
+                <div class="p-6 md:p-8 text-center">
+                    <h3 class="text-2xl font-bold text-blue-800 mb-3">
+                        Buku Panduan Investasi
+                    </h3>
+                    <p class="text-gray-700 text-base md:text-lg mb-6">
+                        Panduan komprehensif mengenai prosedur, regulasi, insentif,
+                        serta peluang investasi di Kota Surabaya.
+                    </p>
+
+                    <!-- Tombol besar & jelas -->
+                    <a href="https://drive.google.com/drive/folders/1E_YCjDGL8-hsQqsu1moeYK97RahrzPPS?usp=share_link"
+                        target="_blank"
+                        class="inline-flex items-center justify-center
+                                bg-blue-600 hover:bg-blue-700
+                                text-white font-bold text-lg
+                                px-8 py-4 rounded-xl
+                                transition duration-300 w-full">
+                        <i class="fas fa-file-pdf mr-3 text-xl"></i>
+                        Buka Dokumen
+                    </a>
+                </div>
+            </div>
+
+            <!-- Petunjuk LKPM -->
+            <div class="bg-white rounded-2xl shadow-custom overflow-hidden card-hover">
+                
+                <!-- Gambar -->
+                <div class="w-full bg-gray-100 flex items-center justify-center py-6">
+                <img src={`${MEDIA_BASE_URL}/images/lkpm.jpeg`}
+                    alt="Petunjuk LKPM"
+                    class="w-[280px] md:w-[320px] lg:w-[360px] aspect-square object-contain rounded-lg shadow">
+                </div>
+
+                <!-- Konten -->
+                <div class="p-6 md:p-8 text-center">
+                    <h3 class="text-2xl font-bold text-blue-800 mb-3">
+                        Petunjuk LKPM
+                    </h3>
+                    <p class="text-gray-700 text-base md:text-lg mb-6">
+                        Panduan pengisian Laporan Kegiatan Penanaman Modal (LKPM)
+                        bagi pelaku usaha dan investor.
+                    </p>
+                    <a href="https://drive.google.com/drive/folders/1rSnP55FvPt-JMB67nHWFSl4R7ar_NfGs?usp=share_link"
+                        target="_blank"
+                        class="inline-flex items-center justify-center
+                                bg-blue-600 hover:bg-blue-700
+                                text-white font-bold text-lg
+                                px-8 py-4 rounded-xl
+                                transition duration-300 w-full">
+                        <i class="fas fa-file-alt mr-3 text-xl"></i>
+                        Buka Dokumen
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+  <!-- SCRIPT -->
+  <script is:inline>
+    const select = document.getElementById("kinerjaSelect");
+    const viewer = document.getElementById("pdfViewer");
+    const container = document.getElementById("pdfViewerContainer");
+    const download = document.getElementById("downloadPdf");
+    const ket = document.getElementById("keteranganKinerja");
+
+    select.addEventListener("change", () => {
+      if (!select.value) return;
+
+     viewer.data = "/pdf/" + select.value;
+download.href = "/pdf/" + select.value;
+
+      container.classList.remove("hidden");
+      ket.innerHTML = `
+        <p class="text-blue-800 font-medium flex items-center">
+          <i class="fas fa-check-circle text-green-600 mr-2"></i>
+          Laporan berhasil dimuat
+        </p>
+      `;
+    });
+  </script>
+

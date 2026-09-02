@@ -1,0 +1,8 @@
+# Site branding. A single row, looked up by id = 1 in Header.astro.
+table: website_pengaturan
+# Columns that identify a row, so a re-run skips what is already there.
+key: [id]
+rows:
+  - id: 1
+    nama: "DPM-PTSP Surabaya"
+    logo: "/logo.png"

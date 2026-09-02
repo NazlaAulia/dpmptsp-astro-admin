@@ -1,0 +1,890 @@
+---
+import { MEDIA_BASE_URL } from "../lib/media";
+import MainLayout from "../layouts/MainLayout.astro";
+---
+
+<MainLayout title="DPMPTSP Kota Surabaya">
+
+<!-- ================= NAVBAR ================= -->
+<nav class="bg-dpmBlue text-white sticky top-0 z-50 shadow">
+  <div class="max-w-7xl mx-auto px-6">
+    </div>
+
+    <!-- MENU MOBILE -->
+    <div id="mobileMenu" class="hidden md:hidden pb-6">
+      <div class="flex flex-col gap-4 font-medium">
+        <a href="#beranda" class="hover:text-dpmYellow">Beranda</a>
+        <a href="/Tentang" class="hover:text-dpmYellow">Profil</a>
+        <a href="#layanan" class="hover:text-dpmYellow">Layanan</a>
+        <a href="#kontak" class="hover:text-dpmYellow">Kontak</a>
+
+        <a
+          href="#"
+          class="mt-4 bg-dpmYellow text-dpmBlue px-4 py-2 rounded-lg font-semibold text-center"
+        >
+          OSS / Perizinan
+        </a>
+      </div>
+    </div>
+
+  </div>
+</nav>
+
+<!-- ================= HERO ================= -->
+<section class="relative overflow-hidden bg-blue-600">
+  <div class="container mx-auto px-4 py-16 md:py-24">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+
+      <!-- Hero Text -->
+      <div class="text-white animate-fadeInUp animate__animated animate__fadeInUp">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">
+          Investasi & Perizinan Terpadu
+        </h1>
+        <p class="text-xl mb-8 opacity-90">
+          Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kota Surabaya
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <a href="#"
+             class="bg-yellow-400 text-blue-800 font-bold px-6 py-3 rounded-lg hover:bg-yellow-300 transition duration-300 transform hover:scale-105">
+            Mulai Berinvestasi <i class="fas fa-arrow-right ml-2"></i>
+          </a>
+          <a href="#"
+             class="bg-white text-blue-600 font-bold px-6 py-3 rounded-lg hover:bg-gray-100 transition duration-300">
+            Lihat Layanan <i class="fas fa-list ml-2"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Carousel -->
+      <div class="relative slide-in">
+        <div id="hero-carousel" class="relative overflow-hidden rounded-2xl shadow-2xl">
+          <div class="carousel-item active bg-blue-800 p-8 rounded-2xl text-white">
+            <h3 class="text-2xl font-bold mb-4">Klinik Investasi Surabaya</h3>
+            <p class="mb-6">Konsultasi perizinan usaha di Kota Surabaya dengan tim ahli kami.</p>
+            <a href="#" class="inline-flex items-center text-yellow-400 font-medium">
+              Selengkapnya <i class="fas fa-chevron-right ml-2"></i>
+            </a>
+          </div>
+          <div class="carousel-item hidden bg-blue-800 p-8 rounded-2xl text-white">
+            <h3 class="text-2xl font-bold mb-4">Layanan Cepat & Transparan</h3>
+            <p class="mb-6">Proses perizinan lebih mudah untuk warga Surabaya.</p>
+            <a href="#" class="inline-flex items-center text-yellow-400 font-medium">
+              Selengkapnya <i class="fas fa-chevron-right ml-2"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Carousel indicators -->
+        <div class="flex justify-center mt-6 space-x-2">
+          <button class="w-3 h-3 rounded-full bg-white"></button>
+          <button class="w-3 h-3 rounded-full bg-white opacity-50"></button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Decorative Circles -->
+  <div class="absolute top-0 right-0 w-64 h-64 bg-yellow-400 rounded-full opacity-10 -translate-y-32 translate-x-32"></div>
+  <div class="absolute bottom-0 left-0 w-96 h-96 bg-blue-600 rounded-full opacity-10 -translate-x-64 translate-y-64"></div>
+</section>
+
+<script is:inline>
+const slides = document.querySelectorAll('#hero-carousel .carousel-item');
+const indicators = document.querySelectorAll('#hero-carousel + div button');
+let current = 0;
+
+function showSlide(index) {
+  slides.forEach((slide,i)=>{
+    slide.classList.toggle('hidden', i !== index);
+    indicators[i].classList.toggle('opacity-50', i !== index);
+  });
+  current = index;
+}
+
+indicators.forEach((btn,i)=>btn.addEventListener('click',()=>showSlide(i)));
+setInterval(()=>showSlide((current+1)%slides.length),5000);
+showSlide(current);
+</script>
+
+<style>
+.hero-gradient {
+    background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 50%, #fbbf24 100%);
+}
+.rounded-2xl { border-radius: 1rem; }
+</style>
+
+
+
+
+
+<!-- ================= TENTANG ================= -->
+<section class="py-16 bg-white">
+  <div class="container mx-auto px-4">
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+
+      <!-- Text Content -->
+      <div class="animate__animated animate__fadeInUp">
+        <span class="text-sm font-semibold tracking-wider text-blue-600 uppercase">
+          Tentang Kami
+        </span>
+
+        <h2 class="text-3xl md:text-4xl font-bold text-blue-800 mt-2 mb-6">
+          Selamat Datang di DPM-PTSP Surabaya
+        </h2>
+
+        <p class="text-gray-700 mb-5 leading-relaxed">
+          Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu (DPMPTSP)
+          Kota Surabaya merupakan perangkat daerah yang memiliki peran
+          strategis dalam penyelenggaraan pelayanan perizinan terpadu.
+        </p>
+
+        <p class="text-gray-700 mb-8 leading-relaxed">
+          Kami hadir untuk mempermudah proses perizinan dan investasi
+          melalui pelayanan yang cepat, transparan, akuntabel,
+          serta terintegrasi berbasis digital.
+        </p>
+
+        <a
+          href="#"
+          class="inline-flex items-center bg-blue-600 text-white font-bold
+                 px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+        >
+          Selengkapnya Tentang Kami
+          <i class="fas fa-arrow-right ml-2"></i>
+        </a>
+      </div>
+
+      <!-- Image Content -->
+      <div class="relative animate__animated animate__fadeInRight">
+
+        <div class="bg-gradient-to-br from-blue-600 to-yellow-400 p-1 rounded-2xl shadow-custom">
+          <div class="bg-white p-2 rounded-xl">
+            <img
+              src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1170&q=80"
+              alt="Kantor DPMPTSP Kota Surabaya"
+              class="w-full h-64 md:h-72 object-cover rounded-lg"
+            />
+          </div>
+        </div>
+
+        <!-- Decorative Badge -->
+        <div
+          class="absolute -top-4 -right-4 w-20 h-20 bg-yellow-400 rounded-full
+                 flex items-center justify-center shadow-lg"
+        >
+          <i class="fas fa-award text-blue-800 text-2xl"></i>
+        </div>
+
+        <div
+          class="absolute -bottom-4 -left-4 w-16 h-16 bg-blue-600 rounded-full
+                 flex items-center justify-center shadow-lg"
+        >
+          <i class="fas fa-star text-white text-xl"></i>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<section class="py-16 bg-gradient-to-b from-gray-50 to-white">
+  <div class="container mx-auto px-4">
+
+    <!-- Heading -->
+    <div class="text-center mb-14">
+      <span class="text-sm font-semibold tracking-widest text-blue-600 uppercase">
+        Keunggulan Investasi
+      </span>
+      <h2 class="text-3xl md:text-4xl font-bold text-blue-800 mt-2 mb-4">
+        Mengapa Berinvestasi di Surabaya?
+      </h2>
+      <p class="text-gray-600 max-w-2xl mx-auto">
+        Kota Surabaya menawarkan berbagai keunggulan strategis sebagai
+        destinasi investasi terbaik dan berkelanjutan di Indonesia.
+      </p>
+    </div>
+
+    <!-- Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+      <!-- Card 1 -->
+      <div class="bg-white rounded-2xl p-7 shadow-custom card-hover transition">
+        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+          <i class="fas fa-chart-line text-blue-600 text-2xl"></i>
+        </div>
+        <h3 class="text-xl font-bold text-blue-800 mb-3">
+          Iklim Investasi Kondusif
+        </h3>
+        <p class="text-gray-700 mb-6 leading-relaxed">
+          Pertumbuhan ekonomi Surabaya didukung kebijakan pemerintah daerah
+          yang pro-investasi dan berorientasi pada kemudahan usaha.
+        </p>
+        <a href="#" class="text-blue-600 font-semibold inline-flex items-center hover:underline">
+          Pelajari Lebih Lanjut <i class="fas fa-arrow-right ml-2"></i>
+        </a>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="bg-white rounded-2xl p-7 shadow-custom card-hover transition">
+        <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-6">
+          <i class="fas fa-city text-yellow-500 text-2xl"></i>
+        </div>
+        <h3 class="text-xl font-bold text-blue-800 mb-3">
+          Kota Metropolitan Strategis
+        </h3>
+        <p class="text-gray-700 mb-6 leading-relaxed">
+          Sebagai kota metropolitan terbesar kedua di Indonesia, Surabaya
+          menjadi pusat perdagangan, industri, dan jasa kawasan timur.
+        </p>
+        <a href="#" class="text-blue-600 font-semibold inline-flex items-center hover:underline">
+          Pelajari Lebih Lanjut <i class="fas fa-arrow-right ml-2"></i>
+        </a>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="bg-white rounded-2xl p-7 shadow-custom card-hover transition">
+        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+          <i class="fas fa-ship text-blue-600 text-2xl"></i>
+        </div>
+        <h3 class="text-xl font-bold text-blue-800 mb-3">
+          Infrastruktur Internasional
+        </h3>
+        <p class="text-gray-700 mb-6 leading-relaxed">
+          Didukung bandara dan pelabuhan berstandar internasional untuk
+          memperlancar distribusi dan konektivitas global.
+        </p>
+        <a href="#" class="text-blue-600 font-semibold inline-flex items-center hover:underline">
+          Pelajari Lebih Lanjut <i class="fas fa-arrow-right ml-2"></i>
+        </a>
+      </div>
+
+      <!-- Card 1 -->
+      <div class="bg-white rounded-2xl p-7 shadow-custom card-hover transition">
+        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+          <i class="fas fa-chart-line text-blue-600 text-2xl"></i>
+        </div>
+        <h3 class="text-xl font-bold text-blue-800 mb-3">
+          Iklim Investasi Kondusif
+        </h3>
+        <p class="text-gray-700 mb-6 leading-relaxed">
+          Pertumbuhan ekonomi Surabaya didukung kebijakan pemerintah daerah
+          yang pro-investasi dan berorientasi pada kemudahan usaha.
+        </p>
+        <a href="#" class="text-blue-600 font-semibold inline-flex items-center hover:underline">
+          Pelajari Lebih Lanjut <i class="fas fa-arrow-right ml-2"></i>
+        </a>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="bg-white rounded-2xl p-7 shadow-custom card-hover transition">
+        <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-6">
+          <i class="fas fa-city text-yellow-500 text-2xl"></i>
+        </div>
+        <h3 class="text-xl font-bold text-blue-800 mb-3">
+          Kota Metropolitan Strategis
+        </h3>
+        <p class="text-gray-700 mb-6 leading-relaxed">
+          Sebagai kota metropolitan terbesar kedua di Indonesia, Surabaya
+          menjadi pusat perdagangan, industri, dan jasa kawasan timur.
+        </p>
+        <a href="#" class="text-blue-600 font-semibold inline-flex items-center hover:underline">
+          Pelajari Lebih Lanjut <i class="fas fa-arrow-right ml-2"></i>
+        </a>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="bg-white rounded-2xl p-7 shadow-custom card-hover transition">
+        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+          <i class="fas fa-ship text-blue-600 text-2xl"></i>
+        </div>
+        <h3 class="text-xl font-bold text-blue-800 mb-3">
+          Infrastruktur Internasional
+        </h3>
+        <p class="text-gray-700 mb-6 leading-relaxed">
+          Didukung bandara dan pelabuhan berstandar internasional untuk
+          memperlancar distribusi dan konektivitas global.
+        </p>
+        <a href="#" class="text-blue-600 font-semibold inline-flex items-center hover:underline">
+          Pelajari Lebih Lanjut <i class="fas fa-arrow-right ml-2"></i>
+        </a>
+      </div>
+
+    </div>
+
+    <!-- CTA -->
+    <div class="text-center mt-14">
+      <a
+        href="#"
+        class="inline-flex items-center bg-yellow-400 text-blue-800
+               font-bold px-8 py-3 rounded-lg
+               hover:bg-yellow-300 transition"
+      >
+        Lihat Semua Keunggulan
+        <i class="fas fa-chevron-down ml-2"></i>
+      </a>
+    </div>
+
+  </div>
+</section>
+
+
+<section class="py-16 bg-white">
+  <div class="container mx-auto px-4">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+      <!-- KIRI : MAP CARD -->
+      <div class="order-2 lg:order-1">
+        <div class="relative rounded-2xl overflow-hidden shadow-2xl group">
+
+          <!-- Background -->
+          <div class="bg-gradient-to-br from-blue-600 to-blue-800 p-8 h-full relative z-10">
+            <div class="text-white max-w-md">
+              <span class="inline-block mb-3 text-xs font-semibold tracking-wider bg-yellow-400 text-blue-900 px-3 py-1 rounded-full">
+                PETA INVESTASI
+              </span>
+
+              <h3 class="text-2xl md:text-3xl font-bold mb-4">
+                Peta Potensi Investasi Surabaya
+              </h3>
+
+              <p class="mb-6 text-blue-100">
+                Temukan sektor unggulan dan peluang investasi di setiap wilayah Kota Surabaya
+                melalui peta interaktif yang informatif.
+              </p>
+
+              <a
+                href="#"
+                class="inline-flex items-center bg-yellow-400 text-blue-800 font-bold px-6 py-3 rounded-lg
+                       hover:bg-yellow-300 transition-all duration-300 group-hover:translate-x-1"
+              >
+                Jelajahi Peta
+                <i class="fas fa-map-marked-alt ml-2"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Decorative Elements -->
+          <div class="absolute -top-16 -right-16 w-40 h-40 bg-yellow-400 rounded-full opacity-20"></div>
+          <div class="absolute bottom-6 right-6 w-24 h-24 bg-white/10 rounded-xl"></div>
+
+        </div>
+      </div>
+
+      <!-- KANAN : TEKS RENSTRA -->
+      <div class="order-1 lg:order-2">
+        <span class="text-sm font-semibold tracking-wider text-blue-600 uppercase">
+          Rencana Strategis
+        </span>
+
+        <h2 class="text-3xl md:text-4xl font-bold text-blue-800 mt-2 mb-6">
+          Renstra Investasi 2021–2026
+        </h2>
+
+        <p class="text-gray-700 mb-8 leading-relaxed">
+          Kota Surabaya terus mengembangkan potensi investasi lintas sektor dengan
+          fokus pada pertumbuhan ekonomi yang inklusif dan berkelanjutan.
+        </p>
+
+        <div class="space-y-5">
+          <div class="flex items-start">
+            <div class="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+              <i class="fas fa-check text-white text-sm"></i>
+            </div>
+            <p class="text-gray-700">
+              Informasi sektor unggulan dan potensi investasi di setiap kawasan strategis.
+            </p>
+          </div>
+
+          <div class="flex items-start">
+            <div class="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+              <i class="fas fa-check text-white text-sm"></i>
+            </div>
+            <p class="text-gray-700">
+              Analisis data berbasis real-time untuk mendukung keputusan investasi.
+            </p>
+          </div>
+
+          <div class="flex items-start">
+            <div class="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+              <i class="fas fa-check text-white text-sm"></i>
+            </div>
+            <p class="text-gray-700">
+              Panduan investasi lengkap bagi investor pemula hingga profesional.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="py-16 bg-gradient-to-b from-white to-gray-50">
+  <div class="container mx-auto px-4">
+
+    <!-- Heading -->
+    <div class="text-center mb-12">
+      <span class="text-sm font-semibold tracking-wider text-blue-600 uppercase">
+        Media Informasi
+      </span>
+      <h2 class="text-3xl md:text-4xl font-bold text-blue-800 mt-2 mb-4">
+        Video Terupdate
+      </h2>
+      <p class="text-gray-600 max-w-2xl mx-auto">
+        Ikuti perkembangan terbaru seputar investasi dan pelayanan perizinan
+        di Kota Surabaya.
+      </p>
+    </div>
+
+    <!-- Grid Video -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+      <!-- Video Card -->
+      <div class="bg-white rounded-2xl overflow-hidden shadow-custom card-hover group">
+        <div class="relative">
+          <div class="h-48 bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center">
+            <div
+              class="w-16 h-16 bg-white rounded-full flex items-center justify-center
+                     group-hover:scale-110 transition"
+            >
+              <i class="fas fa-play text-blue-600 text-2xl ml-1"></i>
+            </div>
+          </div>
+
+          <div class="absolute top-4 right-4 bg-yellow-400 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">
+            Baru
+          </div>
+        </div>
+
+        <div class="p-6">
+          <h3 class="text-lg font-bold text-blue-800 mb-2">
+            Pesona Buaya September 2024
+          </h3>
+          <p class="text-gray-600 text-sm mb-4">
+            Video terbaru perkembangan investasi dan pariwisata Surabaya.
+          </p>
+          <a href="#" class="text-blue-600 font-semibold inline-flex items-center text-sm">
+            Tonton Video
+            <i class="fas fa-arrow-right ml-2"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Video Card -->
+      <div class="bg-white rounded-2xl overflow-hidden shadow-custom card-hover group">
+        <div class="relative">
+          <div class="h-48 bg-gradient-to-br from-yellow-400 to-yellow-500 flex items-center justify-center">
+            <div
+              class="w-16 h-16 bg-white rounded-full flex items-center justify-center
+                     group-hover:scale-110 transition"
+            >
+              <i class="fas fa-play text-blue-600 text-2xl ml-1"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6">
+          <h3 class="text-lg font-bold text-blue-800 mb-2">
+            Surabaya Great Expo 2024
+          </h3>
+          <p class="text-gray-600 text-sm mb-4">
+            Highlight kegiatan eksposisi dan peluang investasi Kota Surabaya.
+          </p>
+          <a href="#" class="text-blue-600 font-semibold inline-flex items-center text-sm">
+            Tonton Video
+            <i class="fas fa-arrow-right ml-2"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Video Card -->
+      <div class="bg-white rounded-2xl overflow-hidden shadow-custom card-hover group">
+        <div class="relative">
+          <div class="h-48 bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
+            <div
+              class="w-16 h-16 bg-white rounded-full flex items-center justify-center
+                     group-hover:scale-110 transition"
+            >
+              <i class="fas fa-play text-blue-600 text-2xl ml-1"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6">
+          <h3 class="text-lg font-bold text-blue-800 mb-2">
+            Pesona Buaya Juli 2024
+          </h3>
+          <p class="text-gray-600 text-sm mb-4">
+            Update pembangunan dan investasi Kota Surabaya.
+          </p>
+          <a href="#" class="text-blue-600 font-semibold inline-flex items-center text-sm">
+            Tonton Video
+            <i class="fas fa-arrow-right ml-2"></i>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Button -->
+    <div class="text-center mt-12">
+      <a
+        href="#"
+        class="inline-flex items-center bg-blue-600 text-white font-bold px-8 py-3
+               rounded-lg hover:bg-blue-700 transition"
+      >
+        Lihat Semua Video
+        <i class="fas fa-video ml-2"></i>
+      </a>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ================= BERITA & ARTIKEL ================= -->
+<section class="py-16 bg-white">
+  <div class="max-w-7xl mx-auto px-6">
+
+    <!-- HEADING -->
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-bold text-dpmBlue mb-4">
+        Berita & Artikel Terupdate
+      </h2>
+      <p class="text-gray-600 max-w-2xl mx-auto">
+        Informasi terkini seputar perizinan, investasi, dan perkembangan Kota Surabaya.
+      </p>
+    </div>
+
+    <!-- FEATURED ARTIKEL -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+
+      <!-- FEATURED 1 -->
+      <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl shadow-xl">
+        <div class="p-8 text-white h-full flex flex-col justify-between">
+          <div>
+            <span class="inline-block bg-dpmYellow text-dpmBlue text-xs font-bold px-3 py-1 rounded-full mb-4">
+              ARTIKEL PERIZINAN
+            </span>
+
+            <h3 class="text-2xl font-bold mb-4">
+              Layanan Drive Thru PATAS Mengalami Peningkatan Pemanfaatan
+            </h3>
+
+            <p class="text-blue-100 mb-6">
+              Pelayanan perizinan drive thru semakin diminati pelaku usaha
+              dengan peningkatan signifikan pada bulan terakhir.
+            </p>
+          </div>
+
+          <div class="flex items-center justify-between text-sm">
+            <span>📅 24 Nov 2025</span>
+            <a
+              href="#"
+              class="bg-white text-blue-700 font-semibold px-4 py-2 rounded-lg hover:bg-gray-100 transition"
+            >
+              Baca Selengkapnya
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- FEATURED 2 -->
+      <div class="bg-gradient-to-r from-dpmYellow to-yellow-400 rounded-2xl shadow-xl">
+        <div class="p-8 text-dpmBlue h-full flex flex-col justify-between">
+          <div>
+            <span class="inline-block bg-dpmBlue text-white text-xs font-bold px-3 py-1 rounded-full mb-4">
+              ARTIKEL INVESTASI
+            </span>
+
+            <h3 class="text-2xl font-bold mb-4">
+              Capaian Realisasi Investasi PMDN Non-UMK Triwulan II 2025
+            </h3>
+
+            <p class="mb-6">
+              Analisis perkembangan investasi Kota Surabaya pada
+              triwulan kedua tahun 2025 dengan tren positif.
+            </p>
+          </div>
+
+          <div class="flex items-center justify-between text-sm">
+            <span>📅 28 Agt 2025</span>
+            <a
+              href="#"
+              class="bg-dpmBlue text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-900 transition"
+            >
+              Baca Selengkapnya
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- GRID BERITA -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <!-- CARD -->
+      <div class="bg-white rounded-2xl shadow hover:shadow-xl transition overflow-hidden card-hover group">
+        <div class="h-48 sm:h-52 lg:h-56 w-full overflow-hidden">
+          <img src={`${MEDIA_BASE_URL}/fileberita/tpid-2025-2025-12-16(BERITA).jpeg`} class="h-50 w-full object-fit">
+        </div>
+        <div class="p-4">
+          <h3 class="font-bold text-base sm:text-lg text-dpmBlue mb-2">
+            Pemkot Surabaya Adakan Kegiatan High Level Marketing
+          </h3>
+          <p class="text-gray-600 text-sm mb-4">
+            Kegiatan untuk memperkuat sinergi kebijakan dan pertumbuhan ekonomi.
+          </p>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-500">📅 16 Des 2025</span>
+            <a href="#" class="text-dpmBlue font-medium hover:underline">
+              Baca →
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD -->
+      <div class="bg-white rounded-2xl shadow hover:shadow-xl transition overflow-hidden card-hover group">
+        <img src={`${MEDIA_BASE_URL}/fileberita/tpid-2025-2025-12-16(BERITA).jpeg`} class="h-50 w-full object-fit">
+        <div class="m-2 mt-5">
+          <h3 class="font-bold text-lg text-dpmBlue mb-2">
+            Pemkot Tangerang Studi Tiru ke Kota Surabaya
+          </h3>
+          <p class="text-gray-600 text-sm mb-4">
+            Kunjungan studi tiru percepatan pelayanan perizinan dan non-perizinan.
+          </p>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-500">📅 16 Des 2025</span>
+            <a href="#" class="text-dpmBlue font-medium hover:underline">
+              Baca →
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD -->
+      <div class="bg-white rounded-2xl shadow hover:shadow-xl transition overflow-hidden card-hover group">
+        <img src={`${MEDIA_BASE_URL}/fileberita/tpid-2025-2025-12-16(BERITA).jpeg`} class="h-50 w-full object-fit">
+        <div class="m-2 mt-5">
+          <h3 class="font-bold text-lg text-dpmBlue mb-2">
+            DPMPTSP Terima Kunjungan Kementerian Investasi
+          </h3>
+          <p class="text-gray-600 text-sm mb-4">
+            Fasilitasi UMKM dalam pengembangan usaha dan kemudahan perizinan.
+          </p>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-500">📅 16 Des 2025</span>
+            <a href="#" class="text-dpmBlue font-medium hover:underline">
+              Baca →
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BUTTON -->
+    <div class="text-center mt-12">
+      <a
+        href="#"
+        class="inline-flex items-center bg-dpmYellow text-dpmBlue font-bold px-8 py-3 rounded-lg hover:bg-yellow-300 transition"
+      >
+        Lihat Semua Berita 📰
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<section class="py-16 bg-gradient-to-b from-gray-50 to-white">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-bold text-blue-800 mb-4">Instansi Terkait</h2>
+      <p class="text-gray-600 max-w-2xl mx-auto">
+        Kolaborasi dengan berbagai instansi untuk pelayanan investasi dan perizinan yang lebih baik.
+      </p>
+    </div>
+    <div class="overflow-hidden" id="scroll-container">
+      <div class="flex gap-6 flex-nowrap" id="scroll-content">
+        <!-- ITEM -->
+        <div class="bg-white rounded-xl p-6 flex items-center justify-center shadow-custom card-hover scroll-item min-w-[320px] h-[160px]">
+          <img
+            src="https://bkpm.go.id/storage/image/origin/webp/gakPYWgKIG7y6M4GYSNh2AZJGiNTxv.webp"
+            alt="BKPM"
+            class="h-24 w-auto object-contain transition"
+          />
+        </div>
+
+        <div class="bg-white rounded-xl p-6 flex items-center justify-center shadow-custom card-hover scroll-item min-w-[320px] h-[160px]">
+          <img
+            src="https://ppid.menpan.go.id/system/uploads/2021/07/20210721_new_logo_kemenpanrb-1.png"
+            alt="Pemkot Surabaya"
+            class="h-24 w-auto object-contain transition"
+          />
+        </div>
+
+        <div class="bg-white rounded-xl p-6 flex items-center justify-center shadow-custom card-hover scroll-item min-w-[320px] h-[160px]">
+          <img
+            src="https://dpmptsp.jatimprov.go.id/wp-content/uploads/2020/07/logo-admin.png"
+            alt="Kemenkeu"
+            class="h-24 w-auto object-contain transition"
+          />
+        </div>
+
+        <div class="bg-white rounded-xl p-6 flex items-center justify-center shadow-custom card-hover scroll-item min-w-[320px] h-[160px]">
+          <img
+            src="https://s3.oss.go.id/oss/logo/LOGO_OSS_NEW_ID-222baabce52bc87c29a24178b74429f7.svg"
+            alt="OSS"
+            class="h-24 w-auto object-contain transition"
+          />
+        </div>
+
+        <div class="bg-white rounded-xl p-6 flex items-center justify-center shadow-custom card-hover scroll-item min-w-[320px] h-[160px]">
+          <img
+            src="https://dgip.go.id/frontend/assets/images/logo-web.png"
+            alt="BPN"
+            class="h-24 w-auto object-contain transition"
+          />
+        </div>
+
+        <div class="bg-white rounded-xl p-6 flex items-center justify-center shadow-custom card-hover scroll-item min-w-[320px] h-[160px]">
+          <img
+            src="https://bkpm.go.id/storage/image/origin/webp/gakPYWgKIG7y6M4GYSNh2AZJGiNTxv.webp"
+            alt="Kemendag"
+            class="h-24 w-auto object-contain transition"
+          />
+        </div>
+
+        <!-- clone -->
+        <!-- bawah -->
+        <!-- clone -->
+        <div class="bg-white rounded-xl p-6 flex items-center justify-center shadow-custom card-hover min-w-[320px] h-[160px]">
+          <img
+            src="https://wbs.surabaya.go.id/git_themes/assets/img/logo.png"
+            alt="BKPM"
+            class="h-24 w-auto object-contain transition"
+          />
+        </div>
+
+        <div class="bg-white rounded-xl p-6 flex items-center justify-center shadow-custom card-hover min-w-[320px] h-[160px]">
+          <img
+            src="https://satudata.surabaya.go.id/assets/static/media/company_logo.898a33cd.png"
+            alt="Pemkot Surabaya"
+            class="h-24 w-auto object-contain transition"
+          />
+        </div>
+
+        <div class="bg-white rounded-xl p-6 flex items-center justify-center shadow-custom card-hover min-w-[320px] h-[160px]">
+          <img
+            src="https://bkpm.go.id/storage/image/origin/webp/gakPYWgKIG7y6M4GYSNh2AZJGiNTxv.webp"
+            alt="Kemenkeu"
+            class="h-24 w-auto object-contain transition"
+          />
+        </div>
+
+        <div class="bg-white rounded-xl p-6 flex items-center justify-center shadow-custom card-hover min-w-[320px] h-[160px]">
+          <img
+            src="https://bkpm.go.id/storage/image/origin/webp/gakPYWgKIG7y6M4GYSNh2AZJGiNTxv.webp"
+            alt="OSS"
+            class="h-24 w-auto object-contain transition"
+          />
+        </div>
+
+        <div class="bg-white rounded-xl p-6 flex items-center justify-center shadow-custom card-hover min-w-[320px] h-[160px]">
+          <img
+            src="https://bkpm.go.id/storage/image/origin/webp/gakPYWgKIG7y6M4GYSNh2AZJGiNTxv.webp"
+            alt="BPN"
+            class="h-24 w-auto object-contain transition"
+          />
+        </div>
+
+        <div class="bg-white rounded-xl p-6 flex items-center justify-center shadow-custom card-hover min-w-[320px] h-[160px]">
+          <img
+            src="https://bkpm.go.id/storage/image/origin/webp/gakPYWgKIG7y6M4GYSNh2AZJGiNTxv.webp"
+            alt="Kemendag"
+            class="h-24 w-auto object-contain transition"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ================= FOOTER ================= -->
+<footer id="kontak" class="bg-dpmBlue text-white py-8">
+  <div class="max-w-7xl mx-auto px-6 text-center text-sm">
+    © 2025 DPMPTSP Kota Surabaya. All rights reserved.
+  </div>
+</footer>
+
+<!-- ================= JS MENU ================= -->
+<script is:inline>
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById("btnMenu");
+  const menu = document.getElementById("mobileMenu");
+
+  btn?.addEventListener("click", () => {
+    menu.classList.toggle("hidden");
+  });
+
+  //dipercaya
+  const container = document.getElementById('scroll-container');
+  const content = document.getElementById('scroll-content');
+  const items = document.querySelectorAll('.scroll-item');
+  
+  // Duplicate content for seamless loop
+  items.forEach(item => {
+      const clone = item.cloneNode(true);
+      content.appendChild(clone);
+  });
+            
+  // Calculate total width
+  const itemWidth = items[0]?.offsetWidth || 224; // w-56 = 224px
+  const gap = 24; // gap-6 = 24px
+  const totalItems = items.length;
+  const totalWidth = (totalItems * 2) * (itemWidth + gap);
+  
+  // Set container width
+  content.style.width = `${totalWidth}px`;
+  
+  // Animation variables
+  let position = 0;
+  const speed = 1; // pixels per frame
+  let animationId;
+  
+  function animate() {
+      // Move to left
+      position -= speed;
+      
+      // Reset position when first set is completely out of view
+      const firstSetWidth = totalItems * (itemWidth + gap);
+      if (Math.abs(position) >= firstSetWidth) {
+          position = 0;
+      }
+      
+      content.style.transform = `translateX(${position}px)`;
+      animationId = requestAnimationFrame(animate);
+  }
+  
+  // Start animation
+  animate();
+  
+  // Pause on hover
+  container.addEventListener('mouseenter', () => {
+      cancelAnimationFrame(animationId);
+  });
+  
+  container.addEventListener('mouseleave', () => {
+      animationId = requestAnimationFrame(animate);
+  });
+});
+</script>
+
+</MainLayout>

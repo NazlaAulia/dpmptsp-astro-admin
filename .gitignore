@@ -24,3 +24,18 @@ pnpm-debug.log*
 .idea/
 .vercel
 .env*.local
+
+# knowledge graph output (local tooling)
+graphify-out/
+
+# runtime-written user content (kept on disk, not in git)
+**/public/uploads/
+**/public/absensi/
+
+# database dumps — never commit production data
+*.sql
+
+# gateway access list is environment-specific
+infra/gateway/policy/allowed_ips.list
+
+legacy-media/

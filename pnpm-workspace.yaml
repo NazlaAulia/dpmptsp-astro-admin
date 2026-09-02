@@ -1,0 +1,19 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+# Single source of truth for versions shared by web and admin, so the two Astro
+# apps cannot drift onto different majors.
+catalog:
+  astro: ^5.16.6
+  '@astrojs/node': ^9.4.4
+  tailwindcss: ^4.1.18
+  '@tailwindcss/vite': ^4.1.18
+  typescript: ^5.9.3
+
+# pnpm 11 blocks dependency build scripts unless they are allowed here.
+# Astro's esbuild and sharp need theirs: without this `pnpm install` fails with
+# ERR_PNPM_IGNORED_BUILDS, and approving them interactively is not reproducible.
+allowBuilds:
+  esbuild: true
+  sharp: true

@@ -1,0 +1,764 @@
+openapi: 3.1.0
+
+info:
+  title: DPMPTSP API
+  version: 0.1.0
+  description: |
+    Internal API for the DPMPTSP web and admin applications.
+
+    This service is reachable only from the internal docker network (SPEC.md
+    §8). The browser never calls it: it calls Astro, and Astro calls this
+    server-side. There is therefore no CORS configuration, no public rate
+    limiting and no browser-facing auth — those concerns live at the
+    Astro/browser boundary instead.
+
+    This file is the contract (SPEC.md §5). packages/api-client's types are
+    generated from it; the request/response shapes must not be hand-written in
+    web or admin (CLAUDE.md rule 5).
+
+servers:
+  - url: http://api:8080
+    description: internal docker network
+
+security:
+  - ServiceKey: []
+
+tags:
+  - name: health
+  - name: articles
+  - name: site
+  - name: content
+  - name: pages
+
+paths:
+  /healthz:
+    get:
+      tags: [health]
+      summary: Liveness
+      description: |
+        Touches no dependency. A container liveness probe must not restart the
+        API because the database blinked.
+      security: []
+      responses:
+        "200":
+          description: process is up
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, example: ok }
+
+  /readyz:
+    get:
+      tags: [health]
+      summary: Readiness
+      description: Reports whether this instance can serve traffic.
+      security: []
+      responses:
+        "200":
+          description: ready
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Health" }
+        "503":
+          description: a dependency is unavailable
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Health" }
+
+  /v1/articles:
+    get:
+      tags: [articles]
+      summary: List articles
+      parameters:
+        - { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+        - name: per_page
+          in: query
+          description: Clamped server-side; a caller cannot request the whole table.
+          schema: { type: integer, minimum: 1, maximum: 100, default: 10 }
+        - name: q
+          in: query
+          description: Full-text search over title and content.
+          schema: { type: string }
+        - name: category
+          in: query
+          description: Comma-separated category ids, e.g. `1,8`.
+          schema: { type: string }
+        - { name: headline, in: query, schema: { type: boolean } }
+        - name: include_inactive
+          in: query
+          description: Admin listings only. Public callers must leave this unset.
+          schema: { type: boolean }
+      responses:
+        "200":
+          description: a page of articles
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/Article" }
+                  meta: { $ref: "#/components/schemas/PageMeta" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+    post:
+      tags: [articles]
+      summary: Create an article
+      description: |
+        The slug is derived from the title by the server and is not accepted
+        from the caller. It reproduces the legacy JavaScript slug function
+        exactly, quirks included, because article URLs already depend on it.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ArticleInput" }
+      responses:
+        "201":
+          description: created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: "#/components/schemas/Article" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "422": { $ref: "#/components/responses/ValidationFailed" }
+
+  /v1/articles/by-slug/{slug}:
+    get:
+      tags: [articles]
+      summary: Get one article by slug
+      description: |
+        Replaces the page that loaded every article and slugified each one in
+        JavaScript to find a single match.
+      parameters:
+        - { name: slug, in: path, required: true, schema: { type: string } }
+        - name: count_view
+          in: query
+          description: Increment the view counter. Set only from the public article page.
+          schema: { type: boolean, default: false }
+      responses:
+        "200":
+          description: the article, including its full body
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: "#/components/schemas/Article" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /v1/articles/{id}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: integer, format: int64 } }
+    get:
+      tags: [articles]
+      summary: Get one article by id
+      responses:
+        "200":
+          description: the article
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: "#/components/schemas/Article" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    put:
+      tags: [articles]
+      summary: Update an article
+      description: |
+        The slug is only regenerated when the title actually changes. A slug is
+        a URL, and rewriting it on every save would break inbound links.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ArticleInput" }
+      responses:
+        "200":
+          description: updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: "#/components/schemas/Article" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/ValidationFailed" }
+    delete:
+      tags: [articles]
+      summary: Delete an article
+      responses:
+        "204": { description: deleted }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /v1/categories:
+    get:
+      tags: [articles]
+      summary: List article categories
+      description: |
+        Ids 1, 2, 3, 8, 10 and 11 are load-bearing — the site groups articles by
+        them — so they are pinned by the seeder rather than left to a sequence.
+      responses:
+        "200":
+          description: every category
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/Category" }
+
+  /v1/regulations:
+    get:
+      tags: [content]
+      summary: Active regulations, in display order
+      responses:
+        "200":
+          description: regulations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Regulation" } }
+
+  /v1/public-apps:
+    get:
+      tags: [content]
+      summary: Public application links
+      responses:
+        "200":
+          description: public apps
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/PublicApp" } }
+
+  /v1/videos:
+    get:
+      tags: [content]
+      summary: Videos, newest first
+      responses:
+        "200":
+          description: videos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Video" } }
+
+  /v1/performance-docs:
+    get:
+      tags: [content]
+      summary: Quarterly investment reports
+      responses:
+        "200":
+          description: reports
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/PerformanceDoc" } }
+
+  /v1/service-locations:
+    get:
+      tags: [content]
+      summary: Service locations
+      responses:
+        "200":
+          description: locations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/ServiceLocation" } }
+
+  /v1/ppid:
+    get:
+      tags: [content]
+      summary: PPID categories with their items nested
+      description: |
+        Items arrive inside their category so the page does not have to join two
+        lists in the template.
+      responses:
+        "200":
+          description: ppid tree
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/PPIDCategory" } }
+
+  /v1/home:
+    get:
+      tags: [pages]
+      summary: Everything the homepage renders
+      description: |
+        One endpoint rather than ten. The page this replaces awaited ten queries
+        in sequence, so its render time was their sum; the repository fetches
+        them concurrently, making it their maximum.
+      responses:
+        "200":
+          description: homepage content
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { data: { $ref: "#/components/schemas/Home" } }
+
+  /v1/about:
+    get:
+      tags: [pages]
+      summary: About page content
+      responses:
+        "200":
+          description: about content
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { data: { $ref: "#/components/schemas/About" } }
+
+  /v1/service-standards:
+    get:
+      tags: [pages]
+      summary: Service standard tabs
+      responses:
+        "200":
+          description: service standards
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/ServiceStandard" } }
+
+  /v1/info-sections/{sectionId}:
+    get:
+      tags: [pages]
+      summary: One configurable information section with its items
+      parameters:
+        - { name: sectionId, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: the section
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { data: { $ref: "#/components/schemas/InfoSection" } }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /v1/gallery/photos:
+    get:
+      tags: [pages]
+      summary: Service-location photos, newest first
+      parameters:
+        - { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+        - { name: per_page, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 8 } }
+      responses:
+        "200":
+          description: a page of photos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Photo" } }
+                  meta: { $ref: "#/components/schemas/PageMeta" }
+
+  /v1/site/chrome:
+    get:
+      tags: [site]
+      summary: Branding and header navigation
+      description: |
+        One endpoint rather than two, because the header renders on every page
+        and each round trip is paid on every page view. The menu arrives already
+        nested: reshaping flat parent_id rows into a tree is data work and does
+        not belong in a frontend component.
+      responses:
+        "200":
+          description: site chrome
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: "#/components/schemas/SiteChrome" }
+
+components:
+  securitySchemes:
+    ServiceKey:
+      type: apiKey
+      in: header
+      name: X-Internal-Key
+      description: |
+        Shared key identifying the caller as one of our own Astro apps
+        (SPEC.md §7). Compared in constant time. Health endpoints are exempt so
+        container probes can reach them.
+
+  responses:
+    Unauthorized:
+      description: missing or wrong service key
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    NotFound:
+      description: no such resource
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    ValidationFailed:
+      description: the request was understood but is not valid
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          description: |
+            Safe to display. Internal error text is logged with the request id,
+            never returned — a database error names tables and constraints.
+
+    PageMeta:
+      type: object
+      required: [total, page, per_page, pages]
+      properties:
+        total: { type: integer, format: int64 }
+        page: { type: integer }
+        per_page: { type: integer }
+        pages: { type: integer }
+
+    Health:
+      type: object
+      properties:
+        status: { type: string, enum: [ok, degraded] }
+        engine: { type: string, enum: [postgres, mysql] }
+        storage: { type: string, description: "active disk: local, public or s3" }
+        checks:
+          type: object
+          additionalProperties: { type: string }
+
+    Article:
+      type: object
+      required: [id, category_id, slug, title, published_at, is_headline, hits]
+      properties:
+        id: { type: integer, format: int64 }
+        category_id: { type: integer, format: int64 }
+        category: { type: string, description: Category title, when joined. }
+        slug: { type: string }
+        title: { type: string }
+        content:
+          type: string
+          description: |
+            Full body. Present on single-article responses only — a list of ten
+            must not ship ten HTML documents.
+        ref_content:
+          type: string
+          description: |
+            Rendered body. The public article page displays this rather than
+            `content`; both columns exist in the legacy schema and hold
+            different markup. Single-article responses only.
+        excerpt:
+          type: string
+          description: Tag-stripped summary. Present on list responses instead of content.
+        picture: { type: string }
+        published_at: { type: string, format: date-time }
+        is_headline: { type: boolean }
+        hits: { type: integer, format: int64 }
+
+    ArticleInput:
+      type: object
+      required: [category_id, title]
+      properties:
+        category_id: { type: integer, format: int64 }
+        title: { type: string, minLength: 1 }
+        content: { type: string }
+        picture: { type: string }
+        editor: { type: string }
+        is_active: { type: boolean, default: true }
+        is_headline: { type: boolean, default: false }
+        published_at: { type: string, format: date-time }
+
+    Category:
+      type: object
+      required: [id, title, is_active]
+      properties:
+        id: { type: integer, format: int64 }
+        title: { type: string }
+        is_active: { type: boolean }
+
+    MenuNode:
+      type: object
+      required: [id, name, url, contact_button]
+      properties:
+        id: { type: integer, format: int64 }
+        name: { type: string }
+        url: { type: string }
+        type: { type: string }
+        contact_button:
+          type: boolean
+          description: Rendered as a call-to-action rather than a nav item.
+        children:
+          type: array
+          items: { $ref: "#/components/schemas/MenuNode" }
+
+    Regulation:
+      type: object
+      required: [id, judul]
+      properties:
+        id: { type: integer, format: int64 }
+        jenis: { type: string }
+        nomor: { type: string }
+        tahun: { type: integer }
+        judul: { type: string }
+        file: { type: string }
+
+    PublicApp:
+      type: object
+      required: [id, nama]
+      properties:
+        id: { type: integer, format: int64 }
+        nama: { type: string }
+        deskripsi: { type: string }
+        url: { type: string }
+        icon: { type: string }
+        target: { type: string }
+
+    Video:
+      type: object
+      required: [id, judul]
+      properties:
+        id: { type: integer, format: int64 }
+        judul: { type: string }
+        deskripsi: { type: string }
+        thumbnail: { type: string }
+        url_video: { type: string }
+        status: { type: string, enum: [baru, lama] }
+        tanggal: { type: string }
+
+    PerformanceDoc:
+      type: object
+      required: [id, tw_option, file_path]
+      properties:
+        id: { type: integer, format: int64 }
+        tw_option: { type: string }
+        file_path: { type: string }
+
+    ServiceLocation:
+      type: object
+      required: [id, judul]
+      properties:
+        id: { type: integer, format: int64 }
+        judul: { type: string }
+        deskripsi: { type: string }
+        gambar: { type: string }
+        alt_text: { type: string }
+        lokasi: { type: string }
+        alamat: { type: string }
+        warna: { type: string }
+
+    PPIDItem:
+      type: object
+      required: [id, judul]
+      properties:
+        id: { type: integer, format: int64 }
+        judul: { type: string }
+        isi: { type: string }
+        file_url: { type: string }
+
+    PPIDCategory:
+      type: object
+      required: [id, nama_kategori, slug, items]
+      properties:
+        id: { type: integer, format: int64 }
+        nama_kategori: { type: string }
+        slug: { type: string }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/PPIDItem" }
+
+    ContentBlock:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        tipe: { type: string }
+        konten: { type: string }
+        urutan: { type: integer }
+
+    Slider:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        gambar: { type: string }
+        judul: { type: string }
+        deskripsi: { type: string }
+        urutan: { type: integer }
+
+    Advantage:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        judul: { type: string }
+        deskripsi: { type: string }
+        icon: { type: string }
+        warna_icon: { type: string }
+        warna_bg: { type: string }
+        link: { type: string }
+
+    Notification:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        judul: { type: string }
+        isi: { type: string }
+        gambar: { type: string }
+        tipe: { type: string }
+        icon: { type: string }
+        link: { type: string }
+        teks_link: { type: string }
+
+    InvestmentMap:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        judul: { type: string }
+        deskripsi: { type: string }
+        gambar: { type: string }
+        link: { type: string }
+        judul_renstra: { type: string }
+        deskripsi_renstra: { type: string }
+
+    Home:
+      type: object
+      properties:
+        notifications: { type: array, items: { $ref: "#/components/schemas/Notification" } }
+        blocks: { type: array, items: { $ref: "#/components/schemas/ContentBlock" } }
+        regulations: { type: array, items: { $ref: "#/components/schemas/Regulation" } }
+        sliders: { type: array, items: { $ref: "#/components/schemas/Slider" } }
+        articles: { type: array, items: { $ref: "#/components/schemas/Article" } }
+        advantages: { type: array, items: { $ref: "#/components/schemas/Advantage" } }
+        videos: { type: array, items: { $ref: "#/components/schemas/Video" } }
+        investment_map:
+          oneOf:
+            - { $ref: "#/components/schemas/InvestmentMap" }
+            - { type: "null" }
+        renstra: { type: array, items: { $ref: "#/components/schemas/ContentBlock" } }
+        public_apps: { type: array, items: { $ref: "#/components/schemas/PublicApp" } }
+
+    AboutContent:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        nama: { type: string }
+        isi: { type: string }
+        foto: { type: string }
+        judul: { type: string }
+        keterangan: { type: string }
+        tags: { type: string }
+
+    About:
+      type: object
+      properties:
+        blocks: { type: array, items: { $ref: "#/components/schemas/ContentBlock" } }
+        sliders: { type: array, items: { $ref: "#/components/schemas/Slider" } }
+        contents: { type: array, items: { $ref: "#/components/schemas/AboutContent" } }
+
+    ServiceStandard:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        tab_key: { type: string }
+        tab_icon: { type: string }
+        tab_judul: { type: string }
+        judul: { type: string }
+        deskripsi: { type: string }
+        isi:
+          type: string
+          description: A JSON document the page parses. Never queried by path, so it stays a string.
+        urutan: { type: integer }
+
+    InfoSectionItem:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        icon: { type: string }
+        judul: { type: string }
+        deskripsi: { type: string }
+        warna: { type: string }
+
+    InfoSection:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        section_id: { type: string }
+        badge: { type: string }
+        judul: { type: string }
+        judul_highlight: { type: string }
+        deskripsi: { type: string }
+        icon: { type: string }
+        subjudul: { type: string }
+        subjudul_keterangan: { type: string }
+        isi: { type: string }
+        akses_judul: { type: string }
+        akses_deskripsi: { type: string }
+        akses_button: { type: string }
+        akses_link: { type: string }
+        email_label: { type: string }
+        email: { type: string }
+        email_button: { type: string }
+        alamat_label: { type: string }
+        nama_instansi: { type: string }
+        alamat: { type: string }
+        cta_judul: { type: string }
+        cta_deskripsi: { type: string }
+        cta_button: { type: string }
+        cta_link: { type: string }
+        items: { type: array, items: { $ref: "#/components/schemas/InfoSectionItem" } }
+
+    Photo:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        title: { type: string }
+        image_path: { type: string }
+        alt_text: { type: string }
+        location: { type: string }
+        alamat: { type: string }
+        created_at: { type: string, format: date-time }
+
+    SiteChrome:
+      type: object
+      required: [settings, navigation, contact]
+      properties:
+        settings:
+          type: object
+          required: [name, logo]
+          properties:
+            name: { type: string }
+            logo: { type: string }
+        navigation:
+          type: array
+          items: { $ref: "#/components/schemas/MenuNode" }
+        contact:
+          type: array
+          items: { $ref: "#/components/schemas/MenuNode" }

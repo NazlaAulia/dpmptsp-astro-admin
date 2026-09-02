@@ -1,0 +1,186 @@
+# SPEC.md §9. `docker compose up -d` must be enough to run everything.
+#
+# Engine selection: COMPOSE_PROFILES is read from .env and set to $DB_ENGINE, so
+# exactly one database service starts. Both carry the network alias `database`,
+# which means the DSN host is literally "database" whichever engine is active and
+# nothing downstream has to branch.
+
+name: dpmptsp
+
+networks:
+  # gateway <-> web/admin only
+  edge:
+  # web/admin <-> api <-> database/redis. apps/api is on this network ONLY.
+  backend:
+
+volumes:
+  pgdata:
+  mysqldata:
+  # Uploads are written at request time by both Astro apps and read back by the
+  # public site. Separate containers mean separate filesystems, so a shared
+  # volume is required for the current code to work at all. This is a bridge:
+  # MinIO already runs on this host and is the correct destination once the Go
+  # API owns uploads.
+  uploads:
+  # Files written by the Go API's local/public disks. Swapping FILESYSTEM_DISK
+  # to s3 makes this volume unnecessary without any code change.
+  storage:
+
+services:
+  gateway:
+    build:
+      context: ./infra/gateway
+    environment:
+      # public | allowed_ips | vps_only | vpn_only
+      # Do not set `public` while the admin app still authenticates against
+      # plaintext passwords.
+      ADMIN_ACCESS: ${ADMIN_ACCESS:-allowed_ips}
+    ports:
+      # Bound to loopback only. cloudflared runs on the host network and proxies
+      # to 127.0.0.1. Publishing on 0.0.0.0 would let a direct caller forge
+      # CF-Connecting-IP and walk through the IP policy — see
+      # infra/gateway/includes/realip.conf.
+      - "127.0.0.1:8017:80"
+      - "127.0.0.1:8018:81"
+    volumes:
+      - ./infra/gateway/policy/allowed_ips.list:/etc/nginx/policy/allowed_ips.list:ro
+    depends_on:
+      - web
+      - admin
+    networks:
+      - edge
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: infra/docker/astro.Dockerfile
+      args:
+        APP: web
+    environment:
+      NODE_ENV: production
+      DB_HOST: database
+      DB_PORT: ${DB_PORT:-3306}
+      DB_USERNAME: ${DB_USERNAME:-root}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      DB_DATABASE: ${DB_DATABASE:-ladpm}
+      API_BASE_URL: http://api:8080
+      API_SERVICE_KEY: ${API_SERVICE_KEY:?API_SERVICE_KEY is required}
+    volumes:
+      - uploads:/app/apps/web/public/uploads
+    networks:
+      - edge
+      - backend
+    restart: unless-stopped
+
+  admin:
+    build:
+      context: .
+      dockerfile: infra/docker/astro.Dockerfile
+      args:
+        APP: admin
+    environment:
+      NODE_ENV: production
+      DB_HOST: database
+      DB_PORT: ${DB_PORT:-3306}
+      DB_USERNAME: ${DB_USERNAME:-root}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      DB_DATABASE: ${DB_DATABASE:-ladpm}
+      SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET is required}
+      API_BASE_URL: http://api:8080
+      API_SERVICE_KEY: ${API_SERVICE_KEY:?API_SERVICE_KEY is required}
+    volumes:
+      - uploads:/app/apps/admin/public/uploads
+    networks:
+      - edge
+      - backend
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./apps/api
+    environment:
+      DB_CONNECTION: ${DB_CONNECTION:-mysql}
+      DB_HOST: database
+      DB_PORT: ${DB_PORT:-3306}
+      DB_DATABASE: ${DB_DATABASE:-ladpm}
+      DB_USERNAME: ${DB_USERNAME:-root}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      DB_SSLMODE: ${DB_SSLMODE:-disable}
+      DATABASE_URL: ${DATABASE_URL:-}
+      REDIS_URL: redis://redis:6379/0
+      API_SERVICE_KEY: ${API_SERVICE_KEY:?API_SERVICE_KEY is required}
+      APP_ENV: ${APP_ENV:-production}
+      FILESYSTEM_DISK: ${FILESYSTEM_DISK:-local}
+      STORAGE_LOCAL_ROOT: /var/lib/dpmptsp/storage
+      STORAGE_PUBLIC_ROOT: /var/lib/dpmptsp/public
+      STORAGE_PUBLIC_URL: ${STORAGE_PUBLIC_URL:-/storage}
+      S3_ENDPOINT: ${S3_ENDPOINT:-}
+      S3_BUCKET: ${S3_BUCKET:-}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-}
+      S3_REGION: ${S3_REGION:-us-east-1}
+      S3_USE_SSL: ${S3_USE_SSL:-false}
+      S3_PUBLIC_URL: ${S3_PUBLIC_URL:-}
+    volumes:
+      - storage:/var/lib/dpmptsp
+    # No `ports:` and not on `edge`. This is the enforcement of SPEC.md §8: the
+    # API cannot be reached from the host or through the gateway, only by web
+    # and admin, which share the backend network.
+    expose:
+      - "8080"
+    depends_on:
+      - redis
+    networks:
+      - backend
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--maxmemory-policy", "allkeys-lru", "--save", ""]
+    # A dedicated instance. nextcloud-redis-1 already runs on this host but is
+    # Nextcloud's, sharing its keyspace — a FLUSHDB or a key collision here
+    # would corrupt Nextcloud's cache.
+    expose:
+      - "6379"
+    networks:
+      - backend
+    restart: unless-stopped
+
+  database-postgres:
+    profiles: ["postgres"]
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-dpmptsp}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      POSTGRES_DB: ${DB_DATABASE:-dpmptsp}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    networks:
+      backend:
+        aliases: [database]
+    restart: unless-stopped
+
+  database-mysql:
+    profiles: ["mysql"]
+    image: mysql:8.0
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_0900_ai_ci"]
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      MYSQL_DATABASE: ${DB_DATABASE:-ladpm}
+    volumes:
+      - mysqldata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
+      interval: 5s
+      timeout: 5s
+      retries: 24
+    networks:
+      backend:
+        aliases: [database]
+    restart: unless-stopped

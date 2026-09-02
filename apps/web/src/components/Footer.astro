@@ -1,0 +1,88 @@
+---
+import { MEDIA_BASE_URL } from "../lib/media";
+---
+<footer class="bg-black text-white pt-12 pb-8">
+  <div class="container mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+      
+      <!-- Logo & Deskripsi -->
+      <div>
+        <div class="flex items-center mb-6">
+          <div class="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center mr-4">
+            <img src={`${MEDIA_BASE_URL}/dpmptsp-removebg.png`} width="150px">
+          </div>
+          <div>
+            <h3 class="text-xl font-bold">DPM-PTSP</h3>
+            <p class="text-sm opacity-80">Kota Surabaya</p>
+          </div>
+        </div>
+        <p class="opacity-80 mb-6">
+          Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kota Surabaya.
+        </p>
+        <div class="flex space-x-4">
+          <a href="#" class="w-10 h-10 bg-blue-700 rounded-full flex items-center justify-center hover:bg-blue-600 transition duration-300">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="#" class="w-10 h-10 bg-blue-700 rounded-full flex items-center justify-center hover:bg-blue-600 transition duration-300">
+            <i class="fab fa-twitter"></i>
+          </a>
+          <a href="#" class="w-10 h-10 bg-blue-700 rounded-full flex items-center justify-center hover:bg-blue-600 transition duration-300">
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a href="#" class="w-10 h-10 bg-blue-700 rounded-full flex items-center justify-center hover:bg-blue-600 transition duration-300">
+            <i class="fab fa-youtube"></i>
+          </a>
+        </div>
+      </div>
+      
+      <!-- Kontak -->
+      <div>
+        <h4 class="text-lg font-bold mb-6">Kontak Kami</h4>
+        <div class="space-y-4">
+          <div class="flex items-start">
+            <i class="fas fa-map-marker-alt text-yellow-400 mr-2 mt-1"></i>
+            <p class="opacity-80">Mal Pelayanan Publik Lt.3, Jl. Tunjungan No. 1-3 Genteng, Surabaya 60275</p>
+          </div>
+          <div class="flex items-center">
+            <i class="fas fa-phone text-yellow-400 mr-2 mt-1"></i>
+            <p class="opacity-80">+623199243924</p>
+          </div>
+          <div class="flex items-center">
+            <i class="fas fa-envelope text-yellow-400 mr-2 mt-1"></i>
+            <p class="opacity-80">dpm-ptsp@surabaya.go.id</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Menu Cepat -->
+      <div>
+        <h4 class="text-lg font-bold mb-6">Menu Cepat</h4>
+        <ul class="space-y-3">
+          <li><a href="#" class="opacity-80 hover:text-yellow-400 transition duration-300">Beranda</a></li>
+          <li><a href="#" class="opacity-80 hover:text-yellow-400 transition duration-300">Tentang Kami</a></li>
+          <li><a href="#" class="opacity-80 hover:text-yellow-400 transition duration-300">Investasi</a></li>
+          <li><a href="#" class="opacity-80 hover:text-yellow-400 transition duration-300">Aplikasi</a></li>
+          <li><a href="#" class="opacity-80 hover:text-yellow-400 transition duration-300">Pelayanan</a></li>
+        </ul>
+      </div>
+      
+      <!-- Layanan -->
+      <div>
+        <h4 class="text-lg font-bold mb-6">Layanan Kami</h4>
+        <ul class="space-y-3">
+          <li><a href="#" class="opacity-80 hover:text-yellow-400 transition duration-300">Perizinan Usaha</a></li>
+          <li><a href="#" class="opacity-80 hover:text-yellow-400 transition duration-300">Konsultasi Investasi</a></li>
+          <li><a href="#" class="opacity-80 hover:text-yellow-400 transition duration-300">Data &amp; Statistik</a></li>
+          <li><a href="#" class="opacity-80 hover:text-yellow-400 transition duration-300">Pengaduan</a></li>
+          <li><a href="#" class="opacity-80 hover:text-yellow-400 transition duration-300">Regulasi</a></li>
+        </ul>
+      </div>
+
+    </div>
+    
+    <!-- Copyright -->
+    <div class="border-t border-blue-700 pt-8 text-center">
+      <p class="opacity-80">Copyright © 2022 - <span id="currentYear">2026</span> <b>DPM &amp; PTSP Kota Surabaya</b> - All Rights Reserved.</p>
+    </div>
+  </div>
+</footer>

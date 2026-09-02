@@ -1,0 +1,26 @@
+---
+// Standalone document for unauthenticated admin screens (login).
+//
+// The login page previously rendered inside the public MainLayout, which pulls
+// in the public Header. That component queries the database on every render, so
+// showing a login form opened a MySQL pool and ran two public-site queries
+// before anything appeared — and wrapped the form in the public navigation and
+// footer. It was also the only import crossing between the public and admin
+// apps, which SPEC.md §11.4 forbids.
+//
+// This does no I/O. The login page carries its own styles.
+const { title = "Login" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <title>{title} · Admin DPMPTSP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

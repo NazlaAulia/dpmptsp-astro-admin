@@ -1,0 +1,16 @@
+# Article categories.
+#
+# These ids are load-bearing: the application hardcodes them. beritalist.astro
+# filters on IN (1,8) for berita and IN (2,3) for artikel, and media/[slug].astro
+# does the same. Renumbering them silently empties those pages, which is why the
+# ids are pinned here rather than left to the sequence.
+table: category_berita
+# Columns that identify a row, so a re-run skips what is already there.
+key: [id_category]
+rows:
+  - { id_category: 1,  title: "Berita Lama",              is_active: true }
+  - { id_category: 2,  title: "Artikel Penanaman Modal",  is_active: true }
+  - { id_category: 3,  title: "Artikel Perizinan",        is_active: true }
+  - { id_category: 8,  title: "Berita Baru",              is_active: true }
+  - { id_category: 10, title: "Youtube",                  is_active: true }
+  - { id_category: 11, title: "Video",                    is_active: true }

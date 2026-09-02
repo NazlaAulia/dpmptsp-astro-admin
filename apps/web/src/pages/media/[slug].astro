@@ -1,0 +1,453 @@
+---
+import { MEDIA_BASE_URL } from "../../lib/media";
+import MainLayout from "../../layouts/MainLayout.astro";
+import { getArticlePage } from "../../lib/services/article.service";
+
+export const prerender = false;
+
+// Data access lives in src/lib/services.
+//
+// This page used to load EVERY article (`SELECT * FROM post WHERE title IS NOT
+// NULL`), slugify each one in JavaScript, and scan for a match — then load up
+// to 1000 more rows for the sidebar, and run two further queries whose results
+// it discarded. It now looks the article up by its indexed slug column.
+const page = await getArticlePage(Astro.params.slug);
+
+// A missing article is a 404. The old code threw, which Astro turns into a 500
+// — the wrong status, and it rendered a stack trace instead of a page.
+if (!page) {
+  return new Response(null, { status: 404, statusText: "Artikel tidak ditemukan" });
+}
+
+const post = page.article;
+const namaKategori = page.categoryName;
+const beritaList = page.berita;
+const artikelList = page.artikel;
+---
+
+
+ <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        /* Animasi custom */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fadeInUp {
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        /* Hover effect untuk kartu */
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* Custom shadow untuk elemen */
+        .shadow-custom {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+        
+        /* Glow effect untuk ikon */
+        .icon-glow {
+            filter: drop-shadow(0 4px 6px rgba(37, 99, 235, 0.3));
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #1d4ed8;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #1e40af;
+        }
+        
+        /* First letter styling for article */
+        .first-letter::first-letter {
+            font-size: 3.5rem;
+            font-weight: 800;
+            float: left;
+            line-height: 1;
+            margin-right: 0.5rem;
+            color: #1d4ed8;
+            padding-top: 0.5rem;
+        }
+        
+        /* Gradient backgrounds */
+        .gradient-blue {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        }
+        
+        .gradient-yellow {
+            background: linear-gradient(135deg, #fbbf24 0%, #fcd34d 100%);
+        }
+        
+        /* Line clamp for text */
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+<MainLayout title={post.title}>
+
+  <!-- HERO -->
+  <section class="relative overflow-hidden bg-gradient-to-r from-blue-800 to-blue-900 py-14">
+    <div class="container mx-auto px-4 text-center text-white">
+      <h1 class="text-3xl md:text-4xl font-bold mb-4 animate-fadeInUp">
+        Detail Media
+      </h1>
+      <p class="text-lg opacity-90 max-w-3xl mx-auto">
+        Informasi lengkap seputar kegiatan dan perkembangan terbaru DPMPTSP Surabaya
+      </p>
+      <div class="mt-6">
+        <a href="/beritalist"
+          class="inline-flex items-center bg-yellow-400 text-blue-800 font-bold px-6 py-3 rounded-lg hover:bg-yellow-300 transition">
+          <i class="fas fa-arrow-left mr-2"></i> Kembali ke Berita
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="container mx-auto px-4 py-10">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+      <!-- ARTIKEL -->
+      <article class="lg:col-span-2 bg-white rounded-2xl shadow-custom overflow-hidden animate-fadeInUp">
+
+        <!-- Header -->
+        <div class="p-6 md:p-8 border-b">
+          <div class="flex justify-between items-center mb-4">
+            <span class="bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-semibold">
+              <i class="fas fa-newspaper mr-1"></i> Berita
+            </span>
+            <span class="text-sm text-gray-500"><i class="far fa-calendar-alt mr-1"></i> {new Date(post.date).toLocaleDateString("id-ID")}</span>
+          </div>
+
+          <h1 class="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
+            {post.title}
+          </h1>
+                            
+          <div class="flex flex-wrap items-center gap-4 text-gray-600">
+              <div class="flex items-center space-x-2">
+                  <i class="fas fa-user text-blue-700"></i>
+                  <span>Admin DPMPTSP</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                  <i class="fas fa-eye text-blue-700"></i>
+                  <span>20 views</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                  <i class="fas fa-clock text-blue-700"></i>
+                  <span> 1 min read </span>
+              </div>
+          </div>
+        </div>
+
+        <!-- Gambar -->
+        {post.picture && (
+          <div class="px-6 mt-6">
+            <img
+              src={`${MEDIA_BASE_URL}/fileberita/${post.picture}`}
+              alt={post.title}
+              class="w-full h-64 md:h-96 object-cover rounded-xl hover:scale-105 transition"
+            />
+          </div>
+        )}
+
+       <div class="p-6 md:p-8 prose prose-lg max-w-none first-letter text-justify text-gray-700">
+  <div set:html={post.ref_content} />
+
+  <div class="mt-8 pt-6 border-t border-gray-100 not-prose">
+    <div class="flex items-center gap-2 flex-wrap">
+      <span class="font-semibold text-gray-700">Tags:</span>
+      <span class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">
+        #{namaKategori}
+      </span>
+    </div>
+  </div>
+</div>
+
+
+      </article>
+
+      <!-- SIDEBAR -->
+      <aside class="space-y-6">
+
+        <!-- Berita Terkait -->
+<div class="bg-white rounded-2xl shadow-custom p-6">
+  <h2 class="text-xl font-bold mb-4 border-b pb-2">
+    Media Terkait
+  </h2>
+  <input
+  type="text"
+  id="search-related"
+  placeholder="Cari judul..."
+  class="w-full mb-4 px-4 py-2 text-sm border rounded-xl
+         focus:outline-none focus:ring-2 focus:ring-blue-600"
+/>
+
+<div class="flex gap-2 mb-5 bg-slate-100 p-1 rounded-xl w-fit">
+  <button
+    class="tab-btn px-4 py-2 text-sm font-medium rounded-lg
+           bg-blue-600 text-white shadow"
+    data-category="berita"
+  >
+    Berita
+  </button>
+
+  <button
+    class="tab-btn px-4 py-2 text-sm font-medium rounded-lg
+           text-slate-600 hover:text-slate-900"
+    data-category="artikel"
+  >
+    Artikel
+  </button>
+</div>
+
+
+  <!-- LIST -->
+  <div id="related-list">
+
+  <!-- BERITA -->
+  {beritaList.map(b => (
+    <a
+      href={`/media/${slugify(b.title)}`}
+      class="related-item flex gap-4 mb-4"
+      data-type="berita"
+    >
+      <img
+        src={`${MEDIA_BASE_URL}/fileberita/${b.picture}`}
+        class="w-20 h-20 rounded-xl object-cover"
+      />
+      <div>
+        <span class="text-[11px] bg-blue-50 text-blue-700 px-2 py-1 rounded">
+          Berita
+        </span>
+        <h3 class="font-semibold text-sm line-clamp-2">
+          {b.title}
+        </h3>
+        <p class="text-xs text-slate-500">
+          {new Date(b.date).toLocaleDateString("id-ID")}
+        </p>
+      </div>
+    </a>
+  ))}
+
+  <!-- ARTIKEL -->
+  {artikelList.map(b => (
+    <a
+      href={`/media/${slugify(b.title)}`}
+      class="related-item hidden flex gap-4 mb-4"
+      data-type="artikel"
+    >
+      <img
+        src={`${MEDIA_BASE_URL}/fileberita/${b.picture}`}
+        class="w-20 h-20 rounded-xl object-cover"
+      />
+      <div>
+        <span class="text-[11px] bg-emerald-50 text-emerald-700 px-2 py-1 rounded">
+          Artikel
+        </span>
+        <h3 class="font-semibold text-sm line-clamp-2">
+          {b.title}
+        </h3>
+        <p class="text-xs text-slate-500">
+          {new Date(b.date).toLocaleDateString("id-ID")}
+        </p>
+      </div>
+    </a>
+  ))}
+
+</div>
+
+
+
+  <a href="/beritalist"
+    class="block text-center bg-blue-700 text-white py-3 rounded-lg hover:bg-blue-800 transition">
+    Lihat Semua Berita
+  </a>
+</div>
+
+
+        <!-- Quick Links -->
+        <div class="bg-gradient-to-r from-blue-700 to-blue-900 rounded-2xl shadow-custom p-6 text-white card-hover">
+            <h2 class="text-xl font-bold mb-6">Layanan Cepat</h2>
+            <div class="space-y-4">
+                <a href="/aplikasi-publik" class="flex items-center justify-between p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
+                    <span class="font-medium">Call Center Surabaya</span>
+                    <i class="fas fa-arrow-right text-yellow-300"></i>
+                </a> 
+                <a href="/aplikasi-publik" class="flex items-center justify-between p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
+                    <span class="font-medium">TAKON SOBAT</span>
+                    <i class="fas fa-arrow-right text-yellow-300"></i>
+                </a> 
+                <a href="/aplikasi-publik" class="flex items-center justify-between p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
+                    <span class="font-medium">LAPIS LUPIS</span>
+                    <i class="fas fa-arrow-right text-yellow-300"></i>
+                </a> 
+                <a href="/aplikasi-publik" class="flex items-center justify-between p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
+                    <span class="font-medium">Perizinan Online</span>
+                    <i class="fas fa-arrow-right text-yellow-300"></i>
+                </a>
+                <a href="/aplikasi-publik" class="flex items-center justify-between p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
+                    <span class="font-medium">Pengaduan Layanan</span>
+                    <i class="fas fa-arrow-right text-yellow-300"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Share -->
+        <div class="bg-white rounded-2xl shadow-custom p-6">
+          <h2 class="text-xl font-bold mb-4 border-b pb-2">
+            Bagikan Artikel
+          </h2>
+
+          <div class="grid grid-cols-2 gap-3">
+                            <a href="#" class="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 card-hover">
+                                <i class="fab fa-facebook-f text-lg mb-2"></i>
+                                <span class="text-xs font-medium">Facebook</span>
+                            </a>
+                            <a href="#" class="bg-blue-400 hover:bg-blue-500 text-white p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 card-hover">
+                                <i class="fab fa-twitter text-lg mb-2"></i>
+                                <span class="text-xs font-medium">Twitter</span>
+                            </a>
+                            <a href="#" class="bg-green-500 hover:bg-green-600 text-white p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 card-hover">
+                                <i class="fab fa-whatsapp text-lg mb-2"></i>
+                                <span class="text-xs font-medium">WhatsApp</span>
+                            </a>
+                            <a href="#" class="bg-red-500 hover:bg-red-600 text-white p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 card-hover">
+                                <i class="fas fa-envelope text-lg mb-2"></i>
+                                <span class="text-xs font-medium">Email</span>
+                            </a>
+                        </div>
+                        
+          <!-- Copy Link -->
+          <div class="mt-6 pt-4 border-t border-gray-100">
+              <div class="flex">
+                  <input type="text" id="article-link" value={`/media/${slug}`} 
+                                       readonly class="flex-grow px-3 py-2 text-sm border border-gray-300 rounded-l-lg focus:outline-none">
+                  <button id="copy-link" class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-r-lg transition-colors">
+                      <i class="fas fa-copy"></i>
+                  </button>
+              </div>
+              <p id="copy-message" class="text-xs text-green-600 mt-2 hidden">Link berhasil disalin!</p>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </section>
+<script>
+  const tabs = document.querySelectorAll(".tab-btn");
+  const items = document.querySelectorAll(".related-item");
+
+  const setActive = (type) => {
+    tabs.forEach(t => {
+      const active = t.dataset.category === type;
+      t.className =
+        "tab-btn px-4 py-2 text-sm font-medium rounded-lg transition " +
+        (active
+          ? "bg-blue-600 text-white shadow"
+          : "text-slate-600 hover:text-slate-900");
+    });
+
+    items.forEach(item => {
+      item.classList.toggle(
+        "hidden",
+        item.dataset.type !== type
+      );
+    });
+  };
+
+  setActive("berita");
+
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      setActive(tab.dataset.category);
+    });
+  });
+</script>
+<script>
+  const tabs = document.querySelectorAll(".tab-btn");
+  const items = document.querySelectorAll(".related-item");
+  const searchInput = document.getElementById("search-related");
+
+  let activeType = "berita";
+
+  function renderList() {
+    const keyword = searchInput.value.toLowerCase().trim();
+
+    items.forEach(item => {
+      const title = item.querySelector("h3")?.innerText.toLowerCase() || "";
+      const matchType = item.dataset.type === activeType;
+      const matchText = title.includes(keyword);
+
+      item.classList.toggle("hidden", !(matchType && matchText));
+    });
+  }
+
+  function setActive(type) {
+    activeType = type;
+
+    tabs.forEach(t => {
+      const active = t.dataset.category === type;
+      t.className =
+        "tab-btn px-4 py-2 text-sm font-medium rounded-lg transition " +
+        (active
+          ? "bg-blue-600 text-white shadow"
+          : "text-slate-600 hover:text-slate-900");
+    });
+
+    renderList();
+  }
+
+  // init
+  setActive("berita");
+
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      setActive(tab.dataset.category);
+    });
+  });
+
+  searchInput.addEventListener("input", renderList);
+</script>
+
+
+</MainLayout>

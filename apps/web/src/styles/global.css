@@ -1,0 +1,921 @@
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        @import url('https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,80');
+@import "tailwindcss";
+
+/* Brand colours, ported from the removed tailwind.config.cjs.
+   Tailwind v4 ignores that file, so these utilities generated no CSS.
+   Names kept camelCase so existing bg-dpmBlue / text-dpmYellow markup works. */
+@theme {
+  --color-dpmBlue: #0f4c81;
+  --color-dpmYellow: #facc15;
+
+  /* Ported from a runtime `tailwind.config = {...}` block in MainLayout.astro.
+     That block was a leftover from CDN Tailwind: under Tailwind v4 the global
+     is undefined, so it threw a ReferenceError on every page load AND the
+     utilities it declared generated no CSS — animate-pulse-slow and friends
+     were inert wherever they were used. The colours it also declared
+     (primary-*, secondary-*) are used nowhere and are not carried over. */
+  --animate-pulse-slow: pulse 3s infinite;
+  --animate-bounce-slow: bounce 2s infinite;
+  --animate-spin-slow: spin 4s linear infinite;
+}
+
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        /* ANIMASI ELEGAN DAN MODERN */
+        
+        /* 1. Animasi Gradient Flow */
+        @keyframes gradientFlow {
+          0%, 100% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+        }
+        
+        .gradient-flow {
+          background-size: 200% 200%;
+          animation: gradientFlow 8s ease infinite;
+        }
+        
+        /* 2. Fade In dengan Skala */
+        @keyframes fadeInScale {
+          from {
+            opacity: 0;
+            transform: scale(0.95) translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
+        }
+        
+        .animate-fade-in-scale {
+          animation: fadeInScale 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* 3. Slide In dari Kiri */
+        @keyframes slideInLeft {
+          from {
+            opacity: 0;
+            transform: translateX(-30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        
+        .animate-slide-in-left {
+          animation: slideInLeft 0.5s ease-out;
+        }
+        
+        /* 4. Slide In dari Kanan */
+        @keyframes slideInRight {
+          from {
+            opacity: 0;
+            transform: translateX(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        
+        .animate-slide-in-right {
+          animation: slideInRight 0.5s ease-out;
+        }
+        
+        /* 5. Floating Subtle */
+        @keyframes floatSubtle {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-8px);
+          }
+        }
+        
+        .animate-float-subtle {
+          animation: floatSubtle 6s ease-in-out infinite;
+        }
+        
+        /* 6. Pulse Soft */
+        @keyframes pulseSoft {
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.8;
+          }
+        }
+        
+        .animate-pulse-soft {
+          animation: pulseSoft 3s ease-in-out infinite;
+        }
+        
+        /* 7. Rotate Slow 3D */
+        @keyframes rotateSlow3D {
+          from {
+            transform: rotateY(0deg);
+          }
+          to {
+            transform: rotateY(360deg);
+          }
+        }
+        
+        .animate-rotate-3d {
+          animation: rotateSlow3D 20s linear infinite;
+          transform-style: preserve-3d;
+        }
+        
+        /* 8. Shimmer Effect */
+        @keyframes shimmer {
+          0% {
+            background-position: -200% center;
+          }
+          100% {
+            background-position: 200% center;
+          }
+        }
+        
+        .shimmer-effect {
+          background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.2) 50%,
+            transparent 100%
+          );
+          background-size: 200% 100%;
+          animation: shimmer 3s infinite;
+        }
+        
+        /* 9. Bounce Soft */
+        @keyframes bounceSoft {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-10px);
+          }
+        }
+        
+        .animate-bounce-soft {
+          animation: bounceSoft 2s ease-in-out infinite;
+        }
+        
+        /* 10. Card Lift Effect */
+        .card-lift {
+          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .card-lift:hover {
+          transform: translateY(-10px);
+          box-shadow: 
+            0 20px 40px rgba(0, 0, 0, 0.1),
+            0 10px 20px rgba(0, 0, 0, 0.06);
+        }
+        
+        /* 11. Wave Animation */
+        @keyframes wave {
+          0%, 100% {
+            transform: translateX(0);
+          }
+          25% {
+            transform: translateX(-5px);
+          }
+          75% {
+            transform: translateX(5px);
+          }
+        }
+        
+        .animate-wave {
+          animation: wave 2s ease-in-out infinite;
+        }
+        
+        /* 12. Text Reveal */
+        @keyframes textReveal {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+            clip-path: inset(0 0 100% 0);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+            clip-path: inset(0 0 0 0);
+          }
+        }
+        
+        .animate-text-reveal {
+          animation: textReveal 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* 13. Border Glow */
+        @keyframes borderGlow {
+          0%, 100% {
+            border-color: #1d4ed8;
+            box-shadow: 0 0 10px rgba(29, 78, 216, 0.3);
+          }
+          50% {
+            border-color: #fbbf24;
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+          }
+        }
+        
+        .animate-border-glow {
+          animation: borderGlow 3s ease-in-out infinite;
+        }
+        
+        /* 14. Scale In */
+        @keyframes scaleIn {
+          from {
+            opacity: 0;
+            transform: scale(0.9);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        
+        .animate-scale-in {
+          animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        /* 15. Ripple Effect */
+        @keyframes ripple {
+          0% {
+            transform: scale(0);
+            opacity: 1;
+          }
+          100% {
+            transform: scale(4);
+            opacity: 0;
+          }
+        }
+        
+        .ripple {
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .ripple::after {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 20px;
+          height: 20px;
+          background: rgba(255, 255, 255, 0.6);
+          opacity: 0;
+          border-radius: 100%;
+          transform: scale(1, 1) translate(-50%);
+          transform-origin: 50% 50%;
+        }
+        
+        .ripple:hover::after {
+          animation: ripple 1s ease-out;
+        }
+        
+        /* 16. Gradient Border Animation */
+        .gradient-border-animated {
+          position: relative;
+          background: linear-gradient(white, white) padding-box,
+                      linear-gradient(45deg, #1d4ed8, #fbbf24, #1d4ed8) border-box;
+          border: 3px solid transparent;
+          background-size: 200% 200%;
+          animation: gradientFlow 3s ease infinite;
+        }
+        
+        /* 17. Typing Effect */
+        @keyframes typing {
+          from {
+            width: 0;
+          }
+          to {
+            width: 100%;
+          }
+        }
+        
+        .animate-typing {
+          overflow: hidden;
+          white-space: nowrap;
+          animation: typing 3.5s steps(40, end);
+        }
+        
+        /* 18. Blur In */
+        @keyframes blurIn {
+          from {
+            opacity: 0;
+            filter: blur(10px);
+            transform: scale(1.1);
+          }
+          to {
+            opacity: 1;
+            filter: blur(0);
+            transform: scale(1);
+          }
+        }
+        
+        .animate-blur-in {
+          animation: blurIn 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* 19. Staggered Animation untuk children */
+        .stagger-children > * {
+          opacity: 0;
+          transform: translateY(20px);
+          animation: fadeInScale 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        
+        .stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
+        .stagger-children > *:nth-child(2) { animation-delay: 0.2s; }
+        .stagger-children > *:nth-child(3) { animation-delay: 0.3s; }
+        .stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
+        .stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
+        
+        /* 20. Smooth Scroll Behavior */
+        html {
+          scroll-behavior: smooth;
+        }
+        
+        /* 21. Button Hover Effect */
+        .btn-hover-effect {
+          position: relative;
+          overflow: hidden;
+          transition: all 0.3s ease;
+        }
+        
+        .btn-hover-effect::before {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 0;
+          height: 0;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 50%;
+          transform: translate(-50%, -50%);
+          transition: width 0.6s, height 0.6s;
+        }
+        
+        .btn-hover-effect:hover::before {
+          width: 300px;
+          height: 300px;
+        }
+        
+        /* 22. Fade In Up dengan Delay */
+        @keyframes fadeInUpDelay {
+          0% {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .animate-fade-up {
+          animation: fadeInUpDelay 0.8s ease-out forwards;
+          opacity: 0;
+        }
+        
+        .animate-fade-up.delay-1 { animation-delay: 0.1s; }
+        .animate-fade-up.delay-2 { animation-delay: 0.2s; }
+        .animate-fade-up.delay-3 { animation-delay: 0.3s; }
+        .animate-fade-up.delay-4 { animation-delay: 0.4s; }
+        
+        /* 23. Glass Morphism Effect */
+        .glass-effect {
+          background: rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* 24. Gradient Text Animation */
+        .gradient-text {
+          background: linear-gradient(45deg, #1d4ed8, #fbbf24, #1d4ed8);
+          background-size: 200% auto;
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+          animation: gradientFlow 3s linear infinite;
+        }
+        
+        /* 25. Morphing Border */
+        @keyframes morphBorder {
+          0%, 100% {
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+          }
+          25% {
+            border-radius: 58% 42% 75% 25% / 76% 46% 54% 24%;
+          }
+          50% {
+            border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%;
+          }
+          75% {
+            border-radius: 33% 67% 58% 42% / 63% 68% 32% 37%;
+          }
+        }
+        
+        .animate-morph-border {
+          animation: morphBorder 8s ease-in-out infinite;
+        }
+        
+        /* 26. Elastic Bounce */
+        @keyframes elasticBounce {
+          0% {
+            transform: scale(0);
+          }
+          70% {
+            transform: scale(1.1);
+          }
+          100% {
+            transform: scale(1);
+          }
+        }
+        
+        .animate-elastic-bounce {
+          animation: elasticBounce 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        /* 27. Fold Unfold */
+        @keyframes foldUnfold {
+          0% {
+            transform: rotateX(90deg);
+            opacity: 0;
+          }
+          100% {
+            transform: rotateX(0);
+            opacity: 1;
+          }
+        }
+        
+        .animate-fold-unfold {
+          animation: foldUnfold 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+          transform-origin: top;
+        }
+        
+        /* 28. Wobble Effect */
+        @keyframes wobble {
+          0%, 100% {
+            transform: translateX(0%);
+          }
+          15% {
+            transform: translateX(-5%) rotate(-5deg);
+          }
+          30% {
+            transform: translateX(4%) rotate(3deg);
+          }
+          45% {
+            transform: translateX(-3%) rotate(-3deg);
+          }
+          60% {
+            transform: translateX(2%) rotate(2deg);
+          }
+          75% {
+            transform: translateX(-1%) rotate(-1deg);
+          }
+        }
+        
+        .animate-wobble {
+          animation: wobble 1s ease-out;
+        }
+        
+        /* 29. Fade In dengan Clip Path */
+        @keyframes clipReveal {
+          from {
+            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+            opacity: 0;
+          }
+          to {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            opacity: 1;
+          }
+        }
+        
+        .animate-clip-reveal {
+          animation: clipReveal 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* 30. Hover Scale dengan Shadow */
+        .hover-scale-shadow {
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .hover-scale-shadow:hover {
+          transform: scale(1.05);
+          box-shadow: 
+            0 25px 50px -12px rgba(0, 0, 0, 0.25),
+            0 0 25px rgba(29, 78, 216, 0.1);
+        }
+        
+        /* 31. Drop In */
+        @keyframes dropIn {
+          0% {
+            opacity: 0;
+            transform: translateY(-50px) scale(0.9);
+          }
+          80% {
+            transform: translateY(10px) scale(1.02);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        
+        .animate-drop-in {
+          animation: dropIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        /* 32. Jelly Effect */
+        @keyframes jelly {
+          0%, 100% {
+            transform: scale(1, 1);
+          }
+          25% {
+            transform: scale(0.9, 1.1);
+          }
+          50% {
+            transform: scale(1.1, 0.9);
+          }
+          75% {
+            transform: scale(0.95, 1.05);
+          }
+        }
+        
+        .animate-jelly {
+          animation: jelly 0.8s ease-out;
+        }
+        
+        /* 33. Fade In dengan Rotation */
+        @keyframes fadeInRotate {
+          from {
+            opacity: 0;
+            transform: rotate(-10deg);
+          }
+          to {
+            opacity: 1;
+            transform: rotate(0);
+          }
+        }
+        
+        .animate-fade-rotate {
+          animation: fadeInRotate 0.6s ease-out;
+        }
+        
+        /* 34. Smooth Zoom */
+        @keyframes smoothZoom {
+          from {
+            opacity: 0;
+            transform: scale(0.8);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        
+        .animate-smooth-zoom {
+          animation: smoothZoom 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* 35. Loading Spinner */
+        @keyframes spinner {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+        
+        .spinner {
+          border: 3px solid rgba(29, 78, 216, 0.2);
+          border-top: 3px solid #1d4ed8;
+          border-radius: 50%;
+          animation: spinner 1s linear infinite;
+        }
+        
+        /* 36. Tilt Effect */
+        .tilt-effect {
+          transition: transform 0.3s ease;
+        }
+        
+        .tilt-effect:hover {
+          transform: rotateX(5deg) rotateY(5deg);
+        }
+        
+        /* 37. Slide Up untuk modals */
+        @keyframes slideUp {
+          from {
+            transform: translateY(100px);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+        
+        .animate-slide-up {
+          animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* 38. Text Shadow Animation */
+        @keyframes textShadow {
+          0%, 100% {
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          }
+          50% {
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 0 20px rgba(251, 191, 36, 0.3);
+          }
+        }
+        
+        .animate-text-shadow {
+          animation: textShadow 3s ease-in-out infinite;
+        }
+        
+        /* 39. Width Expand */
+        @keyframes widthExpand {
+          from {
+            width: 0;
+          }
+          to {
+            width: 100%;
+          }
+        }
+        
+        .animate-width-expand {
+          animation: widthExpand 1s ease-out forwards;
+        }
+        
+        /* 40. Gradient Shift */
+        @keyframes gradientShift {
+          0% {
+            background-position: 0% 0%;
+          }
+          50% {
+            background-position: 100% 100%;
+          }
+          100% {
+            background-position: 0% 0%;
+          }
+        }
+        
+        .animate-gradient-shift {
+          background-size: 200% 200%;
+          animation: gradientShift 4s ease infinite;
+        }
+        
+        /* Animasi custom yang sudah ada sebelumnya */
+        .animate-fadeInUp {
+          animation: fadeInUp 0.5s ease-out;
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 50%, #fbbf24 100%);
+        }
+        
+        .shadow-custom {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+        
+        .tab-nav {
+            scrollbar-width: none;
+        }
+        
+        .tab-nav::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .tab-content {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .accordion-button {
+            transition: all 0.3s ease;
+        }
+        
+        .accordion-button:not(.collapsed) {
+            background-color: #fef3c7;
+            color: #1e40af;
+            font-weight: 600;
+        }
+
+        .image-modal {
+            transition: opacity 0.3s ease;
+        }
+        
+        .zoomed-image {
+            animation: zoomIn 0.3s ease;
+        }
+        
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .zoom-container:hover img {
+            transform: scale(1.05);
+        }
+        
+        .zoom-container {
+            cursor: zoom-in;
+            transition: transform 0.3s ease;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+        
+        @keyframes float-delay-1 {
+            0%, 100% {
+                transform: translateY(0px) rotate(-6deg);
+            }
+            50% {
+                transform: translateY(-15px) rotate(-6deg);
+            }
+        }
+        
+        @keyframes float-delay-2 {
+            0%, 100% {
+                transform: translateY(0px) rotate(3deg);
+            }
+            50% {
+                transform: translateY(-18px) rotate(3deg);
+            }
+        }
+        
+        @keyframes float-delay-3 {
+            0%, 100% {
+                transform: translateY(0px) rotate(6deg);
+            }
+            50% {
+                transform: translateY(-12px) rotate(6deg);
+            }
+        }
+        
+        @keyframes float-delay-4 {
+            0%, 100% {
+                transform: translateY(0px) rotate(-3deg);
+            }
+            50% {
+                transform: translateY(-16px) rotate(-3deg);
+            }
+        }
+        
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .animate-float-delay-1 {
+            animation: float-delay-1 7s ease-in-out infinite;
+            animation-delay: 0.5s;
+        }
+        
+        .animate-float-delay-2 {
+            animation: float-delay-2 8s ease-in-out infinite;
+            animation-delay: 1s;
+        }
+        
+        .animate-float-delay-3 {
+            animation: float-delay-3 6.5s ease-in-out infinite;
+            animation-delay: 1.5s;
+        }
+        
+        .animate-float-delay-4 {
+            animation: float-delay-4 7.5s ease-in-out infinite;
+            animation-delay: 2s;
+        }
+        
+        .animate-spin-slow {
+            animation: spin 20s linear infinite;
+        }
+        
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .animate-bounce-slow {
+            animation: bounce 4s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        .animate-pulse-slow {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        .ring-offset-2 {
+            --tw-ring-offset-width: 2px;
+        }
+
+        .bg-white.p-1\.5.rounded-lg.shadow-lg {
+            transition: all 0.3s ease;
+        }
+
+        .bg-white.p-1\.5.rounded-lg.shadow-lg:hover {
+            transform: scale(1.05) rotate(var(--tw-rotate)) !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+/* investasi */
+        /* Animasi custom */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fadeInUp {
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        /* Hover effect untuk kartu */
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* Gradient background untuk hero section */
+        .hero-gradient {
+            background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 50%, #fbbf24 100%);
+        }
+        
+        /* Custom shadow untuk elemen */
+        .shadow-custom {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+        
+        /* Animasi untuk ikon */
+        .icon-pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Styling untuk select dropdown */
+        .select-custom {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%231e40af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+        }

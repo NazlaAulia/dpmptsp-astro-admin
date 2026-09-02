@@ -1,0 +1,16 @@
+# Bootstrap administrator.
+#
+# password_hash is read from the SEED_ADMIN_PASSWORD environment variable and
+# hashed with argon2id at seed time — a hash is never committed. Existing
+# credentials from the legacy `user` table are deliberately NOT migrated: they
+# were stored in plaintext and shipped alongside a hardcoded admin/admin123
+# backdoor, so every one of them should be treated as compromised.
+table: users
+# Columns that identify a row, so a re-run skips what is already there.
+key: [username]
+rows:
+  - username: "admin"
+    email: null
+    password_hash: "${SEED_ADMIN_PASSWORD}"
+    role: "admin"
+    is_active: true

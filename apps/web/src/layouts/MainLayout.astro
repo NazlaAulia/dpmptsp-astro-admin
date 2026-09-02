@@ -1,0 +1,44 @@
+---
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import "@dpmptsp/ui/styles/global.css";
+
+const {
+  title = "DPMPTSP Kota Surabaya",
+  description = "Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kota Surabaya",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="id" class="scroll-smooth">
+  <head>
+    <!-- Basic -->
+    <meta charset="utf-8" />
+    <title>{title}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- SEO -->
+    <meta name="description" content={description} />
+    <meta name="author" content="DPMPTSP Kota Surabaya" />
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#1e40af" />
+
+    <!-- Favicon (optional) -->
+    <!-- <link rel="icon" href="/favicon.ico" /> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  </head>
+
+  <body class=" bg-gray-50 text-gray-800 antialiased">
+    <!-- Header -->
+    <Header />
+
+    <!-- Content -->
+    <main class="min-h-screen">
+      <slot />
+    </main>
+
+    <!-- Footer -->
+    <Footer />
+  </body>
+</html>

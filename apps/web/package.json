@@ -1,0 +1,28 @@
+{
+  "name": "@dpmptsp/web",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "node ./dist/server/entry.mjs",
+    "start": "node ./dist/server/entry.mjs",
+    "lint": "astro check",
+    "typecheck": "astro check",
+    "test": "node --test 'tests/**/*.test.mjs'"
+  },
+  "dependencies": {
+    "@astrojs/node": "catalog:",
+    "@dpmptsp/api-client": "workspace:*",
+    "@dpmptsp/config": "workspace:*",
+    "@dpmptsp/ui": "workspace:*",
+    "@tailwindcss/vite": "catalog:",
+    "astro": "catalog:",
+    "tailwindcss": "catalog:"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.6",
+    "typescript": "catalog:"
+  }
+}

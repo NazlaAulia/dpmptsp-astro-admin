@@ -1,0 +1,8 @@
+# Homepage copy blocks, ported from the dump.
+table: beranda_dpmptsp
+# Columns that identify a row, so a re-run skips what is already there.
+key: [id]
+rows:
+  - { id: 1, tipe: "judul",    urutan: 1, konten: "Selamat Datang di DPMPTSP Kota Surabaya" }
+  - { id: 2, tipe: "paragraf", urutan: 2, konten: "Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu (DPMPTSP) Kota Surabaya merupakan lembaga yang memegang peranan dan fungsi strategis di bidang penyelenggaraan pelayanan perizinan terpadu Kota Surabaya." }
+  - { id: 3, tipe: "paragraf", urutan: 3, konten: "Kami hadir untuk memudahkan proses perizinan dan investasi di Kota Surabaya." }

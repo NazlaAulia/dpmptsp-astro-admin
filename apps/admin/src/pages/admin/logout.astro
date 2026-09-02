@@ -1,0 +1,21 @@
+---
+// Logout. POST only.
+//
+// This was a GET reached from a plain <a href>, which meant any third-party
+// page could sign an admin out with <img src="/admin/logout">, and a browser
+// prefetching links could do it by accident. State-changing requests must not
+// be reachable by navigation.
+export const prerender = false;
+
+import { clearSession } from "../../lib/session";
+
+if (Astro.request.method !== "POST") {
+  return new Response("Method Not Allowed", {
+    status: 405,
+    headers: { allow: "POST" },
+  });
+}
+
+clearSession(Astro.cookies);
+return Astro.redirect("/admin/login", 303);
+---

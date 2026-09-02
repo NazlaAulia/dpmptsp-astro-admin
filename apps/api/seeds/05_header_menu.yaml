@@ -1,0 +1,20 @@
+# Default site navigation.
+#
+# Derived from the routes this app actually serves, so a fresh installation has
+# a working header. The real menu is content and is edited in the admin panel;
+# this is only a starting point, and re-running the seeder will not overwrite
+# anything already there.
+table: header_menu
+# Columns that identify a row, so a re-run skips what is already there.
+key: [id]
+rows:
+  - { id: 1, parent_id: null, nama: "Beranda",         url: "/",                urutan: 1, is_active: true,  tombol_kontak: false }
+  - { id: 2, parent_id: null, nama: "Profil",          url: "/Tentang",         urutan: 2, is_active: true,  tombol_kontak: false }
+  - { id: 3, parent_id: null, nama: "Berita",          url: "/beritalist",      urutan: 3, is_active: true,  tombol_kontak: false }
+  - { id: 4, parent_id: null, nama: "Pelayanan",       url: "/Pelayanan",       urutan: 4, is_active: true,  tombol_kontak: false }
+  - { id: 5, parent_id: null, nama: "Investasi",       url: "/Investasi",       urutan: 5, is_active: true,  tombol_kontak: false }
+  - { id: 6, parent_id: null, nama: "PPID",            url: "/ppid",            urutan: 6, is_active: true,  tombol_kontak: false }
+  - { id: 7, parent_id: null, nama: "Aplikasi Publik", url: "/aplikasi-publik", urutan: 7, is_active: true,  tombol_kontak: false }
+  # A child, so the nested-tree path is exercised by a real installation.
+  - { id: 8, parent_id: 2,    nama: "Inovasi",         url: "/inovasi",         urutan: 1, is_active: true,  tombol_kontak: false }
+  - { id: 9, parent_id: null, nama: "Kontak",          url: "/Kontak",          urutan: 8, is_active: true,  tombol_kontak: true  }
