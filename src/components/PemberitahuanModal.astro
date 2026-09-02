@@ -1,0 +1,186 @@
+---
+import { db } from "../lib/db.js";
+
+// Ambil semua modal aktif (tanpa kolom deskripsi)
+const [allModals] = await db.query(
+  `SELECT id, judul, foto, link_url, status_aktif, tipe, urutan
+   FROM pemberitahuan
+   WHERE status_aktif = 'Y' AND tipe = 'modal'
+   ORDER BY urutan ASC`
+);
+
+let notif = null;
+if (allModals && allModals.length > 0) {
+  const randomIndex = Math.floor(Math.random() * allModals.length);
+  notif = allModals[randomIndex];
+}
+---
+
+{notif && notif.foto && (
+  <div id="pemberitahuan-modal" class="modal-container">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <button class="modal-close" aria-label="Close modal" id="close-modal">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      
+      <div class="modal-wrapper">
+        <img src={`/uploads/${notif.foto}`} alt={notif.judul} class="modal-image" />
+        
+        {(notif.judul || notif.link_url) && (
+          <div class="modal-info-card">
+            {notif.judul && <h2>{notif.judul}</h2>}
+            {notif.link_url && (
+              <a href={notif.link_url} class="modal-link" target="_blank" rel="noopener noreferrer">
+                Pelajari Lebih Lanjut →
+              </a>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+)}
+
+<style>
+  .modal-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .modal-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    cursor: pointer;
+  }
+
+  .modal-content {
+    position: relative;
+    background: transparent;
+    border-radius: 0;
+    max-width: 600px;
+    width: 95%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: none;
+    animation: slideUp 0.4s ease-out;
+    overflow: visible;
+  }
+
+  .modal-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+    z-index: 20;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .modal-close:hover {
+    background: white;
+    transform: scale(1.1);
+  }
+
+  .modal-close svg {
+    width: 20px;
+    height: 20px;
+    color: #0f172a;
+  }
+
+  .modal-image {
+    width: auto;
+    height: auto;
+    max-width: 90vw;
+    max-height: 95vh;
+    object-fit: contain;
+    display: block;
+    border-radius: 8px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.25);
+  }
+
+  @media (max-width: 768px) {
+    .modal-content {
+      max-width: 95vw;
+      max-height: 95vh;
+    }
+    .modal-image {
+      max-width: 95vw;
+      max-height: 95vh;
+    }
+    .modal-close {
+      width: 36px;
+      height: 36px;
+      top: 12px;
+      right: 12px;
+    }
+    .modal-close svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+</style>
+
+<script>
+  const modal = document.getElementById("pemberitahuan-modal");
+  const closeBtn = document.getElementById("close-modal");
+  const overlay = document.querySelector(".modal-overlay");
+
+  if (modal && closeBtn && overlay) {
+    closeBtn.addEventListener("click", () => {
+      modal.style.display = "none";
+    });
+
+    overlay.addEventListener("click", () => {
+      modal.style.display = "none";
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && modal.style.display !== "none") {
+        modal.style.display = "none";
+      }
+    });
+  }
+</script>
