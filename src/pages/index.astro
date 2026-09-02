@@ -2,7 +2,8 @@
 import MainLayout from "../layouts/MainLayout.astro";
 import { db } from "../lib/db.js";
 import { slugify } from "../utils/slugify";
-  import Pdf from "../components/Pdf.astro";
+import Pdf from "../components/Pdf.astro";
+import PemberitahuanModal from "../components/PemberitahuanModal.astro";
 
 /* =========================================================
    HERO SLIDER
@@ -216,118 +217,6 @@ try {
 ---
 
 <MainLayout title="DPMPTSP Kota Surabaya">
-{notifikasi.length > 0 && (
-  <div
-    id="notificationModal"
-    class="notification-overlay"
-    aria-hidden="false"
-  >
-
-    <div class="notification-modal">
-
-      <!-- CLOSE -->
-      <button
-        type="button"
-        id="notificationClose"
-        class="notification-close"
-        aria-label="Tutup"
-      >
-        <i class="fas fa-xmark"></i>
-      </button>
-
-
-      <!-- SLIDER -->
-      <div
-        id="notificationSlider"
-        class="notification-slider"
-      >
-
-        {notifikasi.map((item, index) => (
-
-          <div
-            class={`notification-slide ${index === 0 ? "active" : ""}`}
-            data-index={index}
-          >
-
-            <div class="notification-card">
-
-              {item.gambar ? (
-
-                <div class="notification-image-wrapper">
-
-                  <img
-                    src={item.gambar}
-                    alt={item.judul || "Informasi"}
-                    class="notification-image"
-                  />
-
-                  <!-- KETERANGAN DI ATAS GAMBAR -->
-                  {(item.judul || item.isi) && (
-                    <div class="notification-image-caption">
-
-                      {item.judul && (
-                        <h2>{item.judul}</h2>
-                      )}
-
-                      {item.isi && (
-                        <p>{item.isi}</p>
-                      )}
-
-                    </div>
-                  )}
-
-                </div>
-
-              ) : (
-
-                <div class="notification-hero-fallback">
-                  <i class={`fas ${item.icon || "fa-bell"}`}></i>
-                </div>
-
-              )}
-
-            </div>
-
-          </div>
-
-        ))}
-
-      </div>
-
-
-      <!-- PANAH -->
-      {notifikasi.length > 1 && (
-        <>
-
-         
-
-
-          <!-- DOT -->
-          <div
-            id="notificationDots"
-            class="notification-dots"
-          >
-
-            {notifikasi.map((_, index) => (
-
-              <button
-                type="button"
-                class={`notification-dot ${index === 0 ? "active" : ""}`}
-                data-slide={index}
-                aria-label={`Slide ${index + 1}`}
-              ></button>
-
-            ))}
-
-          </div>
-
-        </>
-      )}
-
-    </div>
-
-  </div>
-)}
 <!-- =========================================================
      1. HERO CAROUSEL
 ========================================================== -->
@@ -8702,4 +8591,7 @@ document.addEventListener("click", function (e) {
 
 });
 </script>
+
+<!-- Pemberitahuan Modal Component -->
+<PemberitahuanModal />
 </MainLayout>
