@@ -71,7 +71,7 @@ func New(cfg *config.Config, log *slog.Logger, db *gorm.DB, dia dialect.Dialect,
 
 	// Content lists. All read-only and rarely written; the admin panel still
 	// writes them directly until those pages are ported too.
-	content := &handlers.Content{Repo: database.NewContentRepo(db), Log: log}
+	content := &handlers.Content{Repo: cache.NewCachedContentRepo(database.NewContentRepo(db), rdb), Log: log}
 	mux.HandleFunc("GET /v1/regulations", content.Regulations)
 	mux.HandleFunc("GET /v1/public-apps", content.PublicApps)
 	mux.HandleFunc("GET /v1/videos", content.Videos)
@@ -103,10 +103,12 @@ func New(cfg *config.Config, log *slog.Logger, db *gorm.DB, dia dialect.Dialect,
 	mux.Handle("DELETE /v1/about-contents/{id}", guard(http.HandlerFunc(content.DeleteAboutContent)))
 
 	// Composite page payloads.
+	// PageRepo takes the concrete repository; the cache wraps PageRepo itself.
 	contentRepo := database.NewContentRepo(db)
 	pages := &handlers.Pages{
-		Repo: database.NewPageRepo(db, contentRepo, database.NewArticleRepo(db, dia)),
-		Log:  log,
+		Repo: cache.NewCachedPageRepo(
+			database.NewPageRepo(db, contentRepo, database.NewArticleRepo(db, dia)), rdb),
+		Log: log,
 	}
 	mux.HandleFunc("GET /v1/home", pages.Home)
 	mux.HandleFunc("GET /v1/about", pages.About)
@@ -114,7 +116,7 @@ func New(cfg *config.Config, log *slog.Logger, db *gorm.DB, dia dialect.Dialect,
 	mux.HandleFunc("GET /v1/info-sections/{sectionId}", pages.InfoSection)
 	mux.HandleFunc("GET /v1/gallery/photos", pages.Photos)
 
-	announcements := &handlers.Announcements{Repo: database.NewAnnouncementRepo(db), Log: log}
+	announcements := &handlers.Announcements{Repo: cache.NewCachedAnnouncementRepo(database.NewAnnouncementRepo(db), rdb), Log: log}
 	mux.HandleFunc("GET /v1/announcements", announcements.List)
 	mux.HandleFunc("GET /v1/announcements/{id}", announcements.ByID)
 	mux.Handle("POST /v1/announcements", guard(http.HandlerFunc(announcements.Create)))
