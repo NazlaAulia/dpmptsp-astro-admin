@@ -21,6 +21,17 @@ server {
 
     client_max_body_size 25m;
 
+    # Files uploaded through the API. The API writes them into a shared volume
+    # and never serves them itself, so nginx hands them out directly — the
+    # browser still never reaches apps/api.
+    location /storage/ {
+        alias /srv/storage/public/;
+        access_log off;
+        expires 30d;
+        add_header Cache-Control "public";
+        try_files $uri =404;
+    }
+
     location / {
         proxy_pass http://web_upstream;
         include /etc/nginx/includes/proxy.conf;
@@ -32,6 +43,17 @@ server {
     server_name _;
 
     client_max_body_size 25m;
+
+    # Files uploaded through the API. The API writes them into a shared volume
+    # and never serves them itself, so nginx hands them out directly — the
+    # browser still never reaches apps/api.
+    location /storage/ {
+        alias /srv/storage/public/;
+        access_log off;
+        expires 30d;
+        add_header Cache-Control "public";
+        try_files $uri =404;
+    }
 
     # Per-path access policy.
     #

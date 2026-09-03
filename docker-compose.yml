@@ -36,6 +36,9 @@ services:
       - "127.0.0.1:8018:81"
     volumes:
       - ./infra/gateway/policy/allowed_ips.list:/etc/nginx/policy/allowed_ips.list:ro
+      # Read-only: the gateway serves what the API wrote, and must never be able
+      # to change it.
+      - storage:/srv/storage:ro
     depends_on:
       - web
       - admin

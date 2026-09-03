@@ -45,15 +45,22 @@ func (h *Uploads) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	disk, err := h.Files.Disk(r.FormValue("disk"))
-	if err != nil {
-		render.BadRequest(w, err.Error())
-		return
-	}
-
 	visibility := storage.Private
 	if r.FormValue("visibility") == "public" {
 		visibility = storage.Public
+	}
+
+	// A public upload defaults to the public disk. The default disk is `local`,
+	// which has no base URL, so without this a caller asking for a public file
+	// got back a key that nothing can serve.
+	name := r.FormValue("disk")
+	if name == "" && visibility == storage.Public {
+		name = "public"
+	}
+	disk, err := h.Files.Disk(name)
+	if err != nil {
+		render.BadRequest(w, err.Error())
+		return
 	}
 
 	obj, err := storage.Upload(r.Context(), disk, file, header.Filename, storage.UploadRules{

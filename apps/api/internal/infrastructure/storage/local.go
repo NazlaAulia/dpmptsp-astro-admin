@@ -34,10 +34,22 @@ func NewLocalDisk(name, root, baseURL string) (*LocalDisk, error) {
 
 func (d *LocalDisk) Name() string { return d.name }
 
+// dirMode decides whether other users may traverse into the disk.
+//
+// A disk with a base URL is served by another process — nginx, from a shared
+// volume — which runs as a different user. Private directories made its files
+// unreachable no matter what mode the files themselves carried.
+func (d *LocalDisk) dirMode() os.FileMode {
+	if d.baseURL != "" {
+		return 0o755
+	}
+	return 0o750
+}
+
 // EnsureWritable creates the disk root and verifies it is writable. FromEnv
 // calls this for the selected disk only.
 func (d *LocalDisk) EnsureWritable() error {
-	if err := os.MkdirAll(d.root, 0o750); err != nil {
+	if err := os.MkdirAll(d.root, d.dirMode()); err != nil {
 		return fmt.Errorf("storage %s: create root %s: %w", d.name, d.root, err)
 	}
 	probe, err := os.CreateTemp(d.root, ".writable-*")
@@ -62,13 +74,30 @@ func (d *LocalDisk) resolve(key string) (string, error) {
 	return full, nil
 }
 
+// chmodTree fixes the mode of directories created for key, up to the root.
+func (d *LocalDisk) chmodTree(dir string) error {
+	mode := d.dirMode()
+	for len(dir) > len(d.root) {
+		if err := os.Chmod(dir, mode); err != nil && !os.IsNotExist(err) {
+			return fmt.Errorf("storage %s: chmod dir: %w", d.name, err)
+		}
+		dir = filepath.Dir(dir)
+	}
+	return os.Chmod(d.root, mode)
+}
+
 func (d *LocalDisk) Put(_ context.Context, key string, r io.Reader, opts PutOptions) (*Object, error) {
 	full, err := d.resolve(key)
 	if err != nil {
 		return nil, err
 	}
-	if err := os.MkdirAll(filepath.Dir(full), 0o750); err != nil {
+	if err := os.MkdirAll(filepath.Dir(full), d.dirMode()); err != nil {
 		return nil, fmt.Errorf("storage %s: mkdir: %w", d.name, err)
+	}
+	// MkdirAll applies the umask, so a public disk's directories are chmod'd
+	// back to the intended mode.
+	if err := d.chmodTree(filepath.Dir(full)); err != nil {
+		return nil, err
 	}
 
 	// Write to a temporary file and rename into place, so a partial write is

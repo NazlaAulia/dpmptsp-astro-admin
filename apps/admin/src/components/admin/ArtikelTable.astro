@@ -436,7 +436,7 @@ img.thumbnail {
 
             <td>
       <img 
-    src={`/uploads/${item.picture}`}
+    src={uploadUrl(item.picture)}
     class="thumbnail"
     alt={item.title}
     onerror={`this.onerror=null; this.src='${MEDIA_BASE_URL}/fileberita/${item.picture}'`}

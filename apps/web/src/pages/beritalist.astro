@@ -104,7 +104,7 @@ const getLink = (p, t = type) => {
             
             <div class="relative aspect-[4/3] overflow-hidden">
             <img 
-  src={item.picture ? `/uploads/${item.picture}` : '/no-image.jpg'}
+  src={uploadUrl(item.picture, '/no-image.jpg')}
   alt={item.title}
   loading="lazy"
   class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"

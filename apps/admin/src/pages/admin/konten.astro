@@ -1,4 +1,5 @@
 ---
+import { uploadUrl } from "../../lib/media";
 
 import AdminShell from "../../components/admin/AdminShell.astro";
 import { verifyCsrf } from "../../lib/session";
@@ -140,7 +141,7 @@ const csrf = Astro.locals.csrfToken ?? "";
                   {item.Foto_Konten ? (
                     <div class="file-box">
                       <img 
-                        src={`/uploads/konten/${item.Foto_Konten}`} 
+                        src={uploadUrl(item.Foto_Konten, "", "konten")} 
                         alt={item.Nama_Konten}
                         class="thumb-img"
                         onerror="this.style.display='none'"

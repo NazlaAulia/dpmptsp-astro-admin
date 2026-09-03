@@ -1,4 +1,5 @@
 ---
+import { uploadUrl } from "../../lib/media";
 
 import AdminShell from "../../components/admin/AdminShell.astro";
 import { deleteInnovation, findInnovations } from "../../lib/services/content.service";
@@ -63,13 +64,7 @@ const daftarInovasi = await findInnovations();
               <td class="text-center">
   {item.gambar ? (
     <img 
-      src={
-        // Jika sudah berupa URL online (diawali http/https)
-        item.gambar.startsWith('http') 
-          ? item.gambar
-          // Jika cuma nama file (misal: 'mpp.png'), arahkan ke folder public/ uploads
-          : `/uploads/${item.gambar}` 
-      } 
+      src={uploadUrl(item.gambar)}
       alt={item.nama} 
       class="table-img-preview"
       onerror="this.onerror=null; this.src='https://via.placeholder.com/40?text=No+Img';"

@@ -1,4 +1,5 @@
 ---
+import { uploadUrl } from "../../lib/media";
 export const prerender = false;
 
 import AdminShell from "../../components/admin/AdminShell.astro";
@@ -44,7 +45,7 @@ const csrf = Astro.locals.csrfToken ?? "";
             </td>
             <td>
               {item.foto && (
-                <img src={`/uploads/${item.foto}`} alt={item.judul} class="thumb-img" />
+                <img src={uploadUrl(item.foto)} alt={item.judul} class="thumb-img" />
               )}
               {!item.foto && <span class="text-muted">-</span>}
             </td>

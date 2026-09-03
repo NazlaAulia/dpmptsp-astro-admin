@@ -1,4 +1,5 @@
 ---
+import { uploadUrl } from "../lib/media";
 import MainLayout from "../layouts/MainLayout.astro";
 import { getAnnouncements } from "../lib/services/content.service";
 
@@ -33,7 +34,7 @@ const semuaPemberitahuan = await getAnnouncements("notif");
                 <td>{item.id}</td>
                 <td>
                   {item.foto && (
-                    <img src={`/uploads/${item.foto}`} alt={item.judul} class="table-img" />
+                    <img src={uploadUrl(item.foto)} alt={item.judul} class="table-img" />
                   )}
                   {!item.foto && <span class="no-image">Tanpa Gambar</span>}
                 </td>

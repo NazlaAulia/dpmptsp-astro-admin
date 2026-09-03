@@ -1,4 +1,5 @@
 ---
+import { uploadUrl } from "../lib/media";
 import MainLayout from "../layouts/MainLayout.astro";
 import { getPhotoPage } from "../lib/services/content.service";
 
@@ -67,7 +68,7 @@ const getLink = (p) => {
             <!-- IMAGE -->
             <div class="relative aspect-[4/3] overflow-hidden">
               <img
-                src={item.image_path ? `/uploads/${item.image_path}` : '/no-image.jpg'}
+                src={uploadUrl(item.image_path, '/no-image.jpg')}
                 alt={item.alt_text || item.title}
                 loading="lazy"
                 class="w-full h-full object-cover group-hover:scale-110 transition duration-700"
