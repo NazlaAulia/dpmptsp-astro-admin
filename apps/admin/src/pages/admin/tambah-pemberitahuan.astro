@@ -1,10 +1,9 @@
 ---
 export const prerender = false;
 
-import fs from "node:fs/promises";
-import path from "node:path";
 import AdminShell from "../../components/admin/AdminShell.astro";
 import { createAnnouncement } from "../../lib/services/announcement.service";
+import { hasFile, uploadFile } from "../../lib/repositories/upload.repository";
 import { verifyCsrf } from "../../lib/session";
 
 let error = "";
@@ -16,20 +15,18 @@ if (Astro.request.method === "POST") {
     return new Response("Invalid CSRF token.", { status: 403 });
   }
 
-  // Images are still written to public/uploads. They move to the API's storage
-  // layer with the rest of the upload handling.
   let foto = "";
   const file = data.get("foto");
-  if (file && typeof file !== "string" && file.size > 0) {
-    const ext = (file.name.split(".").pop() ?? "bin").toLowerCase().replace(/[^a-z0-9]/g, "");
-    const filename = `pemberitahuan_${Date.now()}.${ext}`;
-    const uploadDir = path.join(process.cwd(), "public/uploads");
-    await fs.mkdir(uploadDir, { recursive: true });
-    await fs.writeFile(path.join(uploadDir, filename), Buffer.from(await file.arrayBuffer()));
-    foto = filename;
+  if (hasFile(file)) {
+    const uploaded = await uploadFile(file, "pemberitahuan");
+    if (!uploaded.ok) {
+      error = uploaded.message;
+    } else {
+      foto = uploaded.key;
+    }
   }
 
-  const res = await createAnnouncement({
+  const res = error ? { ok: false as const, error } : await createAnnouncement({
     judul: String(data.get("judul") ?? ""),
     deskripsi: String(data.get("deskripsi") ?? ""),
     foto,

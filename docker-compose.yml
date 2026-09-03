@@ -14,12 +14,6 @@ networks:
 volumes:
   pgdata:
   mysqldata:
-  # Uploads are written at request time by both Astro apps and read back by the
-  # public site. Separate containers mean separate filesystems, so a shared
-  # volume is required for the current code to work at all. This is a bridge:
-  # MinIO already runs on this host and is the correct destination once the Go
-  # API owns uploads.
-  uploads:
   # Files written by the Go API's local/public disks. Swapping FILESYSTEM_DISK
   # to s3 makes this volume unnecessary without any code change.
   storage:
@@ -57,15 +51,8 @@ services:
         APP: web
     environment:
       NODE_ENV: production
-      DB_HOST: database
-      DB_PORT: ${DB_PORT:-3306}
-      DB_USERNAME: ${DB_USERNAME:-root}
-      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
-      DB_DATABASE: ${DB_DATABASE:-ladpm}
       API_BASE_URL: http://api:8080
       API_SERVICE_KEY: ${API_SERVICE_KEY:?API_SERVICE_KEY is required}
-    volumes:
-      - uploads:/app/apps/web/public/uploads
     networks:
       - edge
       - backend
@@ -79,16 +66,9 @@ services:
         APP: admin
     environment:
       NODE_ENV: production
-      DB_HOST: database
-      DB_PORT: ${DB_PORT:-3306}
-      DB_USERNAME: ${DB_USERNAME:-root}
-      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
-      DB_DATABASE: ${DB_DATABASE:-ladpm}
       SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET is required}
       API_BASE_URL: http://api:8080
       API_SERVICE_KEY: ${API_SERVICE_KEY:?API_SERVICE_KEY is required}
-    volumes:
-      - uploads:/app/apps/admin/public/uploads
     networks:
       - edge
       - backend
