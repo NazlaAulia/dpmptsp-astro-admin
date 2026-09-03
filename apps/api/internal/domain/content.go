@@ -72,6 +72,30 @@ type PPIDItem struct {
 	Urutan     int
 }
 
+// Innovation is an inovasi_layanan row.
+type Innovation struct {
+	ID            int64
+	Slug          string
+	Nama          string
+	Singkatan     string
+	Kategori      string
+	Deskripsi     string
+	RancangBangun string
+	Tujuan        string
+	Manfaat       string
+	Hasil         string
+	TahunUsulan   int
+	Tahapan       string
+	Jenis         string
+	Gambar        string
+	URLLayanan    string
+	URLLabel      string
+	Icon          string
+	Warna         string
+	Urutan        int
+	IsActive      bool
+}
+
 type ContentRepository interface {
 	Regulations(ctx context.Context) ([]Regulation, error)
 	PublicApps(ctx context.Context) ([]PublicApp, error)
@@ -79,4 +103,26 @@ type ContentRepository interface {
 	PerformanceDocs(ctx context.Context) ([]PerformanceDoc, error)
 	ServiceLocations(ctx context.Context) ([]ServiceLocation, error)
 	PPID(ctx context.Context) ([]PPIDCategory, error)
+
+	Innovations(ctx context.Context) ([]Innovation, error)
+	Innovation(ctx context.Context, id int64) (*Innovation, error)
+	CreateInnovation(ctx context.Context, v *Innovation) error
+	UpdateInnovation(ctx context.Context, v *Innovation) error
+	DeleteInnovation(ctx context.Context, id int64) error
+
+	PerformanceDoc(ctx context.Context, id int64) (*PerformanceDoc, error)
+	CreatePerformanceDoc(ctx context.Context, v *PerformanceDoc) error
+	UpdatePerformanceDoc(ctx context.Context, v *PerformanceDoc) error
+	DeletePerformanceDoc(ctx context.Context, id int64) error
+
+	ServiceLocation(ctx context.Context, id int64) (*ServiceLocation, error)
+	CreateServiceLocation(ctx context.Context, v *ServiceLocation) error
+	UpdateServiceLocation(ctx context.Context, v *ServiceLocation) error
+	DeleteServiceLocation(ctx context.Context, id int64) error
+
+	AboutContents(ctx context.Context) ([]AboutContent, error)
+	AboutContentByID(ctx context.Context, id int64) (*AboutContent, error)
+	CreateAboutContent(ctx context.Context, v *AboutContent) error
+	UpdateAboutContent(ctx context.Context, v *AboutContent) error
+	DeleteAboutContent(ctx context.Context, id int64) error
 }

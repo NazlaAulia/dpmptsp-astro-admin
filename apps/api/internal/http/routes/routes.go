@@ -69,6 +69,29 @@ func New(cfg *config.Config, log *slog.Logger, db *gorm.DB, dia dialect.Dialect,
 	mux.HandleFunc("GET /v1/service-locations", content.ServiceLocations)
 	mux.HandleFunc("GET /v1/ppid", content.PPID)
 
+	// Admin writes.
+	mux.HandleFunc("GET /v1/innovations", content.Innovations)
+	mux.HandleFunc("GET /v1/innovations/{id}", content.Innovation)
+	mux.HandleFunc("POST /v1/innovations", content.CreateInnovation)
+	mux.HandleFunc("PUT /v1/innovations/{id}", content.UpdateInnovation)
+	mux.HandleFunc("DELETE /v1/innovations/{id}", content.DeleteInnovation)
+
+	mux.HandleFunc("GET /v1/performance-docs/{id}", content.PerformanceDoc)
+	mux.HandleFunc("POST /v1/performance-docs", content.CreatePerformanceDoc)
+	mux.HandleFunc("PUT /v1/performance-docs/{id}", content.UpdatePerformanceDoc)
+	mux.HandleFunc("DELETE /v1/performance-docs/{id}", content.DeletePerformanceDoc)
+
+	mux.HandleFunc("GET /v1/service-locations/{id}", content.ServiceLocation)
+	mux.HandleFunc("POST /v1/service-locations", content.CreateServiceLocation)
+	mux.HandleFunc("PUT /v1/service-locations/{id}", content.UpdateServiceLocation)
+	mux.HandleFunc("DELETE /v1/service-locations/{id}", content.DeleteServiceLocation)
+
+	mux.HandleFunc("GET /v1/about-contents", content.AboutContents)
+	mux.HandleFunc("GET /v1/about-contents/{id}", content.AboutContent)
+	mux.HandleFunc("POST /v1/about-contents", content.CreateAboutContent)
+	mux.HandleFunc("PUT /v1/about-contents/{id}", content.UpdateAboutContent)
+	mux.HandleFunc("DELETE /v1/about-contents/{id}", content.DeleteAboutContent)
+
 	// Composite page payloads.
 	contentRepo := database.NewContentRepo(db)
 	pages := &handlers.Pages{

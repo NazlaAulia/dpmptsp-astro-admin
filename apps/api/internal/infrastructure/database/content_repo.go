@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"gorm.io/gorm"
@@ -213,4 +214,249 @@ func (r *ContentRepo) PPID(ctx context.Context) ([]domain.PPIDCategory, error) {
 		})
 	}
 	return out, nil
+}
+
+// --- innovations ---------------------------------------------------------
+
+type innovationModel struct {
+	ID            int64  `gorm:"column:id;primaryKey"`
+	Slug          string `gorm:"column:slug"`
+	Nama          string `gorm:"column:nama"`
+	Singkatan     string `gorm:"column:singkatan"`
+	Kategori      string `gorm:"column:kategori"`
+	Deskripsi     string `gorm:"column:deskripsi"`
+	RancangBangun string `gorm:"column:rancang_bangun"`
+	Tujuan        string `gorm:"column:tujuan"`
+	Manfaat       string `gorm:"column:manfaat"`
+	Hasil         string `gorm:"column:hasil"`
+	TahunUsulan   int    `gorm:"column:tahun_usulan"`
+	Tahapan       string `gorm:"column:tahapan"`
+	Jenis         string `gorm:"column:jenis"`
+	Gambar        string `gorm:"column:gambar"`
+	URLLayanan    string `gorm:"column:url_layanan"`
+	URLLabel      string `gorm:"column:url_label"`
+	Icon          string `gorm:"column:icon"`
+	Warna         string `gorm:"column:warna"`
+	Urutan        int    `gorm:"column:urutan"`
+	IsActive      bool   `gorm:"column:is_active"`
+}
+
+func (innovationModel) TableName() string { return "inovasi_layanan" }
+
+func (m innovationModel) toDomain() domain.Innovation {
+	return domain.Innovation{
+		ID: m.ID, Slug: m.Slug, Nama: m.Nama, Singkatan: m.Singkatan,
+		Kategori: m.Kategori, Deskripsi: m.Deskripsi, RancangBangun: m.RancangBangun,
+		Tujuan: m.Tujuan, Manfaat: m.Manfaat, Hasil: m.Hasil,
+		TahunUsulan: m.TahunUsulan, Tahapan: m.Tahapan, Jenis: m.Jenis,
+		Gambar: m.Gambar, URLLayanan: m.URLLayanan, URLLabel: m.URLLabel,
+		Icon: m.Icon, Warna: m.Warna, Urutan: m.Urutan, IsActive: m.IsActive,
+	}
+}
+
+func innovationFromDomain(v *domain.Innovation) innovationModel {
+	return innovationModel{
+		ID: v.ID, Slug: v.Slug, Nama: v.Nama, Singkatan: v.Singkatan,
+		Kategori: v.Kategori, Deskripsi: v.Deskripsi, RancangBangun: v.RancangBangun,
+		Tujuan: v.Tujuan, Manfaat: v.Manfaat, Hasil: v.Hasil,
+		TahunUsulan: v.TahunUsulan, Tahapan: v.Tahapan, Jenis: v.Jenis,
+		Gambar: v.Gambar, URLLayanan: v.URLLayanan, URLLabel: v.URLLabel,
+		Icon: v.Icon, Warna: v.Warna, Urutan: v.Urutan, IsActive: v.IsActive,
+	}
+}
+
+func (r *ContentRepo) Innovations(ctx context.Context) ([]domain.Innovation, error) {
+	rows, err := listActive[innovationModel](ctx, r.db, "urutan ASC, id DESC", "")
+	if err != nil {
+		return nil, err
+	}
+	out := make([]domain.Innovation, 0, len(rows))
+	for _, m := range rows {
+		out = append(out, m.toDomain())
+	}
+	return out, nil
+}
+
+func (r *ContentRepo) Innovation(ctx context.Context, id int64) (*domain.Innovation, error) {
+	var m innovationModel
+	if err := first(ctx, r.db, &m, id); err != nil {
+		return nil, err
+	}
+	v := m.toDomain()
+	return &v, nil
+}
+
+func (r *ContentRepo) CreateInnovation(ctx context.Context, v *domain.Innovation) error {
+	m := innovationFromDomain(v)
+	if err := r.db.WithContext(ctx).Create(&m).Error; err != nil {
+		return fmt.Errorf("create innovation: %w", err)
+	}
+	v.ID = m.ID
+	return nil
+}
+
+func (r *ContentRepo) UpdateInnovation(ctx context.Context, v *domain.Innovation) error {
+	return update(ctx, r.db, &innovationModel{}, v.ID, innovationFromDomain(v))
+}
+
+func (r *ContentRepo) DeleteInnovation(ctx context.Context, id int64) error {
+	return remove(ctx, r.db, &innovationModel{}, id)
+}
+
+// --- performance docs ----------------------------------------------------
+
+func (r *ContentRepo) PerformanceDoc(ctx context.Context, id int64) (*domain.PerformanceDoc, error) {
+	var m performanceDocModel
+	if err := first(ctx, r.db, &m, id); err != nil {
+		return nil, err
+	}
+	return &domain.PerformanceDoc{ID: m.ID, TWOption: m.TWOption, FilePath: m.FilePath}, nil
+}
+
+func (r *ContentRepo) CreatePerformanceDoc(ctx context.Context, v *domain.PerformanceDoc) error {
+	m := performanceDocModel{TWOption: v.TWOption, FilePath: v.FilePath}
+	if err := r.db.WithContext(ctx).Create(&m).Error; err != nil {
+		return fmt.Errorf("create performance doc: %w", err)
+	}
+	v.ID = m.ID
+	return nil
+}
+
+func (r *ContentRepo) UpdatePerformanceDoc(ctx context.Context, v *domain.PerformanceDoc) error {
+	return update(ctx, r.db, &performanceDocModel{}, v.ID,
+		performanceDocModel{TWOption: v.TWOption, FilePath: v.FilePath})
+}
+
+func (r *ContentRepo) DeletePerformanceDoc(ctx context.Context, id int64) error {
+	return remove(ctx, r.db, &performanceDocModel{}, id)
+}
+
+// --- service locations ---------------------------------------------------
+
+func (r *ContentRepo) ServiceLocation(ctx context.Context, id int64) (*domain.ServiceLocation, error) {
+	var m serviceLocationModel
+	if err := first(ctx, r.db, &m, id); err != nil {
+		return nil, err
+	}
+	return &domain.ServiceLocation{
+		ID: m.ID, Judul: m.Judul, Deskripsi: m.Deskripsi, Gambar: m.Gambar,
+		AltText: m.AltText, Lokasi: m.Lokasi, Alamat: m.Alamat, Warna: m.Warna,
+	}, nil
+}
+
+func serviceLocationFromDomain(v *domain.ServiceLocation) serviceLocationModel {
+	return serviceLocationModel{
+		ID: v.ID, Judul: v.Judul, Deskripsi: v.Deskripsi, Gambar: v.Gambar,
+		AltText: v.AltText, Lokasi: v.Lokasi, Alamat: v.Alamat, Warna: v.Warna,
+	}
+}
+
+func (r *ContentRepo) CreateServiceLocation(ctx context.Context, v *domain.ServiceLocation) error {
+	m := serviceLocationFromDomain(v)
+	if err := r.db.WithContext(ctx).Create(&m).Error; err != nil {
+		return fmt.Errorf("create service location: %w", err)
+	}
+	v.ID = m.ID
+	return nil
+}
+
+func (r *ContentRepo) UpdateServiceLocation(ctx context.Context, v *domain.ServiceLocation) error {
+	return update(ctx, r.db, &serviceLocationModel{}, v.ID, serviceLocationFromDomain(v))
+}
+
+func (r *ContentRepo) DeleteServiceLocation(ctx context.Context, id int64) error {
+	return remove(ctx, r.db, &serviceLocationModel{}, id)
+}
+
+// --- about contents ------------------------------------------------------
+
+// aboutContentModel is declared in page_repo.go.
+
+func (m aboutContentModel) toDomain() domain.AboutContent {
+	return domain.AboutContent{
+		ID: m.ID, Nama: m.Nama, Isi: m.Isi, Foto: m.Foto,
+		Judul: m.Judul, Keterangan: m.Keterangan, Tags: m.Tags,
+	}
+}
+
+func aboutContentFromDomain(v *domain.AboutContent) aboutContentModel {
+	return aboutContentModel{
+		ID: v.ID, Nama: v.Nama, Isi: v.Isi, Foto: v.Foto,
+		Judul: v.Judul, Keterangan: v.Keterangan, Tags: v.Tags,
+	}
+}
+
+func (r *ContentRepo) AboutContents(ctx context.Context) ([]domain.AboutContent, error) {
+	rows, err := listActive[aboutContentModel](ctx, r.db, "id DESC", "")
+	if err != nil {
+		return nil, err
+	}
+	out := make([]domain.AboutContent, 0, len(rows))
+	for _, m := range rows {
+		out = append(out, m.toDomain())
+	}
+	return out, nil
+}
+
+func (r *ContentRepo) AboutContentByID(ctx context.Context, id int64) (*domain.AboutContent, error) {
+	var m aboutContentModel
+	if err := first(ctx, r.db, &m, id); err != nil {
+		return nil, err
+	}
+	v := m.toDomain()
+	return &v, nil
+}
+
+func (r *ContentRepo) CreateAboutContent(ctx context.Context, v *domain.AboutContent) error {
+	m := aboutContentFromDomain(v)
+	if err := r.db.WithContext(ctx).Create(&m).Error; err != nil {
+		return fmt.Errorf("create about content: %w", err)
+	}
+	v.ID = m.ID
+	return nil
+}
+
+func (r *ContentRepo) UpdateAboutContent(ctx context.Context, v *domain.AboutContent) error {
+	return update(ctx, r.db, &aboutContentModel{}, v.ID, aboutContentFromDomain(v))
+}
+
+func (r *ContentRepo) DeleteAboutContent(ctx context.Context, id int64) error {
+	return remove(ctx, r.db, &aboutContentModel{}, id)
+}
+
+// --- shared CRUD helpers -------------------------------------------------
+
+// first loads one row by id, translating a missing row into domain.ErrNotFound.
+func first(ctx context.Context, db *gorm.DB, dest any, id int64) error {
+	err := db.WithContext(ctx).Where("id = ?", id).First(dest).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return domain.ErrNotFound
+	}
+	if err != nil {
+		return fmt.Errorf("find by id: %w", err)
+	}
+	return nil
+}
+
+// update writes non-zero fields and reports a missing row as ErrNotFound.
+func update(ctx context.Context, db *gorm.DB, model any, id int64, values any) error {
+	res := db.WithContext(ctx).Model(model).Where("id = ?", id).Updates(values)
+	if res.Error != nil {
+		return fmt.Errorf("update: %w", res.Error)
+	}
+	if res.RowsAffected == 0 {
+		return domain.ErrNotFound
+	}
+	return nil
+}
+
+func remove(ctx context.Context, db *gorm.DB, model any, id int64) error {
+	res := db.WithContext(ctx).Where("id = ?", id).Delete(model)
+	if res.Error != nil {
+		return fmt.Errorf("delete: %w", res.Error)
+	}
+	if res.RowsAffected == 0 {
+		return domain.ErrNotFound
+	}
+	return nil
 }
