@@ -1,6 +1,7 @@
 ---
 
 import AdminShell from "../../components/admin/AdminShell.astro";
+import { verifyCsrf } from "../../lib/session";
 import { createAboutContent, hasFile, uploadFile } from "../../lib/services/content.service";
 
 export const prerender = false;
@@ -9,6 +10,10 @@ let errorMessage = "";
 
 if (Astro.request.method === "POST") {
   const formData = await Astro.request.formData();
+
+  if (!verifyCsrf(Astro.locals.session, formData.get("_csrf"))) {
+    return new Response("Invalid CSRF token.", { status: 403 });
+  }
 
   const namaKonten = formData.get("nama_konten")?.toString().trim() ?? "";
   const judulKonten = formData.get("judul_konten")?.toString().trim() ?? "";
@@ -43,6 +48,8 @@ if (Astro.request.method === "POST") {
     }
   }
 }
+
+const csrf = Astro.locals.csrfToken ?? "";
 ---
 
 <AdminShell
@@ -82,6 +89,7 @@ if (Astro.request.method === "POST") {
 
       <!-- PENTING: Tambahkan method="POST" dan enctype untuk upload file -->
       <form method="POST" enctype="multipart/form-data">
+  <input type="hidden" name="_csrf" value={csrf} />
 
         <!-- NAMA KONTEN -->
         <div class="form-group">

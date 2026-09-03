@@ -1,6 +1,7 @@
 ---
 
 import AdminShell from "../../components/admin/AdminShell.astro";
+import { verifyCsrf } from "../../lib/session";
 import { createPerformanceDoc, hasFile, uploadFile } from "../../lib/services/content.service";
 
 export const prerender = false;
@@ -9,6 +10,10 @@ let error = "";
 
 if (Astro.request.method === "POST") {
   const formData = await Astro.request.formData();
+
+  if (!verifyCsrf(Astro.locals.session, formData.get("_csrf"))) {
+    return new Response("Invalid CSRF token.", { status: 403 });
+  }
   const judul = formData.get("judul")?.toString() ?? "";
   const file = formData.get("file");
 
@@ -27,6 +32,8 @@ if (Astro.request.method === "POST") {
     }
   }
 }
+
+const csrf = Astro.locals.csrfToken ?? "";
 ---
 
 <AdminShell 
@@ -42,6 +49,7 @@ subtitle="Tambahkan dokumen kinerja investasi baru."
 
 
 <form method="POST" enctype="multipart/form-data">
+  <input type="hidden" name="_csrf" value={csrf} />
 
 
 <div class="form-group">

@@ -92,7 +92,7 @@ onclick={`openDeleteModal(${item.id})`}
 <!-- BAGIAN PAGINATION TAMBAHAN -->
 <div class="pagination-container">
 <div class="pagination-info">
-Showing {totalData === 0 ? 0 : offset + 1} to {Math.min(offset + limit, totalData)} of {totalData} entries
+Showing {showingStart} to {showingEnd} of {totalData} entries
 </div>
 
 <div class="pagination-buttons">

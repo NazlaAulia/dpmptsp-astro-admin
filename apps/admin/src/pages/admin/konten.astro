@@ -1,6 +1,7 @@
 ---
 
 import AdminShell from "../../components/admin/AdminShell.astro";
+import { verifyCsrf } from "../../lib/session";
 import { deleteAboutContent, getKontenList } from "../../lib/services/content.service";
 
 export const prerender = false;
@@ -8,6 +9,10 @@ Astro.response.headers.set("Cache-Control", "no-store");
 
 if (Astro.request.method === "POST") {
   const data = await Astro.request.formData();
+
+  if (!verifyCsrf(Astro.locals.session, data.get("_csrf"))) {
+    return new Response("Invalid CSRF token.", { status: 403 });
+  }
   const deleteId = data.get("deleteId");
   const editId = data.get("editId");
 
@@ -27,6 +32,8 @@ const items = [
   { title: "Dokumen publik", value: "14", icon: "document" },
   { title: "Berita hari ini", value: "2", icon: "news" },
 ];
+
+const csrf = Astro.locals.csrfToken ?? "";
 ---
 
 <AdminShell
@@ -222,6 +229,7 @@ const items = [
     <p>Apakah Anda yakin ingin menghapus data konten ini?</p>
     
     <form method="POST" class="modal-actions">
+  <input type="hidden" name="_csrf" value={csrf} />
       <input type="hidden" name="deleteId" id="modalDeleteInput" />
       <button type="button" id="cancelDelete" class="modal-btn modal-btn-cancel">Batal</button>
       <button type="submit" class="modal-btn modal-btn-delete">Hapus</button>
@@ -241,6 +249,7 @@ const items = [
     <p>Apakah Anda yakin ingin mengedit data konten ini?</p>
     
     <form method="POST" class="modal-actions">
+  <input type="hidden" name="_csrf" value={csrf} />
       <input type="hidden" name="editId" id="modalEditInput" />
       <button type="button" id="cancelEdit" class="modal-btn modal-btn-cancel">Batal</button>
       <button type="submit" class="modal-btn modal-btn-edit">Ya, Edit</button>

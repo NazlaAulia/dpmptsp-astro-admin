@@ -22,7 +22,7 @@ export type LegacyKonten = {
 
 function toLegacy(c: AboutContent): LegacyKonten {
   return {
-    Id_Konten: c.id,
+    Id_Konten: c.id ?? 0,
     Nama_Konten: c.nama ?? "",
     Isi_Konten: c.isi ?? "",
     Foto_Konten: c.foto ?? "",

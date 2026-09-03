@@ -5,7 +5,7 @@ export const prerender = false;
 import Navbar from "../../components/admin/Navbar.astro";
 import Sidebar from "../../components/admin/Sidebar.astro";
 import AdminDocument from "../../layouts/AdminDocument.astro";
-import { getArticle, updateArticle } from "../../lib/services/article.service";
+import { getArtikelLegacy, updateArticle } from "../../lib/services/article.service";
 import { verifyCsrf } from "../../lib/session";
 
 const id = Number(Astro.url.searchParams.get("id"));
@@ -13,7 +13,7 @@ if (!Number.isInteger(id) || id <= 0) {
   return Astro.redirect("/admin/artikel");
 }
 
-const artikel = await getArticle(id);
+const artikel = await getArtikelLegacy(id);
 if (!artikel) {
   return Astro.redirect("/admin/artikel");
 }
@@ -32,7 +32,7 @@ if (Astro.request.method === "POST") {
     category_id: Number(formData.get("category")),
     content: formData.get("content")?.toString() ?? "",
     is_active: (formData.get("active")?.toString() ?? "Y") === "Y",
-    picture: artikel.picture ?? "",
+    picture: artikel.picture,
   });
 
   if (result.ok) {

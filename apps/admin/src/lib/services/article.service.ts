@@ -50,3 +50,45 @@ function message(res: { status: number; error: string }): string {
   if (res.status === 422) return res.error;
   return "Terjadi kesalahan pada server.";
 }
+
+import type { Article } from "@dpmptsp/api-client";
+
+/**
+ * The article screens render the legacy `post` column names. Mapping here keeps
+ * the change to data access alone rather than also rewriting markup.
+ */
+export type LegacyArtikel = {
+  id_post: number;
+  id_category: number;
+  kategori: string;
+  title: string;
+  content: string;
+  picture: string;
+  date: string;
+  active: "Y" | "N";
+};
+
+export function toLegacyArtikel(a: Article): LegacyArtikel {
+  return {
+    id_post: a.id,
+    id_category: a.category_id,
+    kategori: a.category ?? "",
+    title: a.title,
+    content: a.content ?? a.excerpt ?? "",
+    picture: a.picture ?? "",
+    date: a.published_at,
+    // The templates compare against "Y"/"N"; the API carries a boolean.
+    active: a.is_active ? "Y" : "N",
+  };
+}
+
+/** One page of articles in the shape the table renders. */
+export async function listArtikelLegacy(rawPage: unknown, perPage: number = DEFAULT_PER_PAGE) {
+  const page = await listArticles(rawPage, perPage);
+  return { ...page, items: page.items.map(toLegacyArtikel) };
+}
+
+export async function getArtikelLegacy(id: number): Promise<LegacyArtikel | null> {
+  const a = await getArticle(id);
+  return a ? toLegacyArtikel(a) : null;
+}

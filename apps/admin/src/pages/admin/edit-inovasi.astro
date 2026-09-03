@@ -1,6 +1,7 @@
 ---
 
 import AdminShell from "../../components/admin/AdminShell.astro";
+import { verifyCsrf } from "../../lib/session";
 import { findInnovation, hasFile, updateInnovation, uploadFile } from "../../lib/services/content.service";
 
 export const prerender = false;
@@ -20,6 +21,10 @@ let errorMessage = "";
 
 if (Astro.request.method === "POST") {
   const formData = await Astro.request.formData();
+
+  if (!verifyCsrf(Astro.locals.session, formData.get("_csrf"))) {
+    return new Response("Invalid CSRF token.", { status: 403 });
+  }
 
   // Keep the existing image unless a new one was supplied.
   let gambar = dataInovasi.gambar ?? "";
@@ -48,6 +53,8 @@ if (Astro.request.method === "POST") {
     errorMessage = result.message;
   }
 }
+
+const csrf = Astro.locals.csrfToken ?? "";
 ---
 
 <AdminShell title="" subtitle="" showHeader={false}>
@@ -59,6 +66,7 @@ if (Astro.request.method === "POST") {
 
   <div class="card-form-container">
     <form method="POST" enctype="multipart/form-data">
+  <input type="hidden" name="_csrf" value={csrf} />
       <div class="form-grid">
         <!-- Kolom Kiri -->
         <div class="form-column">
@@ -103,7 +111,7 @@ if (Astro.request.method === "POST") {
           <div class="form-group">
             <label for="foto">Ganti Foto Inovasi</label>
             <div class="file-info-box">
-              <span class="file-name">File aktif: <b>{dataInovasi.gambar || dataInovasi.foto || '-'}</b></span>
+              <span class="file-name">File aktif: <b>{dataInovasi.gambar || '-'}</b></span>
               <input type="file" id="foto" name="foto" accept="image/*" />
             </div>
           </div>

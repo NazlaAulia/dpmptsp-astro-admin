@@ -1,6 +1,7 @@
 ---
 
 import AdminShell from "../../components/admin/AdminShell.astro";
+import { verifyCsrf } from "../../lib/session";
 import { createInnovation, hasFile, uploadFile } from "../../lib/services/content.service";
 
 export const prerender = false;
@@ -9,6 +10,10 @@ let errorMessage = "";
 
 if (Astro.request.method === "POST") {
   const formData = await Astro.request.formData();
+
+  if (!verifyCsrf(Astro.locals.session, formData.get("_csrf"))) {
+    return new Response("Invalid CSRF token.", { status: 403 });
+  }
 
   const nama = formData.get("nama")?.toString() || "";
   const slug = nama.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
@@ -50,6 +55,8 @@ if (Astro.request.method === "POST") {
     errorMessage = result.message;
   }
 }
+
+const csrf = Astro.locals.csrfToken ?? "";
 ---
 
 <AdminShell title="" subtitle="" showHeader={false}>
@@ -63,6 +70,7 @@ if (Astro.request.method === "POST") {
   <div class="card-form-container">
     {/* Form action mengarah ke halaman ini sendiri biar ditangkap blok handler atas */}
     <form method="POST" enctype="multipart/form-data">
+  <input type="hidden" name="_csrf" value={csrf} />
       
       <div class="form-row">
         <div class="form-group flex-1">

@@ -28,7 +28,7 @@ const csrf = Astro.locals.csrfToken ?? "";
         </tr>
       </thead>
       <tbody>
-        {semuaPemberitahuan.map((item) => (
+        {pemberitahuan.map((item) => (
           <tr>
             <td>{item.id}</td>
             <td class="judul-cell">{item.judul}</td>
@@ -65,7 +65,7 @@ const csrf = Astro.locals.csrfToken ?? "";
     </div>
 
     <div class="pagination-footer">
-      <span class="page-info">Total: {semuaPemberitahuan.length} pemberitahuan</span>
+      <span class="page-info">Total: {pemberitahuan.length} pemberitahuan</span>
     </div>
   </div>
 

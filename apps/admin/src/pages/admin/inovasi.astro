@@ -61,14 +61,14 @@ const daftarInovasi = await findInnovations();
                 </td>
                 <td>{item.singkatan || '-'}</td>
               <td class="text-center">
-  {(item.gambar || item.foto) ? (
+  {item.gambar ? (
     <img 
       src={
         // Jika sudah berupa URL online (diawali http/https)
-        (item.gambar || item.foto).startsWith('http') 
-          ? (item.gambar || item.foto)
+        item.gambar.startsWith('http') 
+          ? item.gambar
           // Jika cuma nama file (misal: 'mpp.png'), arahkan ke folder public/ uploads
-          : `/uploads/${item.gambar || item.foto}` 
+          : `/uploads/${item.gambar}` 
       } 
       alt={item.nama} 
       class="table-img-preview"

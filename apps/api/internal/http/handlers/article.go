@@ -34,6 +34,7 @@ type articleDTO struct {
 	Excerpt     string    `json:"excerpt,omitempty"`
 	Picture     string    `json:"picture,omitempty"`
 	PublishedAt time.Time `json:"published_at"`
+	IsActive    bool      `json:"is_active"`
 	IsHeadline  bool      `json:"is_headline"`
 	Hits        int64     `json:"hits"`
 }
@@ -42,7 +43,7 @@ func toDTO(a domain.Article, withContent bool) articleDTO {
 	d := articleDTO{
 		ID: a.ID, CategoryID: a.CategoryID, Slug: a.Slug, Title: a.Title,
 		Picture: a.Picture, PublishedAt: a.PublishedAt,
-		IsHeadline: a.IsHeadline, Hits: a.Hits,
+		IsActive: a.IsActive, IsHeadline: a.IsHeadline, Hits: a.Hits,
 	}
 	if a.Category != nil {
 		d.Category = a.Category.Title

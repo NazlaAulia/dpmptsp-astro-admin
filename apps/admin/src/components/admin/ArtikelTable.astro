@@ -2,12 +2,12 @@
 import { MEDIA_BASE_URL } from "../../lib/media";
 export const prerender = false;
 
-import { listArticles } from "../../lib/services/article.service";
+import { listArtikelLegacy } from "../../lib/services/article.service";
 
 // CSRF token for the delete form. Set by src/middleware.ts.
 const csrf = Astro.locals.csrfToken ?? "";
 
-const page = await listArticles(
+const page = await listArtikelLegacy(
   Number(new URL(Astro.request.url).searchParams.get("page") ?? "1")
 );
 

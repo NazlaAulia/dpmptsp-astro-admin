@@ -595,7 +595,7 @@ components:
 
     Article:
       type: object
-      required: [id, category_id, slug, title, published_at, is_headline, hits]
+      required: [id, category_id, slug, title, published_at, is_active, is_headline, hits]
       properties:
         id: { type: integer, format: int64 }
         category_id: { type: integer, format: int64 }
@@ -618,6 +618,7 @@ components:
           description: Tag-stripped summary. Present on list responses instead of content.
         picture: { type: string }
         published_at: { type: string, format: date-time }
+        is_active: { type: boolean }
         is_headline: { type: boolean }
         hits: { type: integer, format: int64 }
 

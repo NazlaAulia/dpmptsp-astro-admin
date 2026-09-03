@@ -1192,6 +1192,7 @@ export interface components {
             picture?: string;
             /** Format: date-time */
             published_at: string;
+            is_active: boolean;
             is_headline: boolean;
             /** Format: int64 */
             hits: number;

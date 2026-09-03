@@ -1,6 +1,7 @@
 ---
 
 import AdminShell from "../../components/admin/AdminShell.astro";
+import { verifyCsrf } from "../../lib/session";
 import { getKonten, hasFile, updateAboutContent, uploadFile } from "../../lib/services/content.service";
 
 export const prerender = false;
@@ -19,6 +20,10 @@ let errorMessage = "";
 
 if (Astro.request.method === "POST") {
   const formData = await Astro.request.formData();
+
+  if (!verifyCsrf(Astro.locals.session, formData.get("_csrf"))) {
+    return new Response("Invalid CSRF token.", { status: 403 });
+  }
 
   // Keep the existing photo unless a new one was supplied.
   let foto = kontenItem.Foto_Konten;
@@ -42,6 +47,8 @@ if (Astro.request.method === "POST") {
     errorMessage = result.message;
   }
 }
+
+const csrf = Astro.locals.csrfToken ?? "";
 ---
 
 <AdminShell
@@ -63,6 +70,7 @@ if (Astro.request.method === "POST") {
     {errorMessage && <div class="alert error">{errorMessage}</div>}
 
     <form method="POST" enctype="multipart/form-data" class="styled-form" id="editForm">
+  <input type="hidden" name="_csrf" value={csrf} />
       <div class="form-row">
         <div class="form-group">
           <label for="Nama_Konten">Nama Konten</label>
