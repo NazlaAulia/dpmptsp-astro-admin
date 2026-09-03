@@ -382,6 +382,52 @@ paths:
                   data: { type: array, items: { $ref: "#/components/schemas/Photo" } }
                   meta: { $ref: "#/components/schemas/PageMeta" }
 
+  /v1/contact-messages:
+    post:
+      tags: [contact]
+      summary: Submit a message from the public contact form
+      description: |
+        Unauthenticated by design — the form is public. Submissions are rate
+        limited per client address, which is read from X-Forwarded-For.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ContactMessageInput" }
+      responses:
+        "201":
+          description: stored
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { data: { $ref: "#/components/schemas/ContactTicket" } }
+        "422": { $ref: "#/components/responses/ValidationFailed" }
+        "429":
+          description: too many submissions from this address
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /v1/contact-messages/track:
+    get:
+      tags: [contact]
+      summary: Look a message up by its ticket code
+      description: |
+        The ticket code is the only credential, so the response carries status
+        only — never the reporter's own email or phone number.
+      parameters:
+        - { name: tiket, in: query, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: the message status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { data: { $ref: "#/components/schemas/ContactStatus" } }
+        "404": { $ref: "#/components/responses/NotFound" }
+
   /v1/announcements:
     get:
       tags: [announcements]
@@ -592,6 +638,54 @@ components:
         checks:
           type: object
           additionalProperties: { type: string }
+
+    ContactMessageInput:
+      type: object
+      required: [nama, pesan]
+      properties:
+        nama: { type: string }
+        telepon: { type: string }
+        email: { type: string }
+        kategori: { type: string }
+        subjek: { type: string }
+        pesan: { type: string }
+        website:
+          type: string
+          description: Honeypot. Always empty for a real submission.
+
+    ContactTicket:
+      type: object
+      required: [tiket, status]
+      properties:
+        tiket:
+          type: string
+          description: |
+            Random, not sequential — it is the only credential for reading the
+            message back, so a counter would let anyone enumerate other
+            people's complaints.
+        status: { type: string }
+        created_at: { type: string, format: date-time }
+
+    ContactStatus:
+      type: object
+      required: [tiket, status, tanggal]
+      properties:
+        tiket: { type: string }
+        status: { type: string, enum: [baru, diproses, selesai, ditolak] }
+        nama: { type: string }
+        telepon:
+          type: string
+          description: |
+            Masked. Email is not returned at all — the ticket code travels in a
+            query string, so it is not a strong enough credential to hand back
+            working contact details.
+        kategori: { type: string }
+        subjek: { type: string }
+        pesan: { type: string }
+        catatan: { type: string, description: "Reply or note from the handling officer." }
+        tanggal: { type: string, format: date-time }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
 
     Article:
       type: object

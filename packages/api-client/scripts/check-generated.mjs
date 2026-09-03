@@ -6,14 +6,19 @@
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const committed = "src/generated/schema.d.ts";
+// Resolved from this file, not the shell's directory, so the check works from
+// the repository root as well as from the package.
+const pkg = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const spec = resolve(pkg, "../../apps/api/openapi.yaml");
+const committed = join(pkg, "src/generated/schema.d.ts");
 const tmp = mkdtempSync(join(tmpdir(), "apiclient-"));
 const fresh = join(tmp, "schema.d.ts");
 
 try {
-  execFileSync("npx", ["openapi-typescript", "../../apps/api/openapi.yaml", "-o", fresh], {
+  execFileSync("npx", ["openapi-typescript", spec, "-o", fresh], {
     stdio: ["ignore", "ignore", "inherit"],
   });
 } catch {

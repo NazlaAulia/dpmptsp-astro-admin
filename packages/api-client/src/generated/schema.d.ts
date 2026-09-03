@@ -802,6 +802,107 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/contact-messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Submit a message from the public contact form
+         * @description Unauthenticated by design — the form is public. Submissions are rate
+         *     limited per client address, which is read from X-Forwarded-For.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ContactMessageInput"];
+                };
+            };
+            responses: {
+                /** @description stored */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data?: components["schemas"]["ContactTicket"];
+                        };
+                    };
+                };
+                422: components["responses"]["ValidationFailed"];
+                /** @description too many submissions from this address */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/contact-messages/track": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Look a message up by its ticket code
+         * @description The ticket code is the only credential, so the response carries status
+         *     only — never the reporter's own email or phone number.
+         */
+        get: {
+            parameters: {
+                query: {
+                    tiket: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description the message status */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data?: components["schemas"]["ContactStatus"];
+                        };
+                    };
+                };
+                404: components["responses"]["NotFound"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/announcements": {
         parameters: {
             query?: never;
@@ -1166,6 +1267,50 @@ export interface components {
             checks?: {
                 [key: string]: string;
             };
+        };
+        ContactMessageInput: {
+            nama: string;
+            telepon?: string;
+            email?: string;
+            kategori?: string;
+            subjek?: string;
+            pesan: string;
+            /** @description Honeypot. Always empty for a real submission. */
+            website?: string;
+        };
+        ContactTicket: {
+            /**
+             * @description Random, not sequential — it is the only credential for reading the
+             *     message back, so a counter would let anyone enumerate other
+             *     people's complaints.
+             */
+            tiket: string;
+            status: string;
+            /** Format: date-time */
+            created_at?: string;
+        };
+        ContactStatus: {
+            tiket: string;
+            /** @enum {string} */
+            status: "baru" | "diproses" | "selesai" | "ditolak";
+            nama?: string;
+            /**
+             * @description Masked. Email is not returned at all — the ticket code travels in a
+             *     query string, so it is not a strong enough credential to hand back
+             *     working contact details.
+             */
+            telepon?: string;
+            kategori?: string;
+            subjek?: string;
+            pesan?: string;
+            /** @description Reply or note from the handling officer. */
+            catatan?: string;
+            /** Format: date-time */
+            tanggal: string;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
         };
         Article: {
             /** Format: int64 */

@@ -63,6 +63,15 @@ func New(cfg *config.Config, log *slog.Logger, db *gorm.DB, dia dialect.Dialect,
 	mux.HandleFunc("GET /v1/auth/session", auth.Current)
 	mux.HandleFunc("DELETE /v1/auth/session", auth.Logout)
 
+	// Public contact form. Submission is unauthenticated by design, so it is
+	// rate limited per address in the service.
+	contact := &handlers.Contact{
+		Service: application.NewContactService(database.NewContactRepo(db)),
+		Log:     log,
+	}
+	mux.HandleFunc("POST /v1/contact-messages", contact.Create)
+	mux.HandleFunc("GET /v1/contact-messages/track", contact.Track)
+
 	uploads := &handlers.Uploads{Files: files, Log: log}
 	mux.Handle("POST /v1/uploads", guard(http.HandlerFunc(uploads.Create)))
 

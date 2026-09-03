@@ -36,6 +36,9 @@ export type ServiceStandard = Schemas["ServiceStandard"];
 export type InfoSection = Schemas["InfoSection"];
 export type Photo = Schemas["Photo"];
 export type Announcement = Schemas["Announcement"];
+export type ContactMessageInput = Schemas["ContactMessageInput"];
+export type ContactTicket = Schemas["ContactTicket"];
+export type ContactStatus = Schemas["ContactStatus"];
 export type AnnouncementInput = Schemas["AnnouncementInput"];
 
 export type ListArticlesQuery = {
@@ -318,26 +321,38 @@ export const api = {
   },
 
   createAnnouncement(body: AnnouncementInput, sessionId?: string) {
-    return request<Announcement>("/v1/announcements", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    return send<Announcement>("POST", "/v1/announcements", body, sessionId);
   },
 
   updateAnnouncement(id: number, body: AnnouncementInput, sessionId?: string) {
-    return request<Announcement>(`/v1/announcements/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    return send<Announcement>("PUT", `/v1/announcements/${id}`, body, sessionId);
   },
 
   deleteAnnouncement(id: number, sessionId?: string) {
-    return request<null>(`/v1/announcements/${id}`, { method: "DELETE" });
+    return send<null>("DELETE", `/v1/announcements/${id}`, undefined, sessionId);
   },
 
   photos(page = 1, perPage = 8) {
     return request<Photo[]>(`/v1/gallery/photos?page=${page}&per_page=${perPage}`);
+  },
+
+  /**
+   * Submit the public contact form. The caller's address is forwarded so the
+   * API can rate limit on it; without it every submission looks like it came
+   * from Astro.
+   */
+  submitContact(body: ContactMessageInput, clientIp?: string) {
+    return request<ContactTicket>("/v1/contact-messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(clientIp ? { "X-Forwarded-For": clientIp } : {}),
+      },
+      body: JSON.stringify(body),
+    });
+  },
+
+  trackContact(tiket: string) {
+    return request<ContactStatus>(`/v1/contact-messages/track?tiket=${encodeURIComponent(tiket)}`);
   },
 };
