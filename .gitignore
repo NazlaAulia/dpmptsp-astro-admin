@@ -34,6 +34,9 @@ graphify-out/
 
 # database dumps — never commit production data
 *.sql
+# ...but the migrations ARE the schema. Without this the blanket rule above
+# silently swallows them and the source of truth never reaches the repository.
+!apps/api/migrations/**/*.sql
 
 # gateway access list is environment-specific
 infra/gateway/policy/allowed_ips.list
