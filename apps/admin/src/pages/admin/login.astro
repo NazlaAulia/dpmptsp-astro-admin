@@ -11,12 +11,7 @@ if (Astro.request.method === "GET" && readSession(Astro.cookies)) {
   return Astro.redirect("/admin/dashboard");
 }
 
-/**
- * Only ever redirect to a same-origin, relative path. Without this check the
- * ?next= parameter is an open redirect: an attacker links to
- * /admin/login?next=https://evil.example and the victim lands there after a
- * genuine login, trusting the destination because the flow began on our site.
- */
+/** Accepts only a same-origin relative path, to avoid an open redirect. */
 function safeNext(value: unknown): string {
   if (typeof value !== "string") return "/admin/dashboard";
   if (!value.startsWith("/") || value.startsWith("//")) return "/admin/dashboard";

@@ -4,7 +4,6 @@ import MainLayout from "../layouts/MainLayout.astro";
 import "@dpmptsp/ui/styles/global.css";
 import { getPerformanceDocs } from "../lib/services/content.service";
 
-// Data access lives in src/lib/services.
 const twdata = await getPerformanceDocs();
 ---
 

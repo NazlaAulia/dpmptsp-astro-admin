@@ -1,9 +1,4 @@
 // Shapes for site-wide chrome: branding and the header menu tree.
-//
-// Models describe data, nothing else — no fetching, no SQL, no framework
-// imports. They are the contract the repository fills and the service returns,
-// which is what lets the repository swap from SQL to the Go API without pages
-// noticing.
 
 export type SiteSettings = {
   nama: string;

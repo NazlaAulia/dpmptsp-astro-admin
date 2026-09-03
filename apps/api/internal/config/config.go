@@ -11,9 +11,8 @@ import (
 	"time"
 )
 
-// Engine is the SQL dialect the API talks to. SPEC.md targets Postgres, but the
-// engine is configurable so MySQL stays a supported target (CLAUDE.md rule 4 /
-// SPEC.md §4 amendment).
+// Engine is the SQL dialect the API talks to. Postgres is the deployment
+// target; MySQL is supported and verified.
 type Engine string
 
 const (
@@ -33,15 +32,12 @@ type Config struct {
 // Engine reports the configured SQL dialect.
 func (c *Config) Engine() Engine { return c.DB.Connection }
 
-// Load reads configuration from the environment.
-//
-// It returns every problem it finds at once. Fixing configuration one error per
-// restart is miserable when a stack has just been stood up.
+// Load reads configuration from the environment and reports every problem at
+// once rather than failing on the first.
 func Load() (*Config, error) {
 	var problems []string
 
-	// DB_CONNECTION is Laravel's name; DB_ENGINE is accepted as an alias so an
-	// existing environment file keeps working.
+	// DB_ENGINE is accepted as an alias for DB_CONNECTION.
 	connection := envOr("DB_CONNECTION", envOr("DB_ENGINE", string(Postgres)))
 
 	cfg := &Config{
@@ -70,8 +66,7 @@ func Load() (*Config, error) {
 			"DB_CONNECTION must be %q or %q, got %q", Postgres, MySQL, cfg.DB.Connection))
 	}
 
-	// Default the port to whatever the chosen engine listens on, so a correct
-	// configuration does not have to restate the obvious.
+	// Default the port to the engine's standard port.
 	defaultPort := 5432
 	if cfg.DB.Connection == MySQL {
 		defaultPort = 3306
@@ -87,8 +82,7 @@ func Load() (*Config, error) {
 		cfg.DB.Port = defaultPort
 	}
 
-	// DATABASE_URL, if given, replaces the discrete settings entirely, so they
-	// are only required in its absence.
+	// DATABASE_URL replaces the discrete settings when set.
 	if cfg.DB.URL == "" {
 		if cfg.DB.Name == "" {
 			problems = append(problems, "DB_DATABASE is required (or set DATABASE_URL)")
@@ -99,8 +93,8 @@ func Load() (*Config, error) {
 	}
 
 	// The API is only ever called by the Astro apps over the internal docker
-	// network (SPEC.md §8), and that call is authenticated with a shared key
-	// (SPEC.md §7). Refusing to start without one keeps "temporarily unset"
+	// network, and that call is authenticated with a shared key
+	//. Refusing to start without one keeps "temporarily unset"
 	// from silently becoming "unauthenticated in production".
 	if cfg.ServiceKey == "" {
 		problems = append(problems, "API_SERVICE_KEY is required")

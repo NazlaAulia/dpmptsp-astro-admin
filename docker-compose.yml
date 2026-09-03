@@ -1,9 +1,7 @@
-# SPEC.md §9. `docker compose up -d` must be enough to run everything.
+# `docker compose up -d` runs the whole stack.
 #
-# Engine selection: COMPOSE_PROFILES is read from .env and set to $DB_ENGINE, so
-# exactly one database service starts. Both carry the network alias `database`,
-# which means the DSN host is literally "database" whichever engine is active and
-# nothing downstream has to branch.
+# COMPOSE_PROFILES selects exactly one database service. Both carry the network
+# alias `database`, so the DSN host is the same for either engine.
 
 name: dpmptsp
 
@@ -124,8 +122,7 @@ services:
       S3_PUBLIC_URL: ${S3_PUBLIC_URL:-}
     volumes:
       - storage:/var/lib/dpmptsp
-    # No `ports:` and not on `edge`. This is the enforcement of SPEC.md §8: the
-    # API cannot be reached from the host or through the gateway, only by web
+    # No published ports and not on `edge`: the API is reachable only from web
     # and admin, which share the backend network.
     expose:
       - "8080"

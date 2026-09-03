@@ -3,17 +3,17 @@ import { MEDIA_BASE_URL } from "../lib/media";
 import MainLayout from "../layouts/MainLayout.astro";
 import { slugify } from "../utils/slugify";
   import Pdf from "../components/Pdf.astro";
-import { getHomeContent } from "../lib/services/content.service";
+import { getHomeContent, getAnnouncements } from "../lib/services/content.service";
+import PemberitahuanModal from "../components/PemberitahuanModal.astro";
 
 export const prerender = false;
 
-// Data access lives in src/lib/services. This page ran TEN queries, awaited one
-// after another, so its render time was their sum. The API fetches them
-// concurrently behind a single call.
 const {
   notifikasi, tentang, regulasi, slider, berita,
   unggul, pdfData, videos, peta, renstra, aplikasi,
 } = await getHomeContent();
+
+const modalAnnouncements = await getAnnouncements("modal");
 
 function formatTanggal(value) {
   if (!value) return "";
@@ -27,6 +27,7 @@ function formatTanggal(value) {
 ---
 
 <MainLayout title="DPMPTSP Kota Surabaya">
+  <PemberitahuanModal announcements={modalAnnouncements} />
 {notifikasi.length > 0 && (
   <div
     id="notificationModal"
@@ -6932,10 +6933,9 @@ footer {
 
 
 /* =========================================================
-   BERITA
-   Dekorasi kanan sengaja keluar -120px.
-   Potong di dalam section.
-========================================================= */
+ *    BERITA
+ *    Dekorasi kanan sengaja keluar -120px.
+ */
 
 .berita-section {
   overflow: hidden;
@@ -6954,10 +6954,9 @@ footer {
 
 
 /* =========================================================
-   PSEUDO ELEMENT
-   Tetap keluar secara visual,
-   tapi tidak boleh memperlebar dokumen.
-========================================================= */
+ *    PSEUDO ELEMENT
+ *    Tetap keluar secara visual,
+ */
 
 .berita-section::before,
 .berita-section::after,

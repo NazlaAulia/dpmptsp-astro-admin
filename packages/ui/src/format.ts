@@ -1,8 +1,4 @@
 // Indonesian formatting.
-//
-// Shared because both apps render the same dates and numbers, and because
-// `toLocaleDateString("id-ID", {...})` repeated inline in a dozen templates is
-// how they drift into three different date formats on one site.
 
 const LOCALE = "id-ID";
 

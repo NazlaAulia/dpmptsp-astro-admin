@@ -28,10 +28,6 @@ func NewArticleService(a domain.ArticleRepository, c domain.CategoryRepository) 
 }
 
 // ListArticles clamps paging rather than trusting the caller.
-//
-// The Astro pages currently derive OFFSET from a query string with no bounds
-// check, so ?page=0 produces a negative offset and a SQL error, and a huge
-// ?limit would let a caller ask for the entire table in one request.
 func (s *ArticleService) ListArticles(ctx context.Context, f domain.ArticleFilter) (domain.Page[domain.Article], error) {
 	if f.Limit <= 0 {
 		f.Limit = DefaultPerPage
@@ -147,14 +143,6 @@ var nonSlug = regexp.MustCompile(`[^a-z0-9]+`)
 // Slugify reproduces the behaviour of apps/web/src/utils/slugify.js EXACTLY,
 // including two quirks, because article URLs already derive from it and a
 // "better" implementation would 404 every existing link:
-//
-//   - an en dash surrounded by spaces yields a DOUBLE hyphen, because both
-//     spaces become hyphens and the dash itself is then stripped
-//   - accented letters are DELETED, not transliterated: É disappears rather
-//     than folding to E
-//
-// The JS is `.toLowerCase().trim().replace(/\s+/g,"-").replace(/[^\w\-]/g,"")`,
-// and \w includes the underscore, so underscores survive.
 func Slugify(s string) string {
 	s = strings.ToLower(strings.TrimSpace(s))
 	s = regexp.MustCompile(`\s+`).ReplaceAllString(s, "-")

@@ -3,12 +3,6 @@ import assert from "node:assert/strict";
 import { slugify } from "../src/utils/slugify.js";
 
 // These tests pin the CURRENT behaviour of slugify, quirks included.
-//
-// They are not a statement that this behaviour is good. They exist because
-// article URLs are derived from it, and the planned Go implementation must
-// reproduce it exactly when backfilling the slug column — otherwise every
-// existing /media/<slug> link 404s. Change this function only together with
-// redirects for the URLs it changes.
 
 test("lowercases and joins words with hyphens", () => {
   assert.equal(slugify("Kunjungan Wisatawan Kapal Pesiar"), "kunjungan-wisatawan-kapal-pesiar");

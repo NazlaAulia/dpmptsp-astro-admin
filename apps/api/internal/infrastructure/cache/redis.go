@@ -1,5 +1,5 @@
-// Package cache holds the Redis client and the version-counter helpers that
-// SPEC.md §6 specifies for list invalidation.
+// Package cache holds the Redis client and version-counter helpers used for
+// list invalidation.
 package cache
 
 import (
@@ -35,12 +35,8 @@ func (c *Client) Close() error { return c.rdb.Close() }
 
 func (c *Client) Ping(ctx context.Context) error { return c.rdb.Ping(ctx).Err() }
 
-// Version returns the current version counter for a resource type. Cache keys
-// embed it, so a write only has to bump the counter: old keys become orphans
-// and expire on their own TTL.
-//
-// This is what lets list caches be invalidated without SCAN, which blocks the
-// server and is forbidden by CLAUDE.md rule 7.
+// Version returns the current counter for a resource type. Cache keys embed it,
+// so incrementing the counter retires every key built from the previous value.
 func (c *Client) Version(ctx context.Context, resource string) (int64, error) {
 	key := resource + ":version"
 	n, err := c.rdb.Get(ctx, key).Int64()
@@ -53,7 +49,7 @@ func (c *Client) Version(ctx context.Context, resource string) (int64, error) {
 	return n, nil
 }
 
-// BumpVersion is called on every write to a resource type.
+// BumpVersion increments a resource's counter.
 func (c *Client) BumpVersion(ctx context.Context, resource string) error {
 	key := resource + ":version"
 	if err := c.rdb.Incr(ctx, key).Err(); err != nil {
@@ -64,10 +60,8 @@ func (c *Client) BumpVersion(ctx context.Context, resource string) error {
 
 // --- typed helpers -----------------------------------------------------------
 
-// GetJSON reads and decodes a cached value. A miss, a decode failure, or an
-// unreachable Redis all report "not cached" rather than an error: the cache is
-// an optimisation (SPEC.md §6), and a broken cache must degrade to a slower
-// request, never to a failed one.
+// GetJSON reads and decodes a cached value. A miss, a decode failure and an
+// unreachable server all report "not cached".
 func GetJSON[T any](ctx context.Context, c *Client, key string) (T, bool) {
 	var zero T
 	if c == nil {
@@ -84,7 +78,7 @@ func GetJSON[T any](ctx context.Context, c *Client, key string) (T, bool) {
 	return out, true
 }
 
-// SetJSON stores a value with a TTL. Failures are ignored for the same reason.
+// SetJSON stores a value with a TTL. Failures are ignored.
 func SetJSON(ctx context.Context, c *Client, key string, v any, ttl time.Duration) {
 	if c == nil {
 		return
@@ -96,8 +90,7 @@ func SetJSON(ctx context.Context, c *Client, key string, v any, ttl time.Duratio
 	_ = c.rdb.Set(ctx, key, raw, ttl).Err()
 }
 
-// Del removes specific keys. Only ever called with keys we constructed — never
-// a pattern, because SCAN blocks the server (CLAUDE.md rule 7).
+// Del removes specific keys. Patterns are never used.
 func Del(ctx context.Context, c *Client, keys ...string) {
 	if c == nil || len(keys) == 0 {
 		return

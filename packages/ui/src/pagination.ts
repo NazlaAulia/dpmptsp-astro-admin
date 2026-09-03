@@ -1,8 +1,4 @@
 // Pagination arithmetic.
-//
-// This was inline in ArtikelTable.astro and duplicated, with slightly different
-// clamping each time, across several listing pages. One implementation, tested
-// once.
 
 export type PageWindow = {
   /** Page numbers to render, capped to five. */
@@ -32,9 +28,6 @@ export function pageWindow(
 
 /**
  * Builds a page link that preserves the other query parameters.
- *
- * Losing the active search or filter when changing page is the classic bug
- * here, and it happened because each page rebuilt the query string by hand.
  */
 export function pageHref(params: URLSearchParams, page: number): string {
   const next = new URLSearchParams(params);

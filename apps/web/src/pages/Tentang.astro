@@ -7,7 +7,6 @@ import { getAboutContent } from "../lib/services/content.service";
 
 export const prerender = false;
 
-// Data access lives in src/lib/services.
 const { tentangdp, slider, tabs, dbError } = await getAboutContent();
 
 const ICON_MAP = {

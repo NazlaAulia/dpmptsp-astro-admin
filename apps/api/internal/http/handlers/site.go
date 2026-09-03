@@ -45,9 +45,6 @@ func toMenuDTO(nodes []domain.MenuNode) []menuDTO {
 }
 
 // Chrome handles GET /v1/site/chrome.
-//
-// One endpoint rather than two, because the header runs on every page render
-// and each extra round trip is paid on every page view.
 func (h *Site) Chrome(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 

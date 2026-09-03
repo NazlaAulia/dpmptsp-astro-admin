@@ -7,18 +7,14 @@ import (
 	"strings"
 )
 
-// FromEnv builds the disk registry, in the shape Laravel's filesystems config
-// takes: several disks defined, one selected by FILESYSTEM_DISK.
+// FromEnv builds the disk registry. Every disk is defined; FILESYSTEM_DISK
+// selects the default.
 //
-//	FILESYSTEM_DISK       local | public | s3        (default: local)
-//
-//	STORAGE_LOCAL_ROOT    default /var/lib/dpmptsp/storage   (private)
-//	STORAGE_PUBLIC_ROOT   default /var/lib/dpmptsp/public
-//	STORAGE_PUBLIC_URL    default /storage                   (public prefix)
-//
-//	S3_ENDPOINT           host:port, no scheme. The s3 disk is only configured
-//	                      when this is set, so a local-only deployment needs no
-//	                      S3 variables at all.
+//	FILESYSTEM_DISK      local | public | s3        (default local)
+//	STORAGE_LOCAL_ROOT   default /var/lib/dpmptsp/storage
+//	STORAGE_PUBLIC_ROOT  default /var/lib/dpmptsp/public
+//	STORAGE_PUBLIC_URL   default /storage
+//	S3_ENDPOINT          host:port. The s3 disk exists only when this is set.
 //	S3_BUCKET S3_ACCESS_KEY S3_SECRET_KEY S3_REGION S3_USE_SSL S3_PUBLIC_URL
 func FromEnv(ctx context.Context) (*Manager, error) {
 	disks := map[string]Disk{}
@@ -62,7 +58,7 @@ func FromEnv(ctx context.Context) (*Manager, error) {
 			"%w: FILESYSTEM_DISK=%q but only %s are configured (set S3_ENDPOINT to enable s3)",
 			ErrUnknownDisk, selected, strings.Join(namesOf(disks), ", "))
 	}
-	// Verify only the disk actually in use.
+	// Only the selected disk is verified.
 	if l, ok := disks[selected].(*LocalDisk); ok {
 		if err := l.EnsureWritable(); err != nil {
 			return nil, err

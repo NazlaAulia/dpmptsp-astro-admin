@@ -1,0 +1,259 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import { getAnnouncements } from "../lib/services/content.service";
+
+export const prerender = false;
+
+const semuaPemberitahuan = await getAnnouncements("notif");
+---
+
+
+<MainLayout title="Daftar Pemberitahuan">
+  <section class="pemberitahuan-section">
+    <div class="container">
+      <div class="section-header">
+        <h1>Daftar Pemberitahuan</h1>
+        <p>Informasi terbaru dan pengumuman penting dari DPMPTSP Kota Surabaya</p>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="pemberitahuan-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Foto</th>
+              <th>Tautan</th>
+              <th>Status Aktif</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {semuaPemberitahuan.map((item) => (
+              <tr>
+                <td>{item.id}</td>
+                <td>
+                  {item.foto && (
+                    <img src={`/uploads/${item.foto}`} alt={item.judul} class="table-img" />
+                  )}
+                  {!item.foto && <span class="no-image">Tanpa Gambar</span>}
+                </td>
+                <td>
+                  <a href={item.link_url || "#"} class="tautan-link" title={item.judul}>
+                    {item.judul}
+                  </a>
+                </td>
+                <td>
+                  <span class={`status-badge ${item.status_aktif === 'Y' ? 'aktif' : 'nonaktif'}`}>
+                    {item.status_aktif === 'Y' ? 'Aktif' : 'Nonaktif'}
+                  </span>
+                </td>
+                <td>
+                  <div class="action-cell">
+                    <a href={item.link_url || "#"} class="btn-action edit" title="Lihat">Lihat</a>
+                    <a href={`#pemberitahuan-${item.id}`} class="btn-action info" title="Info">Info</a>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {semuaPemberitahuan.length === 0 && (
+        <div class="empty-state">
+          <p>Tidak ada pemberitahuan saat ini</p>
+        </div>
+      )}
+    </div>
+  </section>
+</MainLayout>
+
+<style>
+  .pemberitahuan-section {
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    min-height: calc(100vh - 74px);
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .section-header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 12px;
+  }
+
+  .section-header p {
+    font-size: 1.1rem;
+    color: #64748b;
+    margin: 0;
+  }
+
+  .table-wrapper {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+    overflow: hidden;
+  }
+
+  .pemberitahuan-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .pemberitahuan-table th {
+    background: #f8fafc;
+    padding: 16px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #0f172a;
+    border-bottom: 2px solid #e5eaf2;
+  }
+
+  .pemberitahuan-table td {
+    padding: 16px;
+    border-bottom: 1px solid #e5eaf2;
+    vertical-align: middle;
+  }
+
+  .pemberitahuan-table tbody tr:hover {
+    background: #f8fafc;
+  }
+
+  .table-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #e5eaf2;
+  }
+
+  .no-image {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #e2e8f0;
+    color: #64748b;
+    border-radius: 6px;
+    font-size: 0.85rem;
+  }
+
+  .tautan-link {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+  }
+
+  .tautan-link:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .status-badge.aktif {
+    background: #dcfce7;
+    color: #166534;
+  }
+
+  .status-badge.nonaktif {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  .action-cell {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+
+  .btn-action.edit {
+    background: #dbeafe;
+    color: #0369a1;
+  }
+
+  .btn-action.edit:hover {
+    background: #bfdbfe;
+  }
+
+  .btn-action.info {
+    background: #fef3c7;
+    color: #b45309;
+  }
+
+  .btn-action.info:hover {
+    background: #fde68a;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: #64748b;
+  }
+
+  @media (max-width: 768px) {
+    .pemberitahuan-section {
+      padding: 40px 16px;
+    }
+
+    .section-header h1 {
+      font-size: 1.8rem;
+    }
+
+    .section-header p {
+      font-size: 1rem;
+    }
+
+    .pemberitahuan-table {
+      font-size: 0.9rem;
+    }
+
+    .pemberitahuan-table th,
+    .pemberitahuan-table td {
+      padding: 12px;
+    }
+
+    .table-img {
+      width: 60px;
+      height: 60px;
+    }
+
+    .action-cell {
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .btn-action {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+    }
+  }
+</style>

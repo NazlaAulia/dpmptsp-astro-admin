@@ -12,11 +12,10 @@ import (
 	"time"
 )
 
-// DefaultMaxUploadBytes matches the cap the old Astro endpoint enforced.
+// DefaultMaxUploadBytes is the default per-upload size limit.
 const DefaultMaxUploadBytes int64 = 50 << 20 // 50 MB
 
-// DefaultAllowedTypes is the allowlist carried over from the endpoint that had
-// one. Everything else uploaded through this API had no validation at all.
+// DefaultAllowedTypes is the default content-type allowlist.
 var DefaultAllowedTypes = []string{
 	"image/jpeg", "image/png", "image/webp", "image/gif",
 	"application/pdf",
@@ -47,24 +46,13 @@ func (r UploadRules) withDefaults() UploadRules {
 
 // Upload validates and stores an incoming file.
 //
-// Three things the Astro upload routes got wrong, fixed here:
-//
-//  1. The content type is sniffed from the first bytes, not taken from the
-//     client's Content-Type. A client can claim anything; a .jpg that is really
-//     an HTML document gets stored and later served.
-//
-//  2. The size limit is enforced while streaming, via io.LimitReader, rather
-//     than after the body is in memory. Checking afterwards means a 2 GB upload
-//     costs 2 GB of RAM before being rejected.
-//
-//  3. The stored key is generated. The client's filename is used for nothing
-//     but a sanity-checked extension — the old code passed it straight to
-//     path.Join, which is a path traversal, and its Date.now() naming collided
-//     whenever two uploads landed in the same millisecond.
+// The content type is detected from the object's leading bytes rather than the
+// client's declaration, the size limit is applied while streaming, and the
+// stored key is generated rather than derived from the supplied filename.
 func Upload(ctx context.Context, disk Disk, r io.Reader, filename string, rules UploadRules) (*Object, error) {
 	rules = rules.withDefaults()
 
-	// Sniff from the leading bytes, then put them back so nothing is consumed.
+	// Detect the type from the leading bytes, then replay them into the body.
 	header := make([]byte, 512)
 	n, err := io.ReadFull(r, header)
 	if err != nil && err != io.ErrUnexpectedEOF && err != io.EOF {
@@ -78,8 +66,7 @@ func Upload(ctx context.Context, disk Disk, r io.Reader, filename string, rules 
 	}
 
 	body := io.MultiReader(strings.NewReader(string(header)), r)
-	// One byte over the cap so exceeding it is detectable rather than silently
-	// truncating the file.
+	// One byte over the cap, so an oversized upload is detectable.
 	limited := io.LimitReader(body, rules.MaxBytes+1)
 
 	key, err := generateKey(rules.Prefix, filename, contentType)
@@ -96,36 +83,32 @@ func Upload(ctx context.Context, disk Disk, r io.Reader, filename string, rules 
 	}
 
 	if obj.Size > rules.MaxBytes {
-		// Do not leave the oversized object behind.
+		// Remove the partial object.
 		_ = disk.Delete(ctx, obj.Key)
 		return nil, fmt.Errorf("%w: %d bytes, limit %d", ErrTooLarge, obj.Size, rules.MaxBytes)
 	}
 	return obj, nil
 }
 
-// generateKey builds an opaque, collision-free key. Only the extension is
-// derived from the client, and only when it is short and alphanumeric.
+// generateKey builds a random, date-sharded object key.
 func generateKey(prefix, filename, contentType string) (string, error) {
 	var buf [16]byte
 	if _, err := rand.Read(buf[:]); err != nil {
 		return "", fmt.Errorf("storage: generate key: %w", err)
 	}
 
-	// The extension comes from what the bytes ARE, not from what the upload
-	// claimed to be. Preferring the client's extension would store a PNG as
-	// notes.txt purely because that is what the browser sent, which is the
-	// same "trust the client" mistake this package exists to avoid.
+	// The extension follows the detected type.
 	ext := extensionFor(contentType)
 	if ext == ".bin" {
-		// Type not recognised: fall back to the client's extension, but only
-		// if it is short and alphanumeric.
+		// Unrecognised type: fall back to the supplied extension if it is
+		// short and alphanumeric.
 		if candidate := strings.ToLower(path.Ext(filename)); safeExt(candidate) {
 			ext = candidate
 		}
 	}
 
 	name := hex.EncodeToString(buf[:]) + ext
-	// Date-shard so no single directory accumulates every object ever uploaded.
+	// Shard by date to bound directory size.
 	datePath := time.Now().UTC().Format("2006/01")
 
 	if prefix != "" {
@@ -169,7 +152,7 @@ func extensionFor(contentType string) string {
 	}
 }
 
-// normaliseType drops the charset parameter DetectContentType adds to text.
+// normaliseType drops any charset parameter.
 func normaliseType(t string) string {
 	if i := strings.IndexByte(t, ';'); i >= 0 {
 		return strings.TrimSpace(t[:i])

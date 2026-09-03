@@ -1,11 +1,7 @@
-// Package storage provides file storage with swappable drivers, in the shape
-// Laravel's filesystem takes: code asks for a disk by name and never knows
-// whether it is writing to local disk or to an S3 bucket.
+// Package storage provides file storage over swappable disks.
 //
-// Disks are configured by environment, so moving uploads from a mounted volume
-// to MinIO is a configuration change, not a code change. That matters here
-// because uploads currently land in the Astro apps' public/ directories, which
-// cannot survive more than one replica.
+// Disks are configured by environment and selected by name, so the backing
+// store can change without touching call sites.
 package storage
 
 import (
@@ -25,9 +21,8 @@ var (
 	ErrTypeRejected = errors.New("storage: content type not allowed")
 )
 
-// Visibility mirrors Laravel's public/private distinction. A private object is
-// only reachable through a handler that can check authorization; a public one
-// has a URL anybody can fetch.
+// Visibility controls whether an object is reachable by URL. Private objects
+// are served only through an authorizing handler.
 type Visibility string
 
 const (
@@ -41,7 +36,7 @@ type Object struct {
 	Key string
 	// Size in bytes, as actually written.
 	Size int64
-	// ContentType as detected from the bytes, not as claimed by the client.
+	// ContentType detected from the object's bytes.
 	ContentType string
 	// Visibility the object was stored with.
 	Visibility Visibility
@@ -55,38 +50,30 @@ type PutOptions struct {
 
 // Disk is one configured storage location.
 //
-// Deliberately small. Everything an upload handler needs is here, and nothing
-// that would tie the interface to one backend — no presigned-URL method, no
-// bucket policy, no directory listing. Those can be added to the concrete S3
-// implementation and reached through a type assertion when something genuinely
-// needs them.
+// Backend-specific operations such as presigned URLs are not part of this
+// interface; reach them on the concrete type.
 type Disk interface {
 	// Name is the configured disk name, for logs and errors.
 	Name() string
 
-	// Put writes r under key. It returns what was actually stored, including
-	// the size written, so a caller does not have to trust a Content-Length it
-	// was given.
+	// Put writes r under key and reports what was stored, including the number
+	// of bytes actually written.
 	Put(ctx context.Context, key string, r io.Reader, opts PutOptions) (*Object, error)
 
 	// Get opens an object for reading. The caller closes it.
 	Get(ctx context.Context, key string) (io.ReadCloser, error)
 
-	// Delete removes an object. Deleting something that is not there is not an
-	// error: callers are usually cleaning up and should not have to care.
+	// Delete removes an object. Deleting an absent object is not an error.
 	Delete(ctx context.Context, key string) error
 
 	// Exists reports whether an object is present.
 	Exists(ctx context.Context, key string) (bool, error)
 
-	// URL returns a publicly fetchable URL, or ErrNotPublic if this disk does
-	// not serve one. Private disks are served through an authorizing handler
-	// instead.
+	// URL returns a public URL, or ErrNotPublic if the disk does not serve one.
 	URL(key string) (string, error)
 }
 
-// Manager resolves disks by name, so call sites read like
-// storage.Disk("s3") rather than threading a concrete type through.
+// Manager resolves configured disks by name.
 type Manager struct {
 	disks       map[string]Disk
 	defaultDisk string
@@ -99,8 +86,7 @@ func NewManager(defaultDisk string, disks map[string]Disk) (*Manager, error) {
 	return &Manager{disks: disks, defaultDisk: defaultDisk}, nil
 }
 
-// Disk returns the named disk. An empty name returns the default, which is what
-// makes FILESYSTEM_DISK the single switch.
+// Disk returns the named disk. An empty name returns the default.
 func (m *Manager) Disk(name string) (Disk, error) {
 	if name == "" {
 		name = m.defaultDisk
@@ -117,7 +103,7 @@ func (m *Manager) Default() Disk {
 	return m.disks[m.defaultDisk]
 }
 
-// Names lists the configured disks, for the health endpoint and for errors.
+// Names lists the configured disks.
 func (m *Manager) Names() []string {
 	out := make([]string, 0, len(m.disks))
 	for n := range m.disks {
@@ -126,12 +112,7 @@ func (m *Manager) Names() []string {
 	return out
 }
 
-// cleanKey normalises an object key and refuses anything that tries to escape
-// the disk root.
-//
-// This is the guard the current Astro upload routes lack: they join the raw
-// client-supplied filename onto the upload directory, so a multipart filename of
-// "../../src/pages/index.astro" writes outside it.
+// cleanKey normalises an object key and rejects paths that escape the disk root.
 func cleanKey(key string) (string, error) {
 	k := strings.TrimPrefix(path.Clean("/"+strings.ReplaceAll(key, `\`, "/")), "/")
 	if k == "" || k == "." {

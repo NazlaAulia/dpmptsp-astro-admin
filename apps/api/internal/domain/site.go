@@ -9,10 +9,6 @@ type SiteSettings struct {
 }
 
 // MenuNode is one entry of the header navigation, already nested.
-//
-// The tree is built in the API, not in the frontend. Reshaping flat parent_id
-// rows into a tree is data work, and doing it in an Astro component meant every
-// page render repeated it.
 type MenuNode struct {
 	ID            int64
 	Name          string

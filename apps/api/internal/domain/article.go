@@ -41,10 +41,6 @@ type Category struct {
 }
 
 // ArticleFilter describes a list query.
-//
-// Search is separate from CategoryIDs because they are answered differently:
-// one is an indexed lookup, the other needs full-text and is the reason the
-// dialect layer still exists.
 type ArticleFilter struct {
 	CategoryIDs  []int64
 	Search       string

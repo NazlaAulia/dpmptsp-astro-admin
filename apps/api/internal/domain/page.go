@@ -124,10 +124,6 @@ type Photo struct {
 }
 
 // HomeContent is everything the homepage renders, in one object.
-//
-// The page it replaces ran ten sequential queries. One composite means one
-// round trip and one cache entry, which matters because this is the most
-// requested page on the site.
 type HomeContent struct {
 	Notifications []Notification
 	Blocks        []ContentBlock

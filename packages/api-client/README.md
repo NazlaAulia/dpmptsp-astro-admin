@@ -2,15 +2,14 @@
 
 Server-side client for the Go API.
 
-**Never import this from anything that reaches the browser.** It carries the
-internal service key, and SPEC.md §2 is explicit that no API contract, endpoint
-or token is ever serialised to a browser. The API is reachable only on the
-internal docker network; the browser talks to Astro, and Astro talks to this.
+**Never import this from browser-facing code.** It carries the internal service
+key. The API is reachable only on the internal network: the browser talks to
+Astro, and Astro talks to this.
 
 ## Types are generated, the transport is not
 
 `src/generated/` is produced from `apps/api/openapi.yaml` and must not be edited
-by hand (CLAUDE.md rule 5). Regenerate after changing the spec:
+by hand. Regenerate after changing the spec:
 
     pnpm --filter @dpmptsp/api-client generate
 

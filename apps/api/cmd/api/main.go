@@ -1,9 +1,4 @@
 // Command api is the DPMPTSP backend.
-//
-// It is reachable only from the internal docker network (SPEC.md §8): the Astro
-// apps call it server-side, and nothing else does. It owns all database access
-// and, once the domain handlers land, all business logic and authorization
-// (CLAUDE.md rules 2 and 3).
 package main
 
 import (
@@ -51,7 +46,7 @@ func run() error {
 	defer database.Close(db)
 	log.Info("database connected", "engine", dia.Name(), "target", cfg.DB.Redacted())
 
-	// Redis is optional at boot. The cache is an optimisation (SPEC.md §6), and
+	// Redis is optional at boot. The cache is an optimisation, and
 	// refusing to serve because a cache is down would turn a performance
 	// dependency into an availability one.
 	var rdb *cache.Client

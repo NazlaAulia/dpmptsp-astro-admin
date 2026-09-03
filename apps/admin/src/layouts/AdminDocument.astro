@@ -1,12 +1,5 @@
 ---
 // Minimal document shell for the admin panel.
-//
-// Admin pages previously rendered as bare fragments with no <html>, <head> or
-// <body> at all, leaving the browser to invent a document. This supplies one.
-//
-// It deliberately does NOT import global.css: the admin panel styles itself
-// with scoped <style> blocks and does not use Tailwind, so pulling in
-// Tailwind's preflight here would restyle every admin screen.
 const { title = "Admin" } = Astro.props;
 ---
 

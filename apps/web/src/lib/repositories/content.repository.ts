@@ -1,8 +1,4 @@
 // Content data access — through the Go API.
-//
-// Every one of these was an inline db.execute in a page. They share a shape:
-// fetch an ordered list, and on failure render an empty section rather than
-// failing the whole page.
 
 import { api } from "@dpmptsp/api-client";
 import type {
@@ -16,10 +12,6 @@ import type {
 
 /**
  * Unwraps a list response, logging and returning [] on failure.
- *
- * The pages these replaced each wrapped their query in try/catch and fell back
- * to an empty array, which is the right behaviour: a missing regulations list
- * should render an empty section, not a 500 for the whole page.
  */
 async function list<T>(
   name: string,
@@ -90,3 +82,9 @@ export async function findPhotos(page: number, perPage: number) {
     totalPages: Math.max(1, res.meta?.pages ?? 1),
   };
 }
+
+import type { Announcement } from "@dpmptsp/api-client";
+
+/** Published announcements of one display type, in display order. */
+export const findAnnouncements = (tipe: "notif" | "modal") =>
+  list<Announcement>("announcements", () => api.announcements({ tipe }));

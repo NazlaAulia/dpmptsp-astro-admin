@@ -6,8 +6,6 @@ import { getPelayananContent } from "../lib/services/content.service";
 
 export const prerender = false;
 
-// Data access lives in src/lib/services. This page ran three queries inline and
-// parsed a JSON column in the template.
 const { pelayananData, info, infoItems } = await getPelayananContent();
 
 const {

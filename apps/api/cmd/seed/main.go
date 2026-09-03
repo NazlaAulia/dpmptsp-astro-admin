@@ -13,7 +13,7 @@
 //
 // Reference and configuration data belongs here. The 553 legacy articles do NOT
 // — that is a one-shot import of production content, not a seeder, and it is
-// kept separate per SPEC.md §4.
+// kept separate
 package main
 
 import (
@@ -36,14 +36,11 @@ import (
 	"dpmptsp/api/internal/security"
 )
 
-// Seeder is one YAML file: a table, the columns that identify a row, and the
-// rows it owns.
+// Seeder is one YAML file: a table, the columns identifying a row, and the rows.
 type Seeder struct {
 	Table string `yaml:"table"`
-	// Key names the columns that make a row unique, so a re-run can tell an
-	// existing row from a new one. Declared explicitly rather than assumed to
-	// be the primary key: some seeders identify rows by a natural key such as
-	// username.
+	// Key names the columns that identify a row. It is not assumed to be the
+	// primary key; some seeders match on a natural key such as username.
 	Key  []string         `yaml:"key"`
 	Rows []map[string]any `yaml:"rows"`
 
@@ -113,8 +110,8 @@ func load(dir, only string) ([]Seeder, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Filename order is run order, which is why the files are numbered: a table
-	// with a foreign key must be seeded after the table it points at.
+	// Filename order is run order; a table with a foreign key must come after
+	// the table it references.
 	sort.Strings(entries)
 
 	var out []Seeder
@@ -144,11 +141,7 @@ func load(dir, only string) ([]Seeder, error) {
 	return out, nil
 }
 
-// apply inserts the rows, skipping any that are already there.
-//
-// Idempotence is the point. Laravel's seeders are not idempotent by default and
-// re-running them duplicates data; here a second run is a no-op, so `make seed`
-// is safe to repeat and safe to put in a setup script.
+// apply inserts the rows, skipping any already present.
 func (s Seeder) apply(ctx context.Context, db *gorm.DB, _ dialect.Dialect, fresh bool) (int, int, error) {
 	var inserted, skipped int
 
@@ -165,13 +158,9 @@ func (s Seeder) apply(ctx context.Context, db *gorm.DB, _ dialect.Dialect, fresh
 				return fmt.Errorf("row %d: %w", i+1, err)
 			}
 
-			// Look the row up by its declared key, then insert only if absent.
-			//
-			// This replaced a conflict clause. GORM's OnConflict{DoNothing} is
-			// not portable here: on MySQL it renders "ON DUPLICATE KEY UPDATE"
-			// with an empty assignment list, which is a syntax error. An
-			// existence check costs one extra SELECT per row and works
-			// identically on both engines.
+			// Match on the declared key, then insert only if absent.
+			// A conflict clause is not used: GORM renders an empty
+			// ON DUPLICATE KEY UPDATE on MySQL, which is invalid.
 			where := tx.Table(s.Table)
 			for _, k := range s.Key {
 				v, ok := values[k]
@@ -201,8 +190,7 @@ func (s Seeder) apply(ctx context.Context, db *gorm.DB, _ dialect.Dialect, fresh
 	return inserted, skipped, err
 }
 
-// resolve expands ${VAR} references so a secret is read from the environment at
-// seed time rather than being committed to a YAML file.
+// resolve expands ${VAR} references from the environment.
 func resolve(row map[string]any) (map[string]any, error) {
 	out := make(map[string]any, len(row))
 	for c, v := range row {
@@ -218,7 +206,7 @@ func resolve(row map[string]any) (map[string]any, error) {
 			return nil, fmt.Errorf("column %q needs environment variable %s, which is unset", c, name)
 		}
 
-		// A password is never stored as given.
+		// Password columns are hashed before storage.
 		if strings.Contains(strings.ToLower(c), "password") {
 			hashed, err := security.Hash(env)
 			if err != nil {

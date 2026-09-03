@@ -1,18 +1,9 @@
-// Package security holds password hashing.
+// Package security implements password hashing.
 //
-// This exists because the legacy `user` table stores passwords in plaintext and
-// the old login compared them literally in SQL. Nothing about that survives: no
-// credential is migrated, and everything from here on is hashed.
-//
-// The driver is selectable, as in Laravel:
-//
-//	HASH_DRIVER=bcrypt   (default, Laravel's default too)
-//	HASH_DRIVER=argon2id
-//	BCRYPT_ROUNDS=12
-//
-// Verify detects the algorithm from the stored hash rather than from config, so
-// changing the driver does not lock anyone out — existing hashes keep verifying
-// and NeedsRehash flags them for transparent upgrade on next login.
+// The algorithm is selected by HASH_DRIVER (bcrypt or argon2id); bcrypt cost is
+// set by BCRYPT_ROUNDS. Verify reads the algorithm from the stored hash, so
+// changing the driver leaves existing hashes valid and NeedsRehash marks them
+// for upgrade.
 package security
 
 import (
@@ -37,16 +28,16 @@ const (
 	Argon2id Driver = "argon2id"
 )
 
-// argon2id parameters follow the OWASP guidance. They are stored inside the
-// hash, so they can be raised later without invalidating existing passwords.
+// argon2id parameters, following OWASP guidance. They are encoded in the hash,
+// so raising them does not invalidate existing passwords.
 const (
 	defaultMemory  = 64 * 1024 // 64 MiB
 	defaultTime    = 3
 	defaultKeyLen  = 32
 	defaultSaltLen = 16
 
-	// bcrypt's own maximum. Anything past 72 bytes is silently ignored by the
-	// algorithm, which would mean two different long passwords sharing a hash.
+	// bcrypt ignores input past 72 bytes, which would let two distinct
+	// passwords share a hash.
 	bcryptMaxPasswordBytes = 72
 	defaultBcryptCost      = 12
 )
@@ -98,8 +89,7 @@ func Verify(password, encoded string) error {
 		strings.HasPrefix(encoded, "$2y$"):
 		return verifyBcrypt(password, encoded)
 	default:
-		// Anything else — including a plaintext value carried over from the
-		// legacy table — is refused outright rather than compared.
+		// Unrecognised format, including plaintext, is refused rather than compared.
 		return ErrInvalidHash
 	}
 }
@@ -135,8 +125,7 @@ func NeedsRehash(encoded string) bool {
 // ---------------------------------------------------------------- bcrypt ---
 
 func hashBcrypt(password string) (string, error) {
-	// bcrypt ignores everything past 72 bytes. Silently truncating means two
-	// different long passwords can produce the same hash, so refuse instead.
+	// Refuse rather than truncate; see bcryptMaxPasswordBytes.
 	if len(password) > bcryptMaxPasswordBytes {
 		return "", ErrTooLong
 	}
@@ -181,9 +170,6 @@ func argonDefaults() argonParams {
 // hashArgon2id returns a PHC-format string:
 //
 //	$argon2id$v=19$m=65536,t=3,p=4$<salt>$<hash>
-//
-// The parameters travel with the hash, which is what makes them changeable
-// without invalidating every existing password.
 func hashArgon2id(password string) (string, error) {
 	p := argonDefaults()
 	salt := make([]byte, defaultSaltLen)
@@ -200,8 +186,7 @@ func hashArgon2id(password string) (string, error) {
 	), nil
 }
 
-// verifyArgon2id compares in constant time: a timing-variable compare on a
-// password hash leaks how much of a guess was correct.
+// verifyArgon2id compares the derived key in constant time.
 func verifyArgon2id(password, encoded string) error {
 	p, salt, want, err := decodeArgon2id(encoded)
 	if err != nil {

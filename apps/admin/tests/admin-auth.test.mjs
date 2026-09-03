@@ -4,8 +4,6 @@ import { authenticateAdmin } from "../src/lib/adminAuth.js";
 
 // The previous version of this file asserted that username "admin" with
 // password "admin123" logged in successfully with db: null. That test was
-// pinning a backdoor in place: any attempt to remove the hardcoded credentials
-// would have failed CI. This asserts the opposite.
 
 test("the hardcoded admin/admin123 backdoor is gone", async () => {
   const result = await authenticateAdmin({

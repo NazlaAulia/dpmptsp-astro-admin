@@ -9,9 +9,6 @@ import (
 // GORM models. These are the only place that knows the physical column names,
 // which is what lets the domain types be shaped for the application rather than
 // for the legacy schema.
-//
-// TableName is explicit everywhere: GORM's pluralisation would look for
-// `articles` and `posts`, and the migrations declare `post`.
 
 type articleModel struct {
 	ID           int64     `gorm:"column:id_post;primaryKey"`

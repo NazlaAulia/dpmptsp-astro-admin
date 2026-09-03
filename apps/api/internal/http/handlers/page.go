@@ -88,10 +88,6 @@ func toSliderDTOs(in []domain.Slider) []sliderDTO {
 }
 
 // Home handles GET /v1/home.
-//
-// One endpoint rather than ten. The page it replaces awaited ten queries in
-// sequence, so its render time was their sum; the repository fetches them
-// concurrently, making it their maximum.
 func (h *Pages) Home(w http.ResponseWriter, r *http.Request) {
 	data, err := h.Repo.Home(r.Context())
 	if err != nil {

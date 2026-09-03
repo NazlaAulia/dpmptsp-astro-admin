@@ -14,9 +14,8 @@ import (
 
 // LocalDisk stores objects on the filesystem.
 //
-// Two shapes, matching Laravel's `local` and `public` disks: with BaseURL empty
-// the disk is private and URL() refuses; with BaseURL set the files are assumed
-// to be served from that prefix by the gateway.
+// With BaseURL empty the disk is private and URL returns ErrNotPublic;
+// otherwise files are assumed to be served from that prefix.
 type LocalDisk struct {
 	name    string
 	root    string
@@ -28,19 +27,15 @@ func NewLocalDisk(name, root, baseURL string) (*LocalDisk, error) {
 	if err != nil {
 		return nil, fmt.Errorf("storage %s: resolve root: %w", name, err)
 	}
-	// The root is NOT created here. Disks are all defined regardless of which
-	// one is selected, the way Laravel defines every disk in its config, so
-	// constructing one must not require its directory to be writable — an
-	// S3-only deployment would otherwise be forced to provide writable local
-	// paths it never uses. FromEnv checks the selected disk instead.
+	// The root is created lazily: every disk is constructed regardless of which
+	// one is selected, so construction must not require a writable directory.
 	return &LocalDisk{name: name, root: abs, baseURL: strings.TrimRight(baseURL, "/")}, nil
 }
 
 func (d *LocalDisk) Name() string { return d.name }
 
-// EnsureWritable creates the root and confirms it can be written to. Called by
-// FromEnv for the selected disk only, so a misconfiguration still fails at
-// startup rather than on the first upload.
+// EnsureWritable creates the disk root and verifies it is writable. FromEnv
+// calls this for the selected disk only.
 func (d *LocalDisk) EnsureWritable() error {
 	if err := os.MkdirAll(d.root, 0o750); err != nil {
 		return fmt.Errorf("storage %s: create root %s: %w", d.name, d.root, err)
@@ -54,8 +49,7 @@ func (d *LocalDisk) EnsureWritable() error {
 	return os.Remove(name)
 }
 
-// resolve maps a key to an absolute path and verifies the result is still
-// inside the root, so a crafted key cannot write elsewhere on the filesystem.
+// resolve maps a key to an absolute path inside the disk root.
 func (d *LocalDisk) resolve(key string) (string, error) {
 	clean, err := cleanKey(key)
 	if err != nil {
@@ -77,9 +71,8 @@ func (d *LocalDisk) Put(_ context.Context, key string, r io.Reader, opts PutOpti
 		return nil, fmt.Errorf("storage %s: mkdir: %w", d.name, err)
 	}
 
-	// Write to a temporary file in the same directory and rename into place, so
-	// a crashed or truncated upload never leaves a half-written object that a
-	// reader can observe.
+	// Write to a temporary file and rename into place, so a partial write is
+	// never observable.
 	tmp, err := os.CreateTemp(filepath.Dir(full), ".upload-*")
 	if err != nil {
 		return nil, fmt.Errorf("storage %s: temp file: %w", d.name, err)
@@ -159,8 +152,7 @@ func (d *LocalDisk) URL(key string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	// Escape each segment: filenames can legitimately contain spaces and
-	// non-ASCII, and an unescaped URL breaks on both.
+	// Escape each segment; keys may contain spaces and non-ASCII characters.
 	parts := strings.Split(clean, "/")
 	for i, p := range parts {
 		parts[i] = url.PathEscape(p)

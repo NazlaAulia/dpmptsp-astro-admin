@@ -1,23 +1,9 @@
 // The single authentication guard for the admin app.
-//
-// Astro runs onRequest for every SSR request, including endpoints and dynamic
-// routes, which is exactly why the check belongs here. Previously it was
-// copy-pasted into 2 of 22 admin pages and into none of the 8 API routes, so
-// anonymous callers could render every management screen and POST to every
-// write endpoint.
-//
-// THE RULE: Astro answers one question — is this request carrying a valid,
-// unexpired session? It never answers "may this subject do this?". That is the
-// Go API's job (SPEC.md §7 and §11.6). There must be no role checks here.
 
 import { defineMiddleware } from "astro:middleware";
 import { readSession, csrfToken } from "./lib/session";
 
-/**
- * Exact paths reachable without a session. Everything else is guarded, so a
- * page added tomorrow is protected by default rather than by remembering to
- * add it to a list.
- */
+/** Exact paths reachable without a session. Everything else is guarded. */
 const PUBLIC_PATHS = new Set(["/admin/login", "/admin/logout"]);
 
 /** Prefixes for build output and static assets, which carry no data. */
@@ -27,14 +13,6 @@ const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
 
 /**
  * Is this a cross-site write?
- *
- * Sec-Fetch-Site is set by the browser and cannot be forged by an attacking
- * page, so it is the authoritative signal when present. The Origin/Host
- * comparison is only a fallback for clients that do not send it.
- *
- * Both are useless against a non-browser client such as curl, which can send
- * anything — but a non-browser client has no victim's cookies to ride on, and
- * the session check below is what stops it.
  */
 function isCrossSite(request: Request): boolean {
   const site = request.headers.get("sec-fetch-site");
@@ -76,15 +54,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
   context.locals.csrfToken = session ? csrfToken(session) : null;
 
   // Cross-origin write protection, applied before anything reads a body.
-  //
-  // SameSite=Lax already stops a cross-site form POST from carrying the session
-  // cookie, so this is defence in depth.
-  //
-  // Note this deliberately does NOT compare against url.origin. Under the node
-  // adapter url.origin is always "http://localhost" regardless of the request,
-  // so any such comparison rejects every real browser request. That is exactly
-  // why Astro's own security.checkOrigin is disabled in astro.config.mjs — it
-  // makes that comparison and 403s every login.
   if (!SAFE_METHODS.has(method)) {
     if (isCrossSite(request)) {
       return new Response("Cross-origin request refused.", { status: 403 });

@@ -1,4 +1,6 @@
-# syntax=docker/dockerfile:1.7
+# No `# syntax=` pin: it makes BuildKit fetch an external frontend on every
+# build, so a registry hiccup breaks local builds. The built-in frontend
+# already supports the cache mounts used below.
 
 # Go is not installed on the host, and does not need to be: the toolchain lives
 # here. `make build` and `make test` for the API work through this image.

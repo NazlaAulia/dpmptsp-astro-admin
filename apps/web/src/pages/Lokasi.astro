@@ -2,7 +2,6 @@
 import MainLayout from "../layouts/MainLayout.astro";
 import { getServiceLocations } from "../lib/services/content.service";
 
-// Data access lives in src/lib/services.
 const lokasiLayanan = await getServiceLocations();
 ---
 <MainLayout title="DPMPTSP Surabaya - Lokasi Layanan">

@@ -1,10 +1,5 @@
 ---
 // Delete an article. POST only, with a CSRF token.
-//
-// This route previously ran `DELETE FROM post WHERE id_post = ?` on a GET
-// request reached from a plain link. Any crawler following links, any browser
-// prefetching them, or any third-party <img src="/admin/hapus-artikel?id=1">
-// deleted content. It also had no authentication of any kind.
 export const prerender = false;
 
 import { db } from "../../lib/db.js";

@@ -5,12 +5,6 @@ import { getArticlePage } from "../../lib/services/article.service";
 
 export const prerender = false;
 
-// Data access lives in src/lib/services.
-//
-// This page used to load EVERY article (`SELECT * FROM post WHERE title IS NOT
-// NULL`), slugify each one in JavaScript, and scan for a match — then load up
-// to 1000 more rows for the sidebar, and run two further queries whose results
-// it discarded. It now looks the article up by its indexed slug column.
 const page = await getArticlePage(Astro.params.slug);
 
 // A missing article is a 404. The old code threw, which Astro turns into a 500

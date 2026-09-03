@@ -6,9 +6,6 @@ import { listArticles, PER_PAGE, type ListType } from "../lib/services/article.s
 
 export const prerender = false;
 
-// Data access lives in src/lib/services. This page previously built a WHERE
-// clause by string concatenation, ran its own COUNT and SELECT, and
-// interpolated LIMIT/OFFSET straight into the SQL.
 const url = new URL(Astro.request.url);
 const q = url.searchParams.get("q") || "";
 const type = (url.searchParams.get("type") || "all") as ListType;

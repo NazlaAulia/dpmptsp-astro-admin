@@ -12,9 +12,8 @@ packages/config env access
 infra/          gateway and container definitions
 ```
 
-The browser never talks to `apps/api`. It talks to Astro, Astro talks to Go.
-The rules are in `CLAUDE.md`; the reasoning and the target design are in
-`SPEC.md`. Read `SPEC.md` before implementing anything.
+The browser never talks to `apps/api`. It talks to Astro, and Astro talks to Go
+over the internal network.
 
 ## Running it
 

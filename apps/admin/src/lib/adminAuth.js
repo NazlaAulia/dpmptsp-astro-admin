@@ -1,19 +1,4 @@
 // Admin credential check.
-//
-// Two things were removed here, and neither should come back:
-//
-//   1. A hardcoded backdoor. Any request with username "admin" and password
-//      "admin123" was accepted before the database was consulted at all, and
-//      it worked even with no database configured. A passing test asserted
-//      this behaviour, so the test was enforcing the vulnerability; it has
-//      been replaced.
-//
-//   2. Nothing else changed about how passwords are stored, and that remains
-//      the outstanding problem: the `user` table holds PLAINTEXT passwords and
-//      this function still compares them literally in SQL. Fixing that means
-//      hashing (argon2id) and a migration, which belongs with the Go API — it
-//      cannot be done from here without locking every existing admin out.
-//      Treat every credential in that table as compromised in the meantime.
 
 export async function authenticateAdmin({ username, password, db }) {
   const normalizedUsername = String(username ?? "").trim();

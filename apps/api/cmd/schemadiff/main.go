@@ -1,14 +1,5 @@
 // Command schemadiff proves the Postgres and MySQL migrations produce the same
 // schema.
-//
-// Two migration sets are maintained because no single SQL file is valid on both
-// engines. The obvious failure mode is that they drift: someone edits one, the
-// other keeps working, and the difference is only discovered when the second
-// engine is actually used. This turns that into a command that fails.
-//
-// It compares table names, column names, nullability and primary keys, with
-// types normalised through an equivalence table — int4 and int are the same
-// thing, and so are bool and tinyint(1).
 package main
 
 import (

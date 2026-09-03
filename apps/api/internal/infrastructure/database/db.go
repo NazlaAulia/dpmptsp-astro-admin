@@ -1,5 +1,4 @@
-// Package database opens the GORM connection and pairs it with the dialect
-// covering what GORM does not abstract away.
+// Package database opens the GORM connection and pairs it with a dialect.
 package database
 
 import (
@@ -18,12 +17,7 @@ import (
 	"dpmptsp/api/internal/infrastructure/database/dialect"
 )
 
-// Open connects and verifies the connection before returning it, so a bad DSN
-// is a startup failure rather than a runtime surprise.
-//
-// GORM carries most of the engine difference: placeholders, RETURNING vs
-// LastInsertId, and upsert clauses are all rendered per driver. What it does
-// not cover stays in the dialect package.
+// Open connects and verifies the connection before returning it.
 func Open(ctx context.Context, cfg *config.Config, log *slog.Logger) (*gorm.DB, dialect.Dialect, error) {
 	dsn, err := cfg.DB.DSN()
 	if err != nil {
@@ -50,8 +44,7 @@ func Open(ctx context.Context, cfg *config.Config, log *slog.Logger) (*gorm.DB, 
 
 	db, err := gorm.Open(opener, &gorm.Config{
 		Logger: gormlogger.Default.LogMode(level),
-		// The schema is owned by golang-migrate (SPEC.md §4: migrations are the
-		// source of truth). GORM must never alter it, so automigration is not
+		// The schema is owned by golang-migrate. GORM must never alter it, so automigration is not
 		// used anywhere and naming is left exactly as the migrations declare.
 		DisableAutomaticPing:                     true,
 		DisableForeignKeyConstraintWhenMigrating: true,
@@ -79,7 +72,7 @@ func Open(ctx context.Context, cfg *config.Config, log *slog.Logger) (*gorm.DB, 
 	return db, d, nil
 }
 
-// Close shuts the underlying pool down. GORM has no Close of its own.
+// Close shuts down the underlying connection pool.
 func Close(db *gorm.DB) error {
 	sqlDB, err := db.DB()
 	if err != nil {
@@ -88,5 +81,5 @@ func Close(db *gorm.DB) error {
 	return sqlDB.Close()
 }
 
-// Pool exposes the standard-library handle, for the health check.
+// Pool returns the underlying database/sql handle.
 func Pool(db *gorm.DB) (*sql.DB, error) { return db.DB() }

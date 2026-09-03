@@ -2,8 +2,6 @@
 import MainLayout from "../layouts/MainLayout.astro";
 import { getPPIDLists } from "../lib/services/content.service";
 
-// Data access lives in src/lib/services. This page ran two queries, the second
-// re-joining the category it had just fetched.
 const { kategori, items } = await getPPIDLists();
 ---
 

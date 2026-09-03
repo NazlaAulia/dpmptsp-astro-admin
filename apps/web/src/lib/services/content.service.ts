@@ -1,8 +1,4 @@
 // Content use cases for the public site.
-//
-// Thin on purpose: these are ordered lists with no logic beyond fetching them.
-// The layer exists so pages depend on a service rather than on a data source,
-// which is what made swapping SQL for the API a change to one file.
 
 export {
   findPerformanceDocs as getPerformanceDocs,
@@ -17,11 +13,6 @@ import { findPPID } from "../repositories/content.repository";
 
 /**
  * PPID in the two flat lists the page renders.
- *
- * The API returns items nested inside their category, which is the better
- * shape, but flattening here keeps the change to the data source alone — the
- * template already iterates a category list and an item list, and rewriting
- * markup in the same commit as a data-access change makes both harder to review.
  */
 export async function getPPIDLists() {
   const categories = await findPPID();
@@ -59,15 +50,6 @@ import { findHome } from "../repositories/content.repository";
 
 /**
  * The homepage, shaped as the template already expects.
- *
- * Most sections need no adaptation: the API's field names are the legacy column
- * names, so notifikasi, slider, unggul, videos, aplikasi, tentang and renstra
- * pass straight through. Two do not:
- *
- *   berita  the API returns the article DTO (id, published_at, excerpt); the
- *           template reads the post columns (id_post, date, content).
- *   peta    the API returns one object or null, because there is only ever one
- *           row; the template indexes it as peta[0].
  */
 export async function getHomeContent() {
   const home = await findHome();
@@ -112,13 +94,6 @@ import { findAbout, findInfoSection, findPhotos, findServiceStandards } from "..
 
 /**
  * About page content.
- *
- * The tab list is mapped back to the legacy mixed-case column names the
- * template reads (Nama_Konten, Isi_Konten…). The schema renamed them because
- * `TentangKamisWebV5` was queried in two different cases and only worked by
- * MySQL's accident of case folding; the markup still reads the old names, and
- * renaming data access and rewriting markup in one change makes both harder to
- * review.
  */
 export async function getAboutContent() {
   const about = await findAbout();
@@ -174,3 +149,5 @@ export async function getPhotoPage(rawPage: unknown, perPage = 8) {
   const page = Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
   return findPhotos(page, perPage);
 }
+
+export { findAnnouncements as getAnnouncements } from "../repositories/content.repository";

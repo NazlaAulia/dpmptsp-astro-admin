@@ -2,8 +2,6 @@
 import { MEDIA_BASE_URL } from "../../lib/media";
 export const prerender = false;
 
-// Data access lives in src/lib/services. This component previously ran the
-// count query, the join query and the pagination arithmetic itself.
 import { listArticles } from "../../lib/services/article.service";
 
 // CSRF token for the delete form. Set by src/middleware.ts.

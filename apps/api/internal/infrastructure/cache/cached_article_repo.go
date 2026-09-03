@@ -6,12 +6,8 @@ import (
 	"dpmptsp/api/internal/domain"
 )
 
-// CachedArticleRepo is the decorator SPEC.md §6 describes: cache-aside in front
-// of the real repository, wired in main.go, invisible to everything above it.
-//
-// The application layer receives a domain.ArticleRepository and cannot tell a
-// cache is here, which is what lets the whole thing be removed by changing one
-// line of wiring.
+// CachedArticleRepo is a cache-aside decorator over a domain.ArticleRepository.
+// It is wired in routes.go and is transparent to the application layer.
 type CachedArticleRepo struct {
 	inner domain.ArticleRepository
 	rdb   *Client
@@ -24,9 +20,8 @@ func NewCachedArticleRepo(inner domain.ArticleRepository, rdb *Client) *CachedAr
 var _ domain.ArticleRepository = (*CachedArticleRepo)(nil)
 
 func (r *CachedArticleRepo) List(ctx context.Context, f domain.ArticleFilter) (domain.Page[domain.Article], error) {
-	// Search is deliberately NOT cached. The key space is unbounded — every
-	// distinct query string is a new key — and the hit rate is near zero. The
-	// fix for slow search is the full-text index, not a cache.
+	// Search is not cached: the key space is unbounded and the hit rate is
+	// negligible.
 	if f.Search != "" {
 		return r.inner.List(ctx, f)
 	}
@@ -61,8 +56,7 @@ func (r *CachedArticleRepo) BySlug(ctx context.Context, slug string) (*domain.Ar
 	return a, nil
 }
 
-// ByID is not cached. It is only reached from the admin panel, and an editor
-// who saves a change and does not see it is a worse bug than a slow page.
+// ByID is not cached; it serves admin reads, which must be current.
 func (r *CachedArticleRepo) ByID(ctx context.Context, id int64) (*domain.Article, error) {
 	return r.inner.ByID(ctx, id)
 }
@@ -84,9 +78,7 @@ func (r *CachedArticleRepo) Update(ctx context.Context, a *domain.Article) error
 }
 
 func (r *CachedArticleRepo) Delete(ctx context.Context, id int64) error {
-	// Read the row first so its slug key can be dropped: after the delete there
-	// is nothing left to tell us which key to remove, and the stale entry would
-	// serve a deleted article until its TTL expired.
+	// Read the row first so its slug key can be dropped after deletion.
 	existing, _ := r.inner.ByID(ctx, id)
 	if err := r.inner.Delete(ctx, id); err != nil {
 		return err
@@ -95,18 +87,15 @@ func (r *CachedArticleRepo) Delete(ctx context.Context, id int64) error {
 	return nil
 }
 
-// IncrementHits does NOT invalidate. A view counter changes on nearly every
-// request, and bumping the version each time would make the list cache useless.
-// The counter being a few minutes stale is the intended trade.
+// IncrementHits does not invalidate: the counter changes on nearly every
+// request and may lag by one TTL.
 func (r *CachedArticleRepo) IncrementHits(ctx context.Context, id int64) error {
 	return r.inner.IncrementHits(ctx, id)
 }
 
-// invalidate bumps the list counter and drops the one entity key.
-//
-// Note what is absent: no SCAN, no KEYS, no pattern delete. Every list key
-// built from the previous version simply stops being addressable and expires
-// on its own TTL (CLAUDE.md rule 7).
+// invalidate bumps the list version counter and drops the entity key. List
+// keys built from the previous version expire on their own TTL; no pattern
+// delete is performed.
 func (r *CachedArticleRepo) invalidate(ctx context.Context, a *domain.Article) {
 	Invalidate(ctx, r.rdb, ResourceArticles)
 	if a != nil && a.Slug != "" {
@@ -114,11 +103,8 @@ func (r *CachedArticleRepo) invalidate(ctx context.Context, a *domain.Article) {
 	}
 }
 
-// CachedSiteRepo caches the branding and menu.
-//
-// This is the highest-value entry in the whole cache: the header renders on
-// every page and its data changes perhaps monthly, so it should be a near
-// permanent hit with a long TTL.
+// CachedSiteRepo caches site branding and navigation, which are read on every
+// page render and written rarely.
 type CachedSiteRepo struct {
 	inner domain.SiteRepository
 	rdb   *Client
@@ -167,7 +153,7 @@ func (r *CachedSiteRepo) MenuTree(ctx context.Context) ([]domain.MenuNode, []dom
 	return nav, contact, nil
 }
 
-// InvalidateChrome is called by whatever edits the menu or the settings.
+// InvalidateChrome retires cached branding and navigation.
 func InvalidateChrome(ctx context.Context, rdb *Client) {
 	Invalidate(ctx, rdb, ResourceChrome)
 }

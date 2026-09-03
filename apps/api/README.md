@@ -1,6 +1,6 @@
 # apps/api
 
-The Go backend. Reachable only from the internal docker network (SPEC.md §8);
+The Go backend. Reachable only from the internal docker network;
 the Astro apps call it server-side and nothing else does.
 
 ## Building without Go installed

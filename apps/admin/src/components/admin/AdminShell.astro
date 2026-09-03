@@ -31,7 +31,9 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
     </section>
   )}
 
-  <slot />
+  <div class="content-body">
+    <slot />
+  </div>
 
 </main>
   </div>
@@ -57,15 +59,25 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  padding: 24px 28px 32px;
+  padding: 24px 28px 0;
   display: flex;
   flex-direction: column;
   gap: 22px;
 }
 
-:global(.content > .box),
-:global(.content > .table-box),
-:global(.content > .table-container) {
+.content-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+:global(.content-body > .box),
+:global(.content-body > .table-box),
+:global(.content-body > .table-container) {
   flex: 1;
   min-height: 0;
 }

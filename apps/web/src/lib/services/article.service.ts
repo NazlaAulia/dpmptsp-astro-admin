@@ -16,10 +16,6 @@ function categoriesFor(type: ListType): number[] | undefined {
 
 /**
  * One page of the article list.
- *
- * The page number is clamped here rather than trusted. The previous version
- * interpolated an offset derived from the query string straight into SQL, so
- * ?page=abc produced `OFFSET NaN` and a 500.
  */
 export async function listArticles(
   rawPage: unknown,
@@ -51,10 +47,6 @@ export async function listArticles(
 
 /**
  * Everything the article page needs, fetched concurrently.
- *
- * The page it replaces ran five queries, two of whose results it discarded, and
- * two of which were `SELECT *` over the whole post table — one unbounded, one
- * `LIMIT 1000` — purely to find one article by slug and pick five siblings.
  */
 export async function getArticlePage(rawSlug: string) {
   const slug = decodeURIComponent(String(rawSlug ?? "")).toLowerCase().trim();

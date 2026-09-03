@@ -1,8 +1,4 @@
 // Site chrome data access — now through the Go API rather than SQL.
-//
-// This file is the seam described in the article repository, and this is what
-// it was for: the service above and Header.astro above that are unchanged. Only
-// the bodies here moved from db.query to an API call.
 
 import { api } from "@dpmptsp/api-client";
 import { FALLBACK_SETTINGS, type MenuRow, type SiteSettings } from "../models/site";
@@ -15,10 +11,6 @@ export type ChromeData = {
 
 /**
  * One call rather than two queries.
- *
- * The menu arrives already nested and sorted: building the tree from flat
- * parent_id rows is data work, and it used to happen inside a component on
- * every render of every page.
  */
 export async function fetchChrome(): Promise<ChromeData> {
   const res = await api.siteChrome();

@@ -50,10 +50,6 @@ func Paged(w http.ResponseWriter, data any, total int64, page, perPage int) {
 }
 
 // Error maps a domain error onto a status code and a message safe to send.
-//
-// The internal error text is logged, never returned: a database error string
-// can name tables, columns and constraints, and there is no reason to hand that
-// to a caller.
 func Error(w http.ResponseWriter, log *slog.Logger, requestID string, err error) {
 	switch {
 	case errors.Is(err, domain.ErrNotFound):

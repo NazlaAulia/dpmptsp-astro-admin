@@ -1,18 +1,10 @@
 // Client for the Go API.
-//
-// SERVER-SIDE ONLY. This carries the internal service key, so it must never be
-// imported from anything that ships to the browser (SPEC.md §2, §7). The API is
-// reachable only on the internal docker network; the browser talks to Astro and
-// Astro talks to this.
-//
-// The transport is hand-written and stays hand-written. Only the request and
-// response *types* are generated from the OpenAPI spec (CLAUDE.md rule 5).
 
 import { optionalEnv, requireEnv, intEnv } from "@dpmptsp/config";
 import type { components } from "./generated/schema";
 
 // Request and response shapes come from the OpenAPI spec, never hand-written
-// (CLAUDE.md rule 5, SPEC.md §5). Regenerate with `pnpm --filter
+// . Regenerate with `pnpm --filter
 // @dpmptsp/api-client generate` after changing apps/api/openapi.yaml.
 type Schemas = components["schemas"];
 
@@ -38,6 +30,8 @@ export type About = Schemas["About"];
 export type ServiceStandard = Schemas["ServiceStandard"];
 export type InfoSection = Schemas["InfoSection"];
 export type Photo = Schemas["Photo"];
+export type Announcement = Schemas["Announcement"];
+export type AnnouncementInput = Schemas["AnnouncementInput"];
 
 export type ListArticlesQuery = {
   page?: number;
@@ -54,10 +48,6 @@ function baseUrl(): string {
 
 /**
  * Every request is bounded.
- *
- * Without a timeout an unhealthy API turns into hung SSR workers: the page
- * never finishes rendering, the connection is held open, and the failure looks
- * like the website being down rather than one dependency being slow.
  */
 const DEFAULT_TIMEOUT_MS = 5_000;
 
@@ -186,6 +176,40 @@ export const api = {
 
   infoSection(sectionId: string) {
     return request<InfoSection>(`/v1/info-sections/${encodeURIComponent(sectionId)}`);
+  },
+
+  announcements(opts: { tipe?: "notif" | "modal"; includeInactive?: boolean } = {}) {
+    return request<Announcement[]>(
+      "/v1/announcements" +
+        qs({
+          tipe: opts.tipe,
+          include_inactive: opts.includeInactive ? "true" : undefined,
+        })
+    );
+  },
+
+  announcement(id: number) {
+    return request<Announcement>(`/v1/announcements/${id}`);
+  },
+
+  createAnnouncement(body: AnnouncementInput) {
+    return request<Announcement>("/v1/announcements", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  },
+
+  updateAnnouncement(id: number, body: AnnouncementInput) {
+    return request<Announcement>(`/v1/announcements/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  },
+
+  deleteAnnouncement(id: number) {
+    return request<null>(`/v1/announcements/${id}`, { method: "DELETE" });
   },
 
   photos(page = 1, perPage = 8) {

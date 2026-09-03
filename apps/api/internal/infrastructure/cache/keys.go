@@ -9,17 +9,11 @@ import (
 	"dpmptsp/api/internal/domain"
 )
 
-// Resource names a group of data that shares one version counter.
-//
-// SPEC.md §6 asks for a counter per resource type. Twelve counters for
-// twenty-six tables would be more machinery than the invalidation patterns
-// justify, so related tables share one and are split only when measurement
-// shows a counter is too coarse.
+// Resource names a group of tables sharing one version counter.
 type Resource string
 
 const (
-	// Read on literally every page, written almost never, so it earns its own
-	// counter and a long TTL that an article edit must not disturb.
+	// Branding and navigation: read on every page, written rarely.
 	ResourceChrome Resource = "chrome"
 	// Articles and their categories.
 	ResourceArticles Resource = "articles"
@@ -27,8 +21,7 @@ const (
 	ResourceContent Resource = "content"
 )
 
-// TTLs. Old versioned keys become unreachable the moment a counter moves and
-// then expire on their own, which is what makes SCAN unnecessary.
+// TTLs. Keys built from a superseded version expire on their own.
 const (
 	TTLChrome   = 24 * time.Hour
 	TTLArticles = 10 * time.Minute
@@ -37,11 +30,8 @@ const (
 )
 
 // VersionedKey builds a cache key carrying the resource's current version.
-//
-// This is the whole mechanism from SPEC.md §6: a write only has to INCR the
-// counter. Every key built from the old version is instantly unreachable and
-// expires on its TTL, so a list cache can be invalidated without SCAN+DEL,
-// which blocks Redis in production (CLAUDE.md rule 7).
+// Incrementing the counter retires every key built from the previous one, so
+// list invalidation needs no pattern delete.
 func VersionedKey(ctx context.Context, c *Client, r Resource, parts ...string) (string, bool) {
 	if c == nil {
 		return "", false
@@ -53,8 +43,7 @@ func VersionedKey(ctx context.Context, c *Client, r Resource, parts ...string) (
 	return fmt.Sprintf("%s:v%d:%s", r, v, strings.Join(parts, ":")), true
 }
 
-// Invalidate bumps a resource's counter, which retires every list key built
-// from it in one operation.
+// Invalidate increments a resource's version counter.
 func Invalidate(ctx context.Context, c *Client, r Resource) {
 	if c == nil {
 		return
@@ -62,14 +51,12 @@ func Invalidate(ctx context.Context, c *Client, r Resource) {
 	_ = c.BumpVersion(ctx, string(r))
 }
 
-// EntityKey is for a single record, which is deleted directly on write rather
-// than versioned — there is exactly one key, so there is nothing to sweep.
+// EntityKey addresses a single record. Such keys are deleted directly on write.
 func EntityKey(r Resource, id string) string {
 	return fmt.Sprintf("%s:entity:%s", r, id)
 }
 
-// ArticleListKey encodes the filter into the key. Anything that changes the
-// result set has to appear here, or two different queries share a cache entry.
+// ArticleListKey encodes every filter field that affects the result set.
 func ArticleListKey(ctx context.Context, c *Client, f domain.ArticleFilter) (string, bool) {
 	cats := make([]string, 0, len(f.CategoryIDs))
 	for _, id := range f.CategoryIDs {

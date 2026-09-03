@@ -81,14 +81,6 @@ func Logging(log *slog.Logger) func(http.Handler) http.Handler {
 }
 
 // ServiceAuth authenticates the caller as one of our own Astro apps.
-//
-// SPEC.md §7 treats a shared internal key and an HMAC-signed request as
-// equivalent, given that §8 keeps this service off the public network. The key
-// is the simpler of the two and is what is implemented; the upgrade trigger is
-// any non-Astro client, or this service ever binding to a routable interface.
-//
-// Compared in constant time: a timing-variable compare on a shared secret is a
-// slow leak of the secret itself.
 func ServiceAuth(key string, skip func(*http.Request) bool) func(http.Handler) http.Handler {
 	want := []byte(key)
 	return func(next http.Handler) http.Handler {

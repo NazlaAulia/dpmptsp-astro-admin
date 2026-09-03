@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// Postgres is the primary target (SPEC.md §12 as amended).
+// Postgres is the primary target.
 type Postgres struct{}
 
 func (Postgres) Name() string { return "postgres" }

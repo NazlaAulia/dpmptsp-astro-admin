@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"strconv"
@@ -98,9 +99,6 @@ func (h *Articles) List(w http.ResponseWriter, r *http.Request) {
 }
 
 // BySlug handles GET /v1/articles/by-slug/{slug}.
-//
-// This replaces the page that loaded all 553 articles and slugified each one in
-// JavaScript to find a single match.
 func (h *Articles) BySlug(w http.ResponseWriter, r *http.Request) {
 	slug := r.PathValue("slug")
 	if slug == "" {
@@ -258,4 +256,9 @@ func excerpt(html string, max int) string {
 		cut = cut[:i]
 	}
 	return cut + "…"
+}
+
+// errInvalid wraps a validation message as a domain validation error.
+func errInvalid(msg string) error {
+	return fmt.Errorf("%w: %s", domain.ErrInvalid, msg)
 }

@@ -1,8 +1,4 @@
 // Article shapes for the public site.
-//
-// Field names follow the legacy `post` columns because the templates already
-// read them that way. Renaming them here would mean editing markup as well as
-// data access in the same change, and those are much easier to review apart.
 
 export type ArticleListItem = {
   id: number;

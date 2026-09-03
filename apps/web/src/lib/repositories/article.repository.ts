@@ -1,8 +1,4 @@
 // Article data access — now through the Go API rather than SQL.
-//
-// This file is the seam. It previously would have held db.query calls; the
-// service and the pages above it are unchanged by the switch, which is the
-// whole reason the layer exists.
 
 import { api, type Article } from "@dpmptsp/api-client";
 import type { ArticleDetail, ArticleListItem, ArticlePage } from "../models/article";

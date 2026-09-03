@@ -2,11 +2,6 @@
 
 /**
  * Escapes text for interpolation into an HTML string.
- *
- * Astro escapes template interpolations automatically, so this is only for the
- * places that still build markup with innerHTML. Those should shrink: the right
- * fix is to render server-side, not to escape more carefully. This exists for
- * the handful of genuinely client-rendered fragments that remain.
  */
 export function escapeHtml(value: unknown): string {
   return String(value ?? "")

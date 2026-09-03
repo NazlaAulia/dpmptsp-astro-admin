@@ -1,20 +1,4 @@
 // Admin session handling.
-//
-// Replaces the previous scheme, which set the cookie `admin-auth` to the
-// literal string "true". That value was constant, so anyone could mint a valid
-// session with `curl -b 'admin-auth=true'`; httpOnly did not help, because an
-// attacker never needed to read the cookie, only to send one.
-//
-// This issues a signed, expiring cookie instead. The payload is HMAC-SHA256'd
-// with SESSION_SECRET and compared in constant time, so it cannot be forged or
-// extended without the secret.
-//
-// KNOWN LIMITATION, deliberate at this stage: the session is self-contained,
-// not backed by a server-side store, because Redis arrives with apps/api. That
-// means logout clears the browser's cookie but cannot revoke a token someone
-// has already copied — it stays valid until it expires. When the Go API lands,
-// the payload becomes an opaque id resolved against Redis and this limitation
-// disappears. Keep the TTL short until then.
 
 import crypto from "node:crypto";
 import type { AstroCookies } from "astro";
@@ -55,10 +39,8 @@ function isSecure(): boolean {
 }
 
 /**
- * The __Host- prefix makes the browser itself enforce Secure, Path=/ and the
- * absence of Domain — free hardening. It is only legal on a secure cookie, so
- * over plain-HTTP dev the browser would silently drop it and login would look
- * broken for no visible reason. Hence the conditional name.
+ * The __Host- prefix is only valid on a Secure cookie, so the plain name is
+ * used when cookies are not secure.
  */
 export function cookieName(): string {
   return isSecure() ? "__Host-dpmptsp_admin" : "dpmptsp_admin";

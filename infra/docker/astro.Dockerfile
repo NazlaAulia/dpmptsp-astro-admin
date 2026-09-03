@@ -1,4 +1,6 @@
-# syntax=docker/dockerfile:1.7
+# No `# syntax=` pin: it makes BuildKit fetch an external frontend on every
+# build, so a registry hiccup breaks local builds. The built-in frontend
+# already supports the cache mounts used below.
 #
 # One Dockerfile for both Astro apps. Select with --build-arg APP=web|admin.
 ARG NODE_VERSION=22.17.1

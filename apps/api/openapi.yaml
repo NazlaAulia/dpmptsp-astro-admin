@@ -6,15 +6,14 @@ info:
   description: |
     Internal API for the DPMPTSP web and admin applications.
 
-    This service is reachable only from the internal docker network (SPEC.md
-    §8). The browser never calls it: it calls Astro, and Astro calls this
+    This service is reachable only from the internal docker network. The browser never calls it: it calls Astro, and Astro calls this
     server-side. There is therefore no CORS configuration, no public rate
     limiting and no browser-facing auth — those concerns live at the
     Astro/browser boundary instead.
 
-    This file is the contract (SPEC.md §5). packages/api-client's types are
+    This file is the contract. packages/api-client's types are
     generated from it; the request/response shapes must not be hand-written in
-    web or admin (CLAUDE.md rule 5).
+    web or admin.
 
 servers:
   - url: http://api:8080
@@ -29,6 +28,7 @@ tags:
   - name: site
   - name: content
   - name: pages
+  - name: announcements
 
 paths:
   /healthz:
@@ -381,6 +381,80 @@ paths:
                   data: { type: array, items: { $ref: "#/components/schemas/Photo" } }
                   meta: { $ref: "#/components/schemas/PageMeta" }
 
+  /v1/announcements:
+    get:
+      tags: [announcements]
+      summary: List announcements
+      parameters:
+        - { name: tipe, in: query, schema: { type: string, enum: [notif, modal] } }
+        - { name: include_inactive, in: query, schema: { type: boolean } }
+      responses:
+        "200":
+          description: announcements
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Announcement" } }
+    post:
+      tags: [announcements]
+      summary: Create an announcement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AnnouncementInput" }
+      responses:
+        "201":
+          description: created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { data: { $ref: "#/components/schemas/Announcement" } }
+        "422": { $ref: "#/components/responses/ValidationFailed" }
+
+  /v1/announcements/{id}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: integer, format: int64 } }
+    get:
+      tags: [announcements]
+      summary: Get one announcement
+      responses:
+        "200":
+          description: the announcement
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { data: { $ref: "#/components/schemas/Announcement" } }
+        "404": { $ref: "#/components/responses/NotFound" }
+    put:
+      tags: [announcements]
+      summary: Update an announcement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AnnouncementInput" }
+      responses:
+        "200":
+          description: updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { data: { $ref: "#/components/schemas/Announcement" } }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/ValidationFailed" }
+    delete:
+      tags: [announcements]
+      summary: Delete an announcement
+      responses:
+        "204": { description: deleted }
+        "404": { $ref: "#/components/responses/NotFound" }
+
   /v1/site/chrome:
     get:
       tags: [site]
@@ -407,8 +481,7 @@ components:
       in: header
       name: X-Internal-Key
       description: |
-        Shared key identifying the caller as one of our own Astro apps
-        (SPEC.md §7). Compared in constant time. Health endpoints are exempt so
+        Shared key identifying the caller as one of our own Astro apps. Compared in constant time. Health endpoints are exempt so
         container probes can reach them.
 
   responses:
@@ -745,6 +818,36 @@ components:
         location: { type: string }
         alamat: { type: string }
         created_at: { type: string, format: date-time }
+
+    Announcement:
+      type: object
+      required: [id, judul, is_active, urutan, tipe]
+      properties:
+        id: { type: integer, format: int64 }
+        judul: { type: string }
+        deskripsi: { type: string }
+        foto: { type: string }
+        link_url: { type: string }
+        is_active: { type: boolean }
+        urutan: { type: integer }
+        tipe:
+          type: string
+          enum: [notif, modal]
+          description: notif renders in the list; modal renders as an overlay on the homepage.
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    AnnouncementInput:
+      type: object
+      required: [judul]
+      properties:
+        judul: { type: string, minLength: 1 }
+        deskripsi: { type: string }
+        foto: { type: string }
+        link_url: { type: string }
+        is_active: { type: boolean, default: true }
+        urutan: { type: integer, default: 0 }
+        tipe: { type: string, enum: [notif, modal], default: notif }
 
     SiteChrome:
       type: object

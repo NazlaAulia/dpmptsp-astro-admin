@@ -15,10 +15,6 @@ import (
 )
 
 // S3Disk stores objects in any S3-compatible bucket.
-//
-// minio-go rather than the AWS SDK: it speaks plain S3, so it works against
-// both AWS and the MinIO instance already running on this host, and it is a
-// fraction of the dependency weight for what this needs.
 type S3Disk struct {
 	name    string
 	client  *minio.Client
@@ -157,10 +153,6 @@ func (d *S3Disk) URL(key string) (string, error) {
 }
 
 // PresignedURL gives temporary access to a private object.
-//
-// Not on the Disk interface on purpose: only S3 can do it, and putting it there
-// would force every other driver to carry a method it cannot implement. Reach
-// it with a type assertion where it is genuinely needed.
 func (d *S3Disk) PresignedURL(ctx context.Context, key string, expiry time.Duration) (string, error) {
 	clean, err := cleanKey(key)
 	if err != nil {

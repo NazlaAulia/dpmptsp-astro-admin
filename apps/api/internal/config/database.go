@@ -6,20 +6,12 @@ import (
 	"strings"
 )
 
-// Database is configured with discrete variables, the way Laravel does it:
+// Database holds the discrete connection settings:
 //
-//	DB_CONNECTION=mysql
-//	DB_HOST=database
-//	DB_PORT=3306
-//	DB_DATABASE=ladpm
-//	DB_USERNAME=root
-//	DB_PASSWORD=secret
+//	DB_CONNECTION DB_HOST DB_PORT DB_DATABASE DB_USERNAME DB_PASSWORD
 //
-// The driver-specific DSN is then built here. That matters because the two
-// drivers disagree about what a DSN even looks like — pgx wants a URL, and
-// go-sql-driver/mysql wants `user:pass@tcp(host:port)/db` — so asking an
-// operator to supply one directly leaks the engine switch straight into the
-// environment file, which is exactly what it exists to hide.
+// The driver-specific DSN is built from them by DSN, since pgx expects a URL
+// and go-sql-driver expects user:pass@tcp(host:port)/db.
 type Database struct {
 	Connection Engine
 	Host       string
@@ -33,9 +25,7 @@ type Database struct {
 	// Charset is MySQL only.
 	Charset string
 
-	// URL, when set, is used verbatim and every field above is ignored.
-	// Laravel offers the same escape hatch, and it is the practical way to
-	// accept a connection string from a managed provider.
+	// URL, when set, is used verbatim and the fields above are ignored.
 	URL string
 }
 
@@ -59,8 +49,7 @@ func (d Database) DSN() (string, error) {
 		return u.String(), nil
 
 	case MySQL:
-		// Not a URL. Credentials are escaped by the driver's own rules, and a
-		// password containing '@' or '/' would otherwise break parsing.
+		// go-sql-driver does not accept a URL scheme.
 		q := url.Values{}
 		q.Set("parseTime", "true")
 		q.Set("charset", orDefault(d.Charset, "utf8mb4"))

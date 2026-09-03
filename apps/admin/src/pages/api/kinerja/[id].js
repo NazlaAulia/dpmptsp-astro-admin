@@ -1,12 +1,4 @@
 // Delete one kinerja (twdata) row.
-//
-// Replaces src/pages/api/[id].js, which was a catch-all directly under /api:
-// any DELETE to /api/<anything-without-a-more-specific-route> ran
-// `DELETE FROM twdata WHERE id = ?` with that path segment, unauthenticated
-// and unvalidated. Namespacing it removes the accidental blast radius.
-//
-// Authentication is enforced by src/middleware.ts, which also refuses any
-// cross-origin write.
 export const prerender = false;
 
 import { db } from "../../../lib/db.js";

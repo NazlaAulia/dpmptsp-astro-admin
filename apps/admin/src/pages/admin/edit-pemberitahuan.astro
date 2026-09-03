@@ -1,0 +1,404 @@
+---
+export const prerender = false;
+
+import fs from "node:fs/promises";
+import path from "node:path";
+import AdminShell from "../../components/admin/AdminShell.astro";
+import { getAnnouncement, updateAnnouncement } from "../../lib/services/announcement.service";
+import { verifyCsrf } from "../../lib/session";
+
+const id = Number(new URL(Astro.request.url).searchParams.get("id"));
+if (!Number.isFinite(id) || id <= 0) {
+  return new Response("Invalid id", { status: 400 });
+}
+
+let error = "";
+
+if (Astro.request.method === "POST") {
+  const data = await Astro.request.formData();
+
+  if (!verifyCsrf(Astro.locals.session, data.get("_csrf"))) {
+    return new Response("Invalid CSRF token.", { status: 403 });
+  }
+
+  let foto = String(data.get("foto_lama") ?? "");
+  const file = data.get("foto");
+  if (file && typeof file !== "string" && file.size > 0) {
+    const ext = (file.name.split(".").pop() ?? "bin").toLowerCase().replace(/[^a-z0-9]/g, "");
+    const filename = `pemberitahuan_${Date.now()}.${ext}`;
+    const uploadDir = path.join(process.cwd(), "public/uploads");
+    await fs.mkdir(uploadDir, { recursive: true });
+    await fs.writeFile(path.join(uploadDir, filename), Buffer.from(await file.arrayBuffer()));
+    foto = filename;
+  }
+
+  const res = await updateAnnouncement(id, {
+    judul: String(data.get("judul") ?? ""),
+    deskripsi: String(data.get("deskripsi") ?? ""),
+    foto,
+    link_url: String(data.get("link_url") ?? ""),
+    is_active: (data.get("status_aktif") ?? "Y") === "Y",
+    tipe: (data.get("tipe") === "modal" ? "modal" : "notif"),
+  });
+
+  if (res.ok) return Astro.redirect("/admin/pemberitahuan", 303);
+  error = res.error;
+}
+
+const pemberitahuan = await getAnnouncement(id);
+if (!pemberitahuan) {
+  return new Response("Pemberitahuan tidak ditemukan", { status: 404 });
+}
+
+// The template reads `item` and the legacy status_aktif flag.
+const item = { ...pemberitahuan, status_aktif: pemberitahuan.is_active ? "Y" : "N" };
+
+const csrf = Astro.locals.csrfToken ?? "";
+---
+
+
+<AdminShell title="Edit Pemberitahuan" subtitle="Perbarui pemberitahuan atau popup modal." actionLabel="Kembali" actionHref="/admin/pemberitahuan">
+  <div class="form-container">
+    <form method="POST" enctype="multipart/form-data" class="form">
+      <div class="form-group">
+        <label for="foto" class="label-with-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+          Upload Gambar (Opsional)
+        </label>
+        <div class="file-upload">
+          <input type="file" id="foto" name="foto" accept="image/*" />
+          <label for="foto" class="file-label">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            <span class="upload-text">Klik di sini atau drag & drop gambar baru</span>
+            <span class="upload-hint">JPG, PNG, GIF (Max 5MB)</span>
+          </label>
+          <div id="preview-container" class="preview-container">
+            {item.foto && (
+              <div class="preview-image">
+                <img src={`/uploads/${item.foto}`} alt="Current" />
+                <button type="button" class="preview-remove" title="Hapus">×</button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="judul">Judul *</label>
+        <input type="text" id="judul" name="judul" value={item.judul} placeholder="Masukkan judul pemberitahuan" required />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="tipe">Tipe *</label>
+          <select id="tipe" name="tipe" required>
+            <option value="modal" selected={item.tipe === 'modal'}>Popup Modal</option>
+            <option value="notif" selected={item.tipe === 'notif'}>Notifikasi</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="status_aktif">Status *</label>
+          <select id="status_aktif" name="status_aktif" required>
+            <option value="Y" selected={item.status_aktif === 'Y'}>Aktif</option>
+            <option value="N" selected={item.status_aktif === 'N'}>Nonaktif</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="link_url">Link URL (Opsional)</label>
+        <input type="url" id="link_url" name="link_url" value={item.link_url || ""} placeholder="https://example.com" />
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-submit">Simpan Perubahan</button>
+        <a href="/admin/pemberitahuan" class="btn-cancel">Batal</a>
+      </div>
+    </form>
+  </div>
+</AdminShell>
+
+<style>
+  .form-container {
+    background: white;
+    border-radius: 20px;
+    border: 1px solid #eef1f6;
+    box-shadow: 0 1px 2px rgba(15,23,42,.03), 0 20px 40px -18px rgba(15,23,42,.10);
+    padding: 32px;
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .form-group label {
+    font-weight: 600;
+    font-size: 13.5px;
+    color: #334155;
+  }
+
+  .label-with-icon {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .label-with-icon svg {
+    color: #2563eb;
+    flex-shrink: 0;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 12px 14px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+    background: #f8fafc;
+    color: #0f172a;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, .12);
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .file-upload {
+    border: 2px dashed #93c5fd;
+    border-radius: 16px;
+    padding: 32px;
+    text-align: center;
+    transition: all 0.2s ease;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0.02) 100%);
+    cursor: pointer;
+  }
+
+  .file-upload:hover {
+    border-color: #2563eb;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+  }
+
+  .file-upload input[type="file"] {
+    display: none;
+  }
+
+  .file-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    color: #64748b;
+  }
+
+  .file-label svg {
+    color: #2563eb;
+    width: 44px;
+    height: 44px;
+  }
+
+  .upload-text {
+    font-weight: 600;
+    font-size: 15px;
+    color: #0f172a;
+  }
+
+  .upload-hint {
+    font-size: 12.5px;
+    color: #94a3b8;
+  }
+
+  .preview-container {
+    margin-top: 18px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .preview-image {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid #e2e8f0;
+    box-shadow: 0 6px 14px -8px rgba(15, 23, 42, 0.2);
+  }
+
+  .preview-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .preview-remove {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 28px;
+    height: 28px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    line-height: 1;
+    font-weight: bold;
+    transition: transform .15s ease, background .15s ease;
+    box-shadow: 0 4px 10px -4px rgba(239, 68, 68, 0.5);
+  }
+
+  .preview-remove:hover {
+    background: #dc2626;
+    transform: scale(1.08);
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    padding-top: 14px;
+    border-top: 1px solid #eef1f6;
+  }
+
+  .btn-submit {
+    padding: 12px 28px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease;
+    box-shadow: 0 8px 18px -8px rgba(37, 99, 235, .5);
+  }
+
+  .btn-submit:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 22px -8px rgba(37, 99, 235, .55);
+  }
+
+  .btn-cancel {
+    padding: 12px 28px;
+    background: #f1f5f9;
+    color: #334155;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .15s ease;
+  }
+
+  .btn-cancel:hover {
+    background: #e2e8f0;
+  }
+</style>
+
+<script>
+  const fileInput = document.getElementById("foto");
+  const previewContainer = document.getElementById("preview-container");
+
+  if (fileInput) {
+    fileInput.addEventListener("change", (e) => {
+      const existingPreview = previewContainer.querySelector(".preview-image");
+      const newPreviewDiv = document.createElement("div");
+
+      const files = e.target.files;
+      if (files && files.length > 0) {
+        const file = files[0];
+        const reader = new FileReader();
+        
+        reader.onload = (event) => {
+          newPreviewDiv.className = "preview-image";
+          newPreviewDiv.innerHTML = `
+            <img src="${event.target.result}" alt="preview" />
+            <button type="button" class="preview-remove" title="Hapus">×</button>
+          `;
+          
+          newPreviewDiv.querySelector(".preview-remove").addEventListener("click", () => {
+            fileInput.value = "";
+            if (previewContainer.contains(newPreviewDiv)) {
+              previewContainer.removeChild(newPreviewDiv);
+            }
+            if (existingPreview) {
+              existingPreview.style.display = "flex";
+            }
+          });
+          
+          if (existingPreview) {
+            existingPreview.style.display = "none";
+          }
+          previewContainer.appendChild(newPreviewDiv);
+        };
+        
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Drag & drop
+    const form = document.querySelector(".file-upload");
+    if (form) {
+      form.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        form.style.borderColor = "#315eea";
+        form.style.background = "rgba(49, 94, 234, 0.1)";
+      });
+
+      form.addEventListener("dragleave", () => {
+        form.style.borderColor = "#e5eaf2";
+        form.style.background = "#f8fafc";
+      });
+
+      form.addEventListener("drop", (e) => {
+        e.preventDefault();
+        form.style.borderColor = "#e5eaf2";
+        form.style.background = "#f8fafc";
+        
+        if (e.dataTransfer.files) {
+          fileInput.files = e.dataTransfer.files;
+          const event = new Event("change", { bubbles: true });
+          fileInput.dispatchEvent(event);
+        }
+      });
+    }
+  }
+</script>

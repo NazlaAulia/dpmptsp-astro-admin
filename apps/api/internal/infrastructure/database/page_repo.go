@@ -187,9 +187,6 @@ func (photoModel) TableName() string { return "tempat_pelayanan_dpmptsp" }
 // --- queries ------------------------------------------------------------
 
 // Home fetches every section concurrently.
-//
-// The page this replaces awaited ten queries one after another, so its render
-// time was their sum. errgroup makes it their maximum instead.
 func (r *PageRepo) Home(ctx context.Context) (domain.HomeContent, error) {
 	var out domain.HomeContent
 	g, gctx := errgroup.WithContext(ctx)

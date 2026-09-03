@@ -27,8 +27,8 @@ func New(cfg *config.Config, log *slog.Logger, db *gorm.DB, dia dialect.Dialect,
 
 	// Articles. Wired here rather than in a framework: net/http's own router
 	// handles method-and-pattern matching since 1.22, so a dependency would
-	// buy nothing (SPEC.md §11.1, §11.8).
-	// Cache-aside decorators, wired here and nowhere else (SPEC.md §6). The
+	// buy nothing.
+	// Cache-aside decorators, wired here and nowhere else. The
 	// application layer receives domain interfaces and cannot tell a cache is
 	// present, so removing it is a one-line change.
 	articleRepo := cache.NewCachedArticleRepo(database.NewArticleRepo(db, dia), rdb)
@@ -74,6 +74,13 @@ func New(cfg *config.Config, log *slog.Logger, db *gorm.DB, dia dialect.Dialect,
 	mux.HandleFunc("GET /v1/service-standards", pages.ServiceStandards)
 	mux.HandleFunc("GET /v1/info-sections/{sectionId}", pages.InfoSection)
 	mux.HandleFunc("GET /v1/gallery/photos", pages.Photos)
+
+	announcements := &handlers.Announcements{Repo: database.NewAnnouncementRepo(db), Log: log}
+	mux.HandleFunc("GET /v1/announcements", announcements.List)
+	mux.HandleFunc("GET /v1/announcements/{id}", announcements.ByID)
+	mux.HandleFunc("POST /v1/announcements", announcements.Create)
+	mux.HandleFunc("PUT /v1/announcements/{id}", announcements.Update)
+	mux.HandleFunc("DELETE /v1/announcements/{id}", announcements.Delete)
 
 	// Health endpoints stay reachable without the service key so that container
 	// orchestration can probe them.

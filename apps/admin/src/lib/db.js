@@ -1,11 +1,5 @@
 // TEMPORARY. This file is deleted once apps/api (Go) owns database access,
-// per CLAUDE.md rule 3: the frontend must never touch the database directly.
-//
-// Deliberately duplicated in apps/web and apps/admin rather than promoted to
-// packages/*. Sharing it would bless an architecture violation as shared
-// infrastructure and guarantee it outlives the Go API.
-//
-// Do not add queries here.
+// : the frontend must never touch the database directly.
 import mysql from "mysql2/promise";
 import { optionalEnv, intEnv } from "@dpmptsp/config";
 

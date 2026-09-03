@@ -1,8 +1,4 @@
 // Data access for articles.
-//
-// THIS IS THE SEAM — see apps/web/src/lib/repositories/site.repository.ts for
-// the same note. These bodies become calls to `GET /v1/posts` once the Go API
-// owns the data; the service and the pages above it do not change.
 
 import { db } from "../db.js";
 import type { Article } from "../models/article";

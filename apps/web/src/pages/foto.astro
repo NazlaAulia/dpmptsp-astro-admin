@@ -4,8 +4,6 @@ import { getPhotoPage } from "../lib/services/content.service";
 
 export const prerender = false;
 
-// Data access lives in src/lib/services. This page spliced LIMIT and OFFSET
-// straight into the SQL string.
 const url = new URL(Astro.request.url);
 const limit = 8;
 const result = await getPhotoPage(url.searchParams.get("page"), limit);
