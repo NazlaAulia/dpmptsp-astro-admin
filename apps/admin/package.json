@@ -17,8 +17,7 @@
     "@dpmptsp/api-client": "workspace:*",
     "@dpmptsp/config": "workspace:*",
     "@dpmptsp/ui": "workspace:*",
-    "astro": "catalog:",
-    "mysql2": "^3.16.0"
+    "astro": "catalog:"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.6",

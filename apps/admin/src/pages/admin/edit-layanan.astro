@@ -1,16 +1,16 @@
 ---
+
 import AdminShell from "../../components/admin/AdminShell.astro";
-import { db } from "../../lib/db.js";
+import { findServiceLocation } from "../../lib/services/content.service";
+
+export const prerender = false;
 
 const id = Astro.url.searchParams.get("id");
 
 let layananData = null;
-
 if (id) {
-  const [rows] = (await db.query("SELECT * FROM tempat_layanan WHERE id = ?", [id])) as any;
-  if (rows && rows.length > 0) {
-    layananData = rows[0];
-  }
+  const result = await findServiceLocation(Number(id));
+  if (result.ok) layananData = result.data;
 }
 ---
 

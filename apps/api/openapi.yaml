@@ -884,6 +884,46 @@ components:
         urutan: { type: integer, default: 0 }
         tipe: { type: string, enum: [notif, modal], default: notif }
 
+    Innovation:
+      type: object
+      required: [id, nama]
+      properties:
+        id: { type: integer, format: int64 }
+        slug: { type: string }
+        nama: { type: string }
+        singkatan: { type: string }
+        kategori: { type: string }
+        deskripsi: { type: string }
+        rancang_bangun: { type: string }
+        tujuan: { type: string }
+        manfaat: { type: string }
+        hasil: { type: string }
+        tahun_usulan: { type: integer }
+        tahapan: { type: string }
+        jenis: { type: string }
+        gambar: { type: string }
+        url_layanan: { type: string }
+        url_label: { type: string }
+        icon: { type: string }
+        warna: { type: string }
+        urutan: { type: integer }
+        is_active: { type: boolean }
+
+    Upload:
+      type: object
+      required: [key, size, content_type]
+      properties:
+        key:
+          type: string
+          description: Generated storage key. Reference stored files by this.
+        url:
+          type: string
+          description: Present only when the disk serves public URLs.
+        size: { type: integer, format: int64 }
+        content_type:
+          type: string
+          description: Detected from the file's bytes, not the client's claim.
+
     User:
       type: object
       required: [id, username, role]

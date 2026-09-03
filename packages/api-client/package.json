@@ -11,7 +11,8 @@
     "@dpmptsp/config": "workspace:*"
   },
   "scripts": {
-    "generate": "openapi-typescript ../../apps/api/openapi.yaml -o src/generated/schema.d.ts"
+    "generate": "openapi-typescript ../../apps/api/openapi.yaml -o src/generated/schema.d.ts",
+    "lint": "node scripts/check-generated.mjs"
   },
   "devDependencies": {
     "openapi-typescript": "^7.4.4"

@@ -1,102 +1,45 @@
 ---
+
 import AdminShell from "../../components/admin/AdminShell.astro";
-import { db } from "../../lib/db.js";
-import fs from "node:fs/promises";
-import path from "node:path";
+import { createAboutContent, hasFile, uploadFile } from "../../lib/services/content.service";
+
+export const prerender = false;
 
 let errorMessage = "";
 
 if (Astro.request.method === "POST") {
-  try {
-    const formData = await Astro.request.formData();
+  const formData = await Astro.request.formData();
 
-    // Mengambil data dari name="..." HTML
-    const namaKonten = formData.get("nama_konten")?.toString().trim();
-    const judulKonten = formData.get("judul_konten")?.toString().trim();
-    const isiKonten = formData.get("isi_konten")?.toString().trim();
-    const keterangan = formData.get("keterangan")?.toString().trim();
-    const tags = formData.get("tags")?.toString().trim();
-    const file = formData.get("foto_konten");
+  const namaKonten = formData.get("nama_konten")?.toString().trim() ?? "";
+  const judulKonten = formData.get("judul_konten")?.toString().trim() ?? "";
+  const isiKonten = formData.get("isi_konten")?.toString().trim() ?? "";
+  const keterangan = formData.get("keterangan")?.toString().trim() ?? "";
+  const tags = formData.get("tags")?.toString().trim() ?? "";
+  const file = formData.get("foto_konten");
 
-    // 1. Validasi Input Utama
-    if (!namaKonten || !judulKonten || !isiKonten) {
-      errorMessage = "Nama konten, judul, dan isi konten wajib diisi.";
-    } else {
-      let namaFile: string | null = null;
-
-      // 2. Process File Upload jika ada
-      if (file && typeof file !== "string" && file.size > 0) {
-        const allowedTypes = [
-          "image/jpeg",
-          "image/png",
-          "image/webp",
-          "image/jpg",
-          "video/mp4",
-          "video/webm",
-          "video/quicktime",
-        ];
-
-        if (!allowedTypes.includes(file.type)) {
-          throw new Error("Format file tidak didukung.");
-        }
-
-        if (file.size > 50 * 1024 * 1024) {
-          throw new Error("Ukuran file maksimal 50 MB.");
-        }
-
-        const originalName = file.name || "file";
-        const extension = path.extname(originalName).toLowerCase();
-        const safeName = namaKonten
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, "-")
-          .replace(/^-+|-+$/g, "");
-
-        namaFile = `${safeName}-${Date.now()}${extension}`;
-
-        const uploadDir = path.join(
-          process.cwd(),
-          "public",
-          "uploads",
-          "konten"
-        );
-
-        await fs.mkdir(uploadDir, { recursive: true });
-
-        const buffer = Buffer.from(await file.arrayBuffer());
-        await fs.writeFile(path.join(uploadDir, namaFile), buffer);
-      }
-
-      // 3. Simpan Ke Database (Nama kolom disesuaikan persis dengan phpMyAdmin)
-      await db.execute(
-        `INSERT INTO tentangkamiswebv5
-        (
-          Nama_Konten,
-          Isi_Konten,
-          Foto_Konten,
-          Judul_Konten,
-          Keterangan,
-          tags
-        )
-        VALUES (?, ?, ?, ?, ?, ?)`,
-        [
-          namaKonten,
-          isiKonten,
-          namaFile,
-          judulKonten,
-          keterangan || null,
-          tags || null,
-        ]
-      );
-
-      // 4. Redirect kembali ke Dashboard Konten jika Sukses
-      return Astro.redirect("/admin/konten?status=success");
+  if (!namaKonten || !judulKonten || !isiKonten) {
+    errorMessage = "Nama konten, judul, dan isi konten wajib diisi.";
+  } else {
+    // Type and size are enforced by the API, which checks the file's bytes
+    // rather than the content type the browser reports.
+    let foto = "";
+    if (hasFile(file)) {
+      const uploaded = await uploadFile(file, "konten", "public");
+      if (!uploaded.ok) errorMessage = uploaded.message;
+      else foto = uploaded.key;
     }
-  } catch (error) {
-    console.error("ERROR SIMPAN KONTEN:", error);
-    if (error instanceof Error) {
-      errorMessage = error.message;
-    } else {
-      errorMessage = "Terjadi kesalahan saat menyimpan konten.";
+
+    if (!errorMessage) {
+      const result = await createAboutContent({
+        nama: namaKonten,
+        judul: judulKonten,
+        isi: isiKonten,
+        keterangan,
+        tags,
+        foto,
+      });
+      if (result.ok) return Astro.redirect("/admin/konten", 303);
+      errorMessage = result.message;
     }
   }
 }

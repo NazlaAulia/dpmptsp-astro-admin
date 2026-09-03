@@ -2,7 +2,7 @@
 // Delete an article. POST only, with a CSRF token.
 export const prerender = false;
 
-import { db } from "../../lib/db.js";
+import { deleteArticle } from "../../lib/services/article.service";
 import { verifyCsrf } from "../../lib/session";
 
 if (Astro.request.method !== "POST") {
@@ -23,7 +23,7 @@ if (typeof id !== "string" || !/^\d+$/.test(id)) {
   return new Response("Invalid id.", { status: 400 });
 }
 
-await db.query("DELETE FROM post WHERE id_post = ?", [id]);
+await deleteArticle(Number(id));
 
 // POST/redirect/GET so a refresh does not attempt the delete again.
 return Astro.redirect("/admin/artikel", 303);

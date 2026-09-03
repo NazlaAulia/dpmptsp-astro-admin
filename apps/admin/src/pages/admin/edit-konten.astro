@@ -1,75 +1,45 @@
 ---
+
 import AdminShell from "../../components/admin/AdminShell.astro";
-import { db } from "../../lib/db.js";
-import fs from "node:fs/promises";
-import path from "node:path";
+import { getKonten, hasFile, updateAboutContent, uploadFile } from "../../lib/services/content.service";
 
-const id = Astro.url.searchParams.get("id");
+export const prerender = false;
 
-if (!id) {
+const id = Number(Astro.url.searchParams.get("id"));
+if (!Number.isInteger(id) || id <= 0) {
   return Astro.redirect("/admin/konten");
 }
 
-let kontenItem: any = null;
-let errorMessage = "";
-
-try {
-  const [rows]: any = await db.execute(
-    "SELECT * FROM tentangkamiswebv5 WHERE Id_Konten = ?",
-    [id]
-  );
-  if (rows.length > 0) {
-    kontenItem = rows[0];
-  }
-} catch (error: any) {
-  console.error("Gagal mengambil data:", error);
-}
-
+const kontenItem = await getKonten(id);
 if (!kontenItem) {
   return Astro.redirect("/admin/konten");
 }
 
+let errorMessage = "";
+
 if (Astro.request.method === "POST") {
-  try {
-    const formData = await Astro.request.formData();
-    
-    const namaKonten = (formData.get("Nama_Konten") as string) || "";
-    const isiKonten = (formData.get("Isi_Konten") as string) || "";
-    const judulKonten = (formData.get("Judul_Konten") as string) || "";
-    const keterangan = (formData.get("Keterangan") as string) || "";
-    const tags = (formData.get("tags") as string) || "";
-    const fotoFile = formData.get("Foto_Konten") as File;
+  const formData = await Astro.request.formData();
 
-    let namaFotoBaru = kontenItem.Foto_Konten || "";
+  // Keep the existing photo unless a new one was supplied.
+  let foto = kontenItem.Foto_Konten;
+  const file = formData.get("Foto_Konten");
+  if (hasFile(file)) {
+    const uploaded = await uploadFile(file, "konten", "public");
+    if (!uploaded.ok) errorMessage = uploaded.message;
+    else foto = uploaded.key;
+  }
 
-    // Cek jika user mengupload file foto baru
-    if (fotoFile && fotoFile.size > 0 && fotoFile.name && fotoFile.name !== "undefined") {
-      const uploadDir = path.join(process.cwd(), "public/uploads");
-      try {
-        await fs.mkdir(uploadDir, { recursive: true });
-      } catch (e) {}
-
-      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-      const originalName = fotoFile.name.replace(/\s+/g, "_");
-      namaFotoBaru = `${uniqueSuffix}-${originalName}`;
-
-      const filePath = path.join(uploadDir, namaFotoBaru);
-      const buffer = Buffer.from(await fotoFile.arrayBuffer());
-      await fs.writeFile(filePath, buffer);
-    }
-
-    // Update database menggunakan kolom yang tepat: Foto_Konten
-    await db.execute(
-      `UPDATE tentangkamiswebv5 
-       SET Nama_Konten = ?, Isi_Konten = ?, Foto_Konten = ?, Judul_Konten = ?, Keterangan = ?, tags = ? 
-       WHERE Id_Konten = ?`,
-      [namaKonten, isiKonten, namaFotoBaru, judulKonten, keterangan, tags, id]
-    );
-
-    return Astro.redirect("/admin/konten");
-  } catch (error: any) {
-    console.error("Gagal mengupdate data:", error);
-    errorMessage = `Gagal menyimpan: ${error.message || error}`;
+  if (!errorMessage) {
+    const result = await updateAboutContent(id, {
+      nama: formData.get("Nama_Konten")?.toString() ?? "",
+      isi: formData.get("Isi_Konten")?.toString() ?? "",
+      judul: formData.get("Judul_Konten")?.toString() ?? "",
+      keterangan: formData.get("Keterangan")?.toString() ?? "",
+      tags: formData.get("tags")?.toString() ?? "",
+      foto,
+    });
+    if (result.ok) return Astro.redirect("/admin/konten", 303);
+    errorMessage = result.message;
   }
 }
 ---

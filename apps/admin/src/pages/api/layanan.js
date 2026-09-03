@@ -1,180 +1,96 @@
-import { db } from "../../lib/db";
-import fs from "node:fs";
-import path from "node:path";
+export const prerender = false;
 
-export async function POST({ request }) {
-    try {
-        const body = await request.json();
-        let imagePath = body.gambar;
+import {
+  createServiceLocation,
+  updateServiceLocation,
+  uploadFile,
+} from "../../lib/services/content.service";
 
-        // Jika gambar dikirim dalam format Base64, ubah jadi file fisik
-        if (imagePath && imagePath.startsWith('data:image')) {
-            const matches = imagePath.match(/^data:image\/([a-zA-Z0-9]+);base64,(.+)$/);
-            
-            if (matches && matches.length === 3) {
-                const ext = matches[1]; // Ekstensi file (png, jpg, jpeg)
-                const base64Data = matches[2];
-                
-                // Buat nama file unik berdasarkan waktu
-                const fileName = `layanan-${Date.now()}.${ext}`;
-                const uploadDir = path.join(process.cwd(), 'public/uploads');
+/**
+ * Stores a base64 data URL through the API and returns its key.
+ *
+ * The client still sends the image inside the JSON body. That inflates the
+ * payload by a third and holds the whole file in a string; converting the form
+ * to multipart is a separate change to the page's script.
+ */
+async function storeDataUrl(value) {
+  if (typeof value !== "string" || !value.startsWith("data:image")) {
+    return { ok: true, key: value ?? "" };
+  }
 
-                // Pastikan folder public/uploads ada
-                if (!fs.existsSync(uploadDir)) {
-                    fs.mkdirSync(uploadDir, { recursive: true });
-                }
+  const match = value.match(/^data:image\/([a-zA-Z0-9]+);base64,(.+)$/);
+  if (!match) return { ok: true, key: "" };
 
-                // Simpan file fisik ke folder public/uploads
-                fs.writeFileSync(path.join(uploadDir, fileName), Buffer.from(base64Data, 'base64'));
+  const [, ext, data] = match;
+  const bytes = Buffer.from(data, "base64");
+  const file = new File([bytes], `layanan.${ext}`, { type: `image/${ext}` });
 
-                // Path relatif yang akan disimpan ke database
-                imagePath = `/uploads/${fileName}`;
-            }
-        }
-
-        await db.query(
-        `
-        INSERT INTO tempat_layanan
-        (
-            judul,
-            deskripsi,
-            gambar,
-            alt_text,
-            lokasi,
-            alamat,
-            warna
-        )
-        VALUES (?,?,?,?,?,?,?)
-        `,
-        [
-            body.judul,
-            body.deskripsi || "",
-            imagePath, // Path file yang sudah rapi (/uploads/...)
-            body.alt_text,
-            body.lokasi,
-            body.alamat,
-            "blue"
-        ]);
-
-        return new Response(
-            JSON.stringify({
-                success: true
-            }),
-            {
-                status: 200,
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            }
-        );
-
-     } catch (error) { 
-        console.log("ERROR DATABASE:", error);
-
-        return new Response(
-            JSON.stringify({
-                success: false,
-                error: error.message
-            }),
-            {
-                status: 500,
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            }
-        );
-    }
+  const uploaded = await uploadFile(file, "layanan", "public");
+  return uploaded.ok ? { ok: true, key: uploaded.key } : { ok: false, message: uploaded.message };
 }
 
-export async function PUT({ request }) {
-    try {
-        const url = new URL(request.url);
-        const id = url.searchParams.get("id");
-        const body = await request.json();
-        let imagePath = body.gambar;
+function json(body, status) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+}
 
-        if (imagePath && imagePath.startsWith('data:image')) {
-            const matches = imagePath.match(/^data:image\/([a-zA-Z0-9]+);base64,(.+)$/);
-            
-            if (matches && matches.length === 3) {
-                const ext = matches[1];
-                const base64Data = matches[2];
-                
-                const fileName = `layanan-${Date.now()}.${ext}`;
-                const uploadDir = path.join(process.cwd(), 'public/uploads');
+async function readBody(request) {
+  try {
+    return await request.json();
+  } catch {
+    return null;
+  }
+}
 
-                if (!fs.existsSync(uploadDir)) {
-                    fs.mkdirSync(uploadDir, { recursive: true });
-                }
+export async function POST({ request }) {
+  const body = await readBody(request);
+  if (!body) return json({ success: false, message: "Body harus JSON." }, 400);
 
-                fs.writeFileSync(path.join(uploadDir, fileName), Buffer.from(base64Data, 'base64'));
-                imagePath = `/uploads/${fileName}`;
-            }
-        }
+  const image = await storeDataUrl(body.gambar);
+  if (!image.ok) return json({ success: false, message: image.message }, 400);
 
-        if (imagePath && imagePath.startsWith('data:image') === false) {
-            await db.query(
-                `
-                UPDATE tempat_layanan
-                SET 
-                    judul = ?,
-                    deskripsi = ?,
-                    gambar = ?,
-                    alt_text = ?,
-                    lokasi = ?,
-                    alamat = ?
-                WHERE id = ?
-                `,
-                [
-                    body.judul,
-                    body.deskripsi || "",
-                    imagePath,
-                    body.alt_text,
-                    body.lokasi,
-                    body.alamat,
-                    id
-                ]
-            );
-        } else {
-            await db.query(
-                `
-                UPDATE tempat_layanan
-                SET 
-                    judul = ?,
-                    deskripsi = ?,
-                    alt_text = ?,
-                    lokasi = ?,
-                    alamat = ?
-                WHERE id = ?
-                `,
-                [
-                    body.judul,
-                    body.deskripsi || "",
-                    body.alt_text,
-                    body.lokasi,
-                    body.alamat,
-                    id
-                ]
-            );
-        }
+  const result = await createServiceLocation({
+    judul: body.judul,
+    deskripsi: body.deskripsi || "",
+    gambar: image.key,
+    alt_text: body.alt_text,
+    lokasi: body.lokasi,
+    alamat: body.alamat,
+    warna: "blue",
+  });
 
-        return new Response(
-            JSON.stringify({ success: true }),
-            {
-                status: 200,
-                headers: { "Content-Type": "application/json" }
-            }
-        );
+  return result.ok
+    ? json({ success: true, data: result.data }, 201)
+    : json({ success: false, message: result.message }, 502);
+}
 
-    } catch (error) { 
-        console.log("ERROR DATABASE:", error);
+export async function PUT({ request, url }) {
+  const id = Number(url.searchParams.get("id"));
+  if (!Number.isInteger(id) || id <= 0) {
+    return json({ success: false, message: "ID tidak valid." }, 400);
+  }
 
-        return new Response(
-            JSON.stringify({ success: false, error: error.message }),
-            {
-                status: 500,
-                headers: { "Content-Type": "application/json" }
-            }
-        );
-    }
+  const body = await readBody(request);
+  if (!body) return json({ success: false, message: "Body harus JSON." }, 400);
+
+  const image = await storeDataUrl(body.gambar);
+  if (!image.ok) return json({ success: false, message: image.message }, 400);
+
+  const payload = {
+    judul: body.judul,
+    deskripsi: body.deskripsi || "",
+    alt_text: body.alt_text,
+    lokasi: body.lokasi,
+    alamat: body.alamat,
+  };
+  // Only overwrite the image when a new one was actually supplied; an empty
+  // value here would blank the existing picture.
+  if (image.key) payload.gambar = image.key;
+
+  const result = await updateServiceLocation(id, payload);
+  return result.ok
+    ? json({ success: true, data: result.data }, 200)
+    : json({ success: false, message: result.message }, 502);
 }

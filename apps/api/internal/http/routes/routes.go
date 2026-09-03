@@ -56,6 +56,9 @@ func New(cfg *config.Config, log *slog.Logger, db *gorm.DB, dia dialect.Dialect,
 	}
 	mux.HandleFunc("POST /v1/auth/login", auth.Login)
 
+	uploads := &handlers.Uploads{Files: files, Log: log}
+	mux.HandleFunc("POST /v1/uploads", uploads.Create)
+
 	site := &handlers.Site{Repo: siteRepo, Log: log}
 	mux.HandleFunc("GET /v1/site/chrome", site.Chrome)
 

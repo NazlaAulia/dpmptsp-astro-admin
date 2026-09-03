@@ -1,67 +1,53 @@
 ---
+
 import AdminShell from "../../components/admin/AdminShell.astro";
-import { db } from "../../lib/db";
+import { createInnovation, hasFile, uploadFile } from "../../lib/services/content.service";
 
 export const prerender = false;
 
 let errorMessage = "";
 
-// Handle Submit Form (POST Request)
 if (Astro.request.method === "POST") {
-  try {
-    const formData = await Astro.request.formData();
+  const formData = await Astro.request.formData();
 
-    // 1. Tangkap seluruh input form sesuai kolom phpMyAdmin
-    const nama = formData.get("nama")?.toString() || "";
-    const singkatan = formData.get("singkatan")?.toString() || "";
-    const kategori = formData.get("kategori")?.toString() || "";
-    const deskripsi = formData.get("deskripsi")?.toString() || "";
-    const rancang_bangun = formData.get("rancang_bangun")?.toString() || "";
-    const tujuan = formData.get("tujuan")?.toString() || "";
-    const manfaat = formData.get("manfaat")?.toString() || "";
-    const hasil = formData.get("hasil")?.toString() || "";
-    const tahun_usulan = formData.get("tahun_usulan")?.toString() || new Date().getFullYear().toString();
-    const tahapan = formData.get("tahapan")?.toString() || "Penerapan Digital";
-    const jenis = formData.get("jenis")?.toString() || "Digital";
-    
-    // Field Tambahan dari Database phpMyAdmin
-    const url_layanan = formData.get("url_layanan")?.toString() || null;
-    const url_label = formData.get("url_label")?.toString() || null;
-    const icon = formData.get("icon")?.toString() || "fa-lightbulb";
-    const warna = formData.get("warna")?.toString() || "blue";
-    const urutan = parseInt(formData.get("urutan")?.toString() || "0");
-    const status = parseInt(formData.get("status")?.toString() || "1");
+  const nama = formData.get("nama")?.toString() || "";
+  const slug = nama.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
 
-    // Format slug otomatis (misal: "TAKON SOBAT" -> "takon-sobat")
-    const slug = nama.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
+  // Previously the image path was recorded as `gambar/<client filename>` and
+  // the file was never written, so the reference always pointed at nothing.
+  let gambar = "";
+  const file = formData.get("gambar");
+  if (hasFile(file)) {
+    const uploaded = await uploadFile(file, "inovasi", "public");
+    if (!uploaded.ok) errorMessage = uploaded.message;
+    else gambar = uploaded.key;
+  }
 
-    // 2. Handle Upload File Gambar
-    const fileGambar = formData.get("gambar") as File;
-    let gambarPath = null;
+  if (!errorMessage) {
+    const result = await createInnovation({
+      slug,
+      nama,
+      singkatan: formData.get("singkatan")?.toString() || "",
+      kategori: formData.get("kategori")?.toString() || "",
+      deskripsi: formData.get("deskripsi")?.toString() || "",
+      rancang_bangun: formData.get("rancang_bangun")?.toString() || "",
+      tujuan: formData.get("tujuan")?.toString() || "",
+      manfaat: formData.get("manfaat")?.toString() || "",
+      hasil: formData.get("hasil")?.toString() || "",
+      tahun_usulan: Number(formData.get("tahun_usulan")) || new Date().getFullYear(),
+      tahapan: formData.get("tahapan")?.toString() || "Penerapan Digital",
+      jenis: formData.get("jenis")?.toString() || "Digital",
+      gambar,
+      url_layanan: formData.get("url_layanan")?.toString() || "",
+      url_label: formData.get("url_label")?.toString() || "",
+      icon: formData.get("icon")?.toString() || "fa-lightbulb",
+      warna: formData.get("warna")?.toString() || "blue",
+      urutan: Number(formData.get("urutan")) || 0,
+      is_active: (formData.get("status")?.toString() ?? "1") === "1",
+    });
 
-    if (fileGambar && fileGambar.name && fileGambar.size > 0) {
-      gambarPath = `gambar/${fileGambar.name}`;
-      // Note: Jika butuh save fisik file ke folder public, aktifkan fs.writeFile di sini
-    }
-
-    // 3. Eksekusi Query MySQL Insert ke Database
-    await db.query(
-      `INSERT INTO inovasi_layanan 
-      (slug, nama, singkatan, kategori, deskripsi, rancang_bangun, tujuan, manfaat, hasil, tahun_usulan, tahapan, jenis, gambar, url_layanan, url_label, icon, warna, urutan, status) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        slug, nama, singkatan, kategori, deskripsi, rancang_bangun, 
-        tujuan, manfaat, hasil, tahun_usulan, tahapan, jenis, 
-        gambarPath, url_layanan, url_label, icon, warna, urutan, status
-      ]
-    );
-
-    // Redirect setelah sukses simpan
-    return Astro.redirect("/admin/inovasi?status=success");
-
-  } catch (error: any) {
-    console.error("Gagal menyimpan ke database:", error);
-    errorMessage = "Gagal menyimpan data: " + error.message;
+    if (result.ok) return Astro.redirect("/admin/inovasi", 303);
+    errorMessage = result.message;
   }
 }
 ---

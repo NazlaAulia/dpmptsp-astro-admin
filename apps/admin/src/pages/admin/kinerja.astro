@@ -1,31 +1,22 @@
 ---
+
 import AdminShell from "../../components/admin/AdminShell.astro";
-import { db } from "../../lib/db";
+import { pageWindow } from "@dpmptsp/ui";
+import { findPerformanceDocs } from "../../lib/services/content.service";
 
-// Ambil parameter halaman dari URL, default ke halaman 1
-const currentPage = Number(Astro.url.searchParams.get("page")) || 1;
-const limit = 10; // Jumlah item per halaman
-const offset = (currentPage - 1) * limit;
+export const prerender = false;
 
-// Ambil total data untuk menghitung jumlah total halaman
-const [countRows]: any = await db.query(`SELECT COUNT(*) as total FROM twdata`);
-const totalData = countRows[0].total;
-const totalPages = Math.ceil(totalData / limit) || 1;
+const limit = 10;
+const parsed = Number.parseInt(Astro.url.searchParams.get("page") ?? "1", 10);
+const requested = Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
 
-// Ambil data sesuai halaman aktif
-const [rows] = await db.query(`
-    SELECT *
-    FROM twdata
-    ORDER BY id DESC
-    LIMIT ? OFFSET ?
-`, [limit, offset]);
-
-
-const dataKinerja = rows as Array<{
-    id:number;
-    tw_option:string;
-    file_path:string;
-}>;
+// The API returns the full list; it is small and rarely written.
+const all = await findPerformanceDocs();
+const totalData = all.length;
+const totalPages = Math.max(1, Math.ceil(totalData / limit));
+const currentPage = Math.min(requested, totalPages);
+const dataKinerja = all.slice((currentPage - 1) * limit, currentPage * limit);
+const { visiblePages, showingStart, showingEnd } = pageWindow(currentPage, totalPages, totalData, limit);
 ---
 
 <AdminShell 

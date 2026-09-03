@@ -1,31 +1,23 @@
 ---
+
 import AdminShell from "../../components/admin/AdminShell.astro";
-import { db } from "../../lib/db";
+import { deleteInnovation, findInnovations } from "../../lib/services/content.service";
 
 export const prerender = false;
 
-// 1. TAMBAHKAN PENANGANAN DELETE DI SINI (DI DALAM BLOK ---)
 if (Astro.request.method === "DELETE") {
-  const url = new URL(Astro.request.url);
-  const id = url.searchParams.get("id");
-  if (id) {
-    try {
-      await db.query("DELETE FROM inovasi_layanan WHERE id = ?", [id]);
-      return new Response(JSON.stringify({ success: true }), { status: 200 });
-    } catch (error) {
-      return new Response(JSON.stringify({ success: false }), { status: 500 });
-    }
+  const id = Number(new URL(Astro.request.url).searchParams.get("id"));
+  if (Number.isInteger(id) && id > 0) {
+    const result = await deleteInnovation(id);
+    return new Response(JSON.stringify({ success: result.ok }), {
+      status: result.ok ? 200 : 502,
+      headers: { "content-type": "application/json" },
+    });
   }
+  return new Response(JSON.stringify({ success: false }), { status: 400 });
 }
 
-let daftarInovasi: any[] = [];
-
-try {
-  const [rows]: any = await db.query("SELECT * FROM inovasi_layanan ORDER BY id DESC");
-  daftarInovasi = rows;
-} catch (error) {
-  console.error("Gagal ambil data:", error);
-}
+const daftarInovasi = await findInnovations();
 ---
 
 <AdminShell 

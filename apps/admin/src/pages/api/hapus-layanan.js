@@ -1,45 +1,28 @@
-import { db } from "../../lib/db";
+export const prerender = false;
+
+import { deleteServiceLocation } from "../../lib/services/content.service";
 
 export async function DELETE({ request }) {
+  let id;
   try {
-    const { id } = await request.json();
-
-    console.log("ID LAYANAN YANG DIHAPUS:", id);
-
-    await db.query(
-      `
-      DELETE FROM tempat_layanan
-      WHERE id = ?
-      `,
-      [id]
-    );
-
-    return new Response(
-      JSON.stringify({
-        success: true
-      }),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json"
-        }
-      }
-    );
-
-  } catch (error) {
-    console.error("Gagal menghapus layanan:", error);
-
-    return new Response(
-      JSON.stringify({
-        success: false,
-        message: "Gagal menghapus layanan"
-      }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json"
-        }
-      }
-    );
+    ({ id } = await request.json());
+  } catch {
+    return json({ success: false, message: "Body harus JSON." }, 400);
   }
+
+  if (!Number.isInteger(Number(id))) {
+    return json({ success: false, message: "ID tidak valid." }, 400);
+  }
+
+  const result = await deleteServiceLocation(Number(id));
+  return result.ok
+    ? json({ success: true }, 200)
+    : json({ success: false, message: result.message }, 502);
+}
+
+function json(body, status) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
 }

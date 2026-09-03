@@ -1,90 +1,48 @@
 ---
+
 import AdminShell from "../../components/admin/AdminShell.astro";
-import { db } from "../../lib/db";
-import { writeFile } from "fs/promises";
-import path from "path";
+import {
+  findPerformanceDoc,
+  hasFile,
+  updatePerformanceDoc,
+  uploadFile,
+} from "../../lib/services/content.service";
+
+export const prerender = false;
 
 const id = Number(Astro.url.searchParams.get("id"));
-
-const [rows] = await db.query(
-  `
-  SELECT *
-  FROM twdata
-  WHERE id = ?
-  `,
-  [id]
-);
-
-const data = (rows as Array<{
-  id: number;
-  tw_option: string;
-  file_path: string;
-}>)[0];
-
-if (!data) {
+if (!Number.isInteger(id) || id <= 0) {
   return Astro.redirect("/admin/kinerja");
 }
 
+const found = await findPerformanceDoc(id);
+if (!found.ok) {
+  return Astro.redirect("/admin/kinerja");
+}
+const data = found.data;
+
+let error = "";
 
 if (Astro.request.method === "POST") {
-
   const formData = await Astro.request.formData();
+  const judul = formData.get("judul")?.toString() ?? "";
+  const file = formData.get("file");
 
-  const judul = formData.get("judul") as string;
-  const file = formData.get("file") as File;
+  // Keep the existing file when no replacement was supplied.
+  let filePath = data.file_path;
 
-
-  if (file && file.size > 0) {
-
-    const buffer = Buffer.from(await file.arrayBuffer());
-
-    const namaFile = file.name;
-
-    const lokasi = path.join(
-      process.cwd(),
-      "public/pdf",
-      namaFile
-    );
-
-    await writeFile(
-      lokasi,
-      buffer
-    );
-
-
-    await db.query(
-      `
-      UPDATE twdata
-      SET tw_option = ?, file_path = ?
-      WHERE id = ?
-      `,
-      [
-        judul,
-        namaFile,
-        id
-      ]
-    );
-
-  } else {
-
-    await db.query(
-      `
-      UPDATE twdata
-      SET tw_option = ?
-      WHERE id = ?
-      `,
-      [
-        judul,
-        id
-      ]
-    );
-
+  if (hasFile(file)) {
+    const uploaded = await uploadFile(file, "kinerja", "public");
+    if (!uploaded.ok) error = uploaded.message;
+    else filePath = uploaded.key;
   }
 
-
-  return Astro.redirect("/admin/kinerja");
+  if (!error) {
+    const result = await updatePerformanceDoc(id, { tw_option: judul, file_path: filePath });
+    if (result.ok) return Astro.redirect("/admin/kinerja", 303);
+    error = result.message;
+  }
 }
-
 ---
 
 <AdminShell

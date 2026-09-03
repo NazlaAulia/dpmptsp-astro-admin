@@ -1,54 +1,32 @@
 ---
-import AdminShell from "../../components/admin/AdminShell.astro";
-import { db } from "../../lib/db";
-import { writeFile } from "fs/promises";
-import path from "path";
 
+import AdminShell from "../../components/admin/AdminShell.astro";
+import { createPerformanceDoc, hasFile, uploadFile } from "../../lib/services/content.service";
+
+export const prerender = false;
+
+let error = "";
 
 if (Astro.request.method === "POST") {
+  const formData = await Astro.request.formData();
+  const judul = formData.get("judul")?.toString() ?? "";
+  const file = formData.get("file");
 
-    const formData = await Astro.request.formData();
-
-    const judul = formData.get("judul") as string;
-    const file = formData.get("file") as File;
-
-
-    const buffer = Buffer.from(await file.arrayBuffer());
-
-
-    const namaFile = file.name;
-
-
-    const lokasi = path.join(
-        process.cwd(),
-        "public/pdf",
-        namaFile
-    );
-
-
-    await writeFile(
-        lokasi,
-        buffer
-    );
-
-
-    await db.query(
-        `
-        INSERT INTO twdata
-        (tw_option, file_path)
-        VALUES (?, ?)
-        `,
-        [
-            judul,
-            namaFile
-        ]
-    );
-
-
-    return Astro.redirect("/admin/kinerja");
-
+  if (!hasFile(file)) {
+    error = "Berkas wajib diunggah.";
+  } else {
+    // Stored through the API rather than written into public/pdf under the
+    // client's own filename.
+    const uploaded = await uploadFile(file, "kinerja", "public");
+    if (!uploaded.ok) {
+      error = uploaded.message;
+    } else {
+      const result = await createPerformanceDoc({ tw_option: judul, file_path: uploaded.key });
+      if (result.ok) return Astro.redirect("/admin/kinerja", 303);
+      error = result.message;
+    }
+  }
 }
-
 ---
 
 <AdminShell 

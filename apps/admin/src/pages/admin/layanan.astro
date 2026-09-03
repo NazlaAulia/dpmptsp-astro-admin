@@ -1,10 +1,10 @@
 ---
 import AdminShell from "../../components/admin/AdminShell.astro";
-import { db } from "../../lib/db.js";
+import { findServiceLocations } from "../../lib/services/content.service";
 
-const [semuaLayanan] = await db.query(
-  "SELECT * FROM tempat_layanan ORDER BY id DESC"
-);
+export const prerender = false;
+
+const semuaLayanan = await findServiceLocations();
 ---
 
 <AdminShell title="Tempat Layanan" subtitle="Pantau layanan yang tersedia dan status operasional harian." actionLabel="Tambah Tempat Pelayanan" actionHref="/admin/tambah-layanan">

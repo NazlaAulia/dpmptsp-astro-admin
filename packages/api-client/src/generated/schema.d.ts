@@ -1383,6 +1383,39 @@ export interface components {
              */
             tipe: "notif" | "modal";
         };
+        Innovation: {
+            /** Format: int64 */
+            id: number;
+            slug?: string;
+            nama: string;
+            singkatan?: string;
+            kategori?: string;
+            deskripsi?: string;
+            rancang_bangun?: string;
+            tujuan?: string;
+            manfaat?: string;
+            hasil?: string;
+            tahun_usulan?: number;
+            tahapan?: string;
+            jenis?: string;
+            gambar?: string;
+            url_layanan?: string;
+            url_label?: string;
+            icon?: string;
+            warna?: string;
+            urutan?: number;
+            is_active?: boolean;
+        };
+        Upload: {
+            /** @description Generated storage key. Reference stored files by this. */
+            key: string;
+            /** @description Present only when the disk serves public URLs. */
+            url?: string;
+            /** Format: int64 */
+            size: number;
+            /** @description Detected from the file's bytes, not the client's claim. */
+            content_type: string;
+        };
         User: {
             /** Format: int64 */
             id: number;

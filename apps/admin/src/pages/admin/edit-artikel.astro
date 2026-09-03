@@ -1,71 +1,45 @@
 ---
+
 export const prerender = false;
 
 import Navbar from "../../components/admin/Navbar.astro";
 import Sidebar from "../../components/admin/Sidebar.astro";
-import { db } from "../../lib/db";
+import AdminDocument from "../../layouts/AdminDocument.astro";
+import { getArticle, updateArticle } from "../../lib/services/article.service";
+import { verifyCsrf } from "../../lib/session";
 
-
-const url = new URL(Astro.request.url);
-const id = url.searchParams.get("id");
-
-
-if (!id) {
-    return Astro.redirect("/admin/artikel");
+const id = Number(Astro.url.searchParams.get("id"));
+if (!Number.isInteger(id) || id <= 0) {
+  return Astro.redirect("/admin/artikel");
 }
 
-
-const [rows] = await db.query(
-    `SELECT * FROM post WHERE id_post = ?`,
-    [id]
-);
-
-
-const artikel = (rows as any[])[0];
-
-
+const artikel = await getArticle(id);
 if (!artikel) {
-    return Astro.redirect("/admin/artikel");
+  return Astro.redirect("/admin/artikel");
 }
 
-
-/* =========================
-   SIMPAN PERUBAHAN
-========================= */
+let error = "";
 
 if (Astro.request.method === "POST") {
+  const formData = await Astro.request.formData();
 
-    const formData = await Astro.request.formData();
+  if (!verifyCsrf(Astro.locals.session, formData.get("_csrf"))) {
+    return new Response("Invalid CSRF token.", { status: 403 });
+  }
 
-    const title = formData.get("title")?.toString() || "";
-    const category = formData.get("category")?.toString() || "";
-    const content = formData.get("content")?.toString() || "";
-    const active = formData.get("active")?.toString() || "Y";
+  const result = await updateArticle(id, {
+    title: formData.get("title")?.toString() ?? "",
+    category_id: Number(formData.get("category")),
+    content: formData.get("content")?.toString() ?? "",
+    is_active: (formData.get("active")?.toString() ?? "Y") === "Y",
+    picture: artikel.picture ?? "",
+  });
 
-
-    await db.query(
-        `
-        UPDATE post
-        SET
-            title = ?,
-            id_category = ?,
-            content = ?,
-            active = ?
-        WHERE id_post = ?
-        `,
-        [
-            title,
-            category,
-            content,
-            active,
-            id
-        ]
-    );
-
-
-    return Astro.redirect("/admin/artikel");
+  if (result.ok) {
+    return Astro.redirect("/admin/artikel", 303);
+  }
+  error = result.message;
 }
-import AdminDocument from "../../layouts/AdminDocument.astro";
 ---
 
 <AdminDocument title="Edit Artikel">

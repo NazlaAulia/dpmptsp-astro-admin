@@ -1,7 +1,7 @@
 // Delete one kinerja (twdata) row.
 export const prerender = false;
 
-import { db } from "../../../lib/db.js";
+import { deletePerformanceDoc } from "../../../lib/services/content.service";
 
 export async function DELETE({ params }) {
   const { id } = params;
@@ -13,10 +13,10 @@ export async function DELETE({ params }) {
     });
   }
 
-  await db.query("DELETE FROM twdata WHERE id = ?", [id]);
+  const result = await deletePerformanceDoc(Number(id));
 
-  return new Response(JSON.stringify({ success: true }), {
-    status: 200,
-    headers: { "content-type": "application/json" },
-  });
+  return new Response(
+    JSON.stringify(result.ok ? { success: true } : { success: false, error: result.message }),
+    { status: result.ok ? 200 : 502, headers: { "content-type": "application/json" } }
+  );
 }

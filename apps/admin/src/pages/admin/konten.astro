@@ -1,43 +1,26 @@
 ---
+
 import AdminShell from "../../components/admin/AdminShell.astro";
-import { db } from "../../lib/db.js";
+import { deleteAboutContent, getKontenList } from "../../lib/services/content.service";
 
-// Tambahkan baris ini di bagian paling atas script Astro halaman depan Anda
 export const prerender = false;
-Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+Astro.response.headers.set("Cache-Control", "no-store");
 
-// === 1. TANGKAP PERINTAH HAPUS & EDIT DI SINI ===
 if (Astro.request.method === "POST") {
-  try {
-    const data = await Astro.request.formData();
-    const deleteId = data.get("deleteId");
-    const editId = data.get("editId");
+  const data = await Astro.request.formData();
+  const deleteId = data.get("deleteId");
+  const editId = data.get("editId");
 
-    // Jika perintah hapus
-    if (deleteId) {
-      await db.execute("DELETE FROM tentangkamiswebv5 WHERE Id_Konten = ?", [deleteId]);
-      return Astro.redirect("/admin/konten");
-    }
-
-    // Jika perintah edit (mengarahkan ke halaman edit dengan query parameter id)
-    if (editId) {
-      return Astro.redirect(`/admin/edit-konten?id=${editId}`);
-    }
-  } catch (error) {
-    console.error("Gagal memproses data dari Database:", error);
+  if (deleteId) {
+    await deleteAboutContent(Number(deleteId));
+    return Astro.redirect("/admin/konten", 303);
+  }
+  if (editId) {
+    return Astro.redirect(`/admin/edit-konten?id=${editId}`, 303);
   }
 }
 
-let konten: any[] = [];
-
-try {
-  const [rows]: any = await db.execute(
-    "SELECT * FROM tentangkamiswebv5 ORDER BY Id_Konten DESC"
-  );
-  konten = rows || [];
-} catch (error) {
-  console.error("Gagal memuat data konten dari Database:", error);
-}
+const konten = await getKontenList();
 
 const items = [
   { title: "Artikel unggulan", value: konten.length.toString(), icon: "article" },

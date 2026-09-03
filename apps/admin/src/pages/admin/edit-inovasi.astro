@@ -1,62 +1,51 @@
 ---
+
 import AdminShell from "../../components/admin/AdminShell.astro";
-import { db } from "../../lib/db";
+import { findInnovation, hasFile, updateInnovation, uploadFile } from "../../lib/services/content.service";
 
 export const prerender = false;
 
-const url = new URL(Astro.request.url);
-const id = url.searchParams.get("id");
-
-if (!id) {
+const id = Number(Astro.url.searchParams.get("id"));
+if (!Number.isInteger(id) || id <= 0) {
   return Astro.redirect("/admin/inovasi");
 }
 
-let dataInovasi: any = null;
+const found = await findInnovation(id);
+if (!found.ok) {
+  return Astro.redirect("/admin/inovasi");
+}
+const dataInovasi = found.data;
+
 let errorMessage = "";
 
-// 1. Ambil data berdasarkan ID yang dikirim dari halaman daftar inovasi
-try {
-  const [rows]: any = await db.query("SELECT * FROM inovasi_layanan WHERE id = ?", [id]);
-  if (rows.length > 0) {
-    dataInovasi = rows[0];
-  }
-} catch (error) {
-  console.error("Gagal mengambil data:", error);
-}
-
-if (!dataInovasi) {
-  return Astro.redirect("/admin/inovasi");
-}
-
-// 2. Handle Update Data (POST Request)
 if (Astro.request.method === "POST") {
-  try {
-    const formData = await Astro.request.formData();
+  const formData = await Astro.request.formData();
 
-    const nama = formData.get("nama")?.toString() || "";
-    const singkatan = formData.get("singkatan")?.toString() || "";
-    const kategori = formData.get("kategori")?.toString() || "";
-    const deskripsi = formData.get("deskripsi")?.toString() || "";
-    const url_layanan = formData.get("url_layanan")?.toString() || null;
-    const warna = formData.get("warna")?.toString() || "blue";
-    const icon = formData.get("icon")?.toString() || "fa-lightbulb";
+  // Keep the existing image unless a new one was supplied.
+  let gambar = dataInovasi.gambar ?? "";
+  const file = formData.get("foto");
+  if (hasFile(file)) {
+    const uploaded = await uploadFile(file, "inovasi", "public");
+    if (!uploaded.ok) errorMessage = uploaded.message;
+    else gambar = uploaded.key;
+  }
 
-    const fileGambar = formData.get("foto") as File;
-    let gambarPath = dataInovasi.gambar || dataInovasi.foto;
+  if (!errorMessage) {
+    const result = await updateInnovation(id, {
+      slug: dataInovasi.slug,
+      nama: formData.get("nama")?.toString() || "",
+      singkatan: formData.get("singkatan")?.toString() || "",
+      kategori: formData.get("kategori")?.toString() || "",
+      deskripsi: formData.get("deskripsi")?.toString() || "",
+      url_layanan: formData.get("url_layanan")?.toString() || "",
+      warna: formData.get("warna")?.toString() || "blue",
+      icon: formData.get("icon")?.toString() || "fa-lightbulb",
+      gambar,
+      is_active: dataInovasi.is_active ?? true,
+    });
 
-    if (fileGambar && fileGambar.name && fileGambar.size > 0) {
-      gambarPath = fileGambar.name;
-    }
-
-    await db.query(
-      `UPDATE inovasi_layanan SET nama = ?, singkatan = ?, kategori = ?, deskripsi = ?, url_layanan = ?, warna = ?, icon = ?, gambar = ? WHERE id = ?`,
-      [nama, singkatan, kategori, deskripsi, url_layanan, warna, icon, gambarPath, id]
-    );
-
-    return Astro.redirect("/admin/inovasi");
-  } catch (error: any) {
-    console.error("Gagal update data:", error);
-    errorMessage = "Gagal menyimpan perubahan: " + error.message;
+    if (result.ok) return Astro.redirect("/admin/inovasi", 303);
+    errorMessage = result.message;
   }
 }
 ---

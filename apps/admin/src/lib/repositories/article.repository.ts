@@ -1,27 +1,49 @@
-// Data access for articles.
+// Admin article data access, through the Go API.
 
-import { db } from "../db.js";
-import type { Article } from "../models/article";
+import { api, type Article } from "@dpmptsp/api-client";
 
-export async function countAll(): Promise<number> {
-  const [rows] = await db.query("SELECT COUNT(*) AS total FROM post");
-  return Number((rows as { total: number }[])?.[0]?.total ?? 0);
+export type ArticlePage = {
+  items: Article[];
+  total: number;
+  page: number;
+  perPage: number;
+  totalPages: number;
+};
+
+export async function findPage(page: number, perPage: number): Promise<ArticlePage> {
+  // include_inactive: the admin table lists drafts as well as published rows.
+  const res = await api.listArticles({ page, perPage, includeInactive: true });
+
+  if (!res.ok) {
+    console.error("listArticles failed:", res.status, res.error);
+    return { items: [], total: 0, page, perPage, totalPages: 1 };
+  }
+
+  const meta = res.meta;
+  return {
+    items: res.data,
+    total: meta?.total ?? res.data.length,
+    page: meta?.page ?? page,
+    perPage: meta?.per_page ?? perPage,
+    totalPages: Math.max(1, meta?.pages ?? 1),
+  };
 }
 
-export async function findPage(limit: number, offset: number): Promise<Article[]> {
-  // LIMIT/OFFSET are bound, not interpolated. Several pages in this codebase
-  // splice them into the SQL string; that pattern must not spread.
-  const [rows] = await db.query(
-    `SELECT post.*, category_berita.title AS kategori
-       FROM post
-       LEFT JOIN category_berita ON post.id_category = category_berita.id_category
-      ORDER BY post.id_post DESC
-      LIMIT ? OFFSET ?`,
-    [limit, offset]
-  );
-  return (rows as Article[]) ?? [];
+export async function findById(id: number): Promise<Article | null> {
+  const res = await api.articleById(id);
+  if (res.ok) return res.data;
+  if (res.status !== 404) console.error("articleById failed:", res.status, res.error);
+  return null;
 }
 
-export async function deleteById(id: number): Promise<void> {
-  await db.query("DELETE FROM post WHERE id_post = ?", [id]);
+export async function create(body: Record<string, unknown>) {
+  return api.createArticle(body);
+}
+
+export async function update(id: number, body: Record<string, unknown>) {
+  return api.updateArticle(id, body);
+}
+
+export async function remove(id: number) {
+  return api.deleteArticle(id);
 }
