@@ -179,8 +179,8 @@ legacy-media-archive: ## Download every reachable legacy image before the old ho
 
 smoke: ## Check the running stack, including that the api is NOT reachable from the gateway
 	@set -e; \
-	echo "web via gateway:   $$(curl -s -o /dev/null -w '%%{http_code}' http://127.0.0.1:8017/ || echo down)"; \
-	echo "admin via gateway: $$(curl -s -o /dev/null -w '%%{http_code}' http://127.0.0.1:8018/admin/login || echo down)"; \
+	echo "web via gateway:   $$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8017/ || echo down)"; \
+	echo "admin via gateway: $$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8018/admin/login || echo down)"; \
 	echo -n "api reachable from web (must succeed):     "; \
 	$(COMPOSE) exec -T web  wget -qO- http://api:8080/healthz >/dev/null 2>&1 && echo yes || echo NO; \
 	echo -n "api reachable from gateway (must be NO):   "; \
