@@ -50,6 +50,12 @@ func New(cfg *config.Config, log *slog.Logger, db *gorm.DB, dia dialect.Dialect,
 	mux.HandleFunc("GET /v1/categories", articles.Categories)
 
 	// Site chrome: branding and the header menu, already nested.
+	auth := &handlers.Auth{
+		Service: application.NewAuthService(database.NewUserRepo(db)),
+		Log:     log,
+	}
+	mux.HandleFunc("POST /v1/auth/login", auth.Login)
+
 	site := &handlers.Site{Repo: siteRepo, Log: log}
 	mux.HandleFunc("GET /v1/site/chrome", site.Chrome)
 

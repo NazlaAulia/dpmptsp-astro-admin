@@ -964,6 +964,67 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Verify administrator credentials
+         * @description Returns the user on success. Astro owns the session cookie; this only
+         *     reports whether the credentials are valid and who they belong to.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        username: string;
+                        password: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description authenticated */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data?: components["schemas"]["User"];
+                        };
+                    };
+                };
+                /**
+                 * @description Wrong password and unknown user return the same response, so the
+                 *     endpoint cannot be used to enumerate usernames.
+                 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/site/chrome": {
         parameters: {
             query?: never;
@@ -1321,6 +1382,13 @@ export interface components {
              * @enum {string}
              */
             tipe: "notif" | "modal";
+        };
+        User: {
+            /** Format: int64 */
+            id: number;
+            username: string;
+            email?: string;
+            role: string;
         };
         SiteChrome: {
             settings: {

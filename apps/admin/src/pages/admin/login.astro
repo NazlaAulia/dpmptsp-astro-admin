@@ -2,8 +2,7 @@
 export const prerender = false;
 
 import AuthLayout from "../../layouts/AuthLayout.astro";
-import { db } from "../../lib/db.js";
-import { authenticateAdmin } from "../../lib/adminAuth.js";
+import { verifyCredentials } from "../../lib/services/auth.service";
 import { issueSession, readSession } from "../../lib/session";
 
 // Already signed in? Nothing to do here.
@@ -27,16 +26,15 @@ if (Astro.request.method === "POST") {
     const username = formData.get("username");
     const password = formData.get("password");
 
-    const result = await authenticateAdmin({ username, password, db });
+    const result = await verifyCredentials(String(username ?? ""), String(password ?? ""));
 
-    if (result.success) {
-      issueSession(Astro.cookies, String(username));
+    if (result.ok) {
+      issueSession(Astro.cookies, result.user.username);
       return Astro.redirect(safeNext(formData.get("next")));
     }
 
-    // One message for every failure mode. Distinguishing "no such user" from
-    // "wrong password" hands an attacker a username oracle.
-    error = "Username atau password salah.";
+    error = result.message;
+
   } catch (e) {
     console.error("LOGIN ERROR:", e);
     error = "Terjadi kesalahan pada server.";

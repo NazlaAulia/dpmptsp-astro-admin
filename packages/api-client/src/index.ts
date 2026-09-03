@@ -19,6 +19,7 @@ export type ArticleInput = Schemas["ArticleInput"];
 export type Category = Schemas["Category"];
 export type MenuNode = Schemas["MenuNode"];
 export type SiteChrome = Schemas["SiteChrome"];
+export type User = Schemas["User"];
 export type Regulation = Schemas["Regulation"];
 export type PublicApp = Schemas["PublicApp"];
 export type Video = Schemas["Video"];
@@ -131,6 +132,14 @@ export const api = {
 
   categories() {
     return request<Category[]>("/v1/categories");
+  },
+
+  login(username: string, password: string) {
+    return request<User>("/v1/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
   },
 
   siteChrome() {
