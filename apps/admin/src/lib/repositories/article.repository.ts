@@ -1,5 +1,6 @@
 // Admin article data access, through the Go API.
 
+import { currentSessionId } from "../request-context";
 import { api, type Article } from "@dpmptsp/api-client";
 
 export type ArticlePage = {
@@ -37,13 +38,13 @@ export async function findById(id: number): Promise<Article | null> {
 }
 
 export async function create(body: Record<string, unknown>) {
-  return api.createArticle(body);
+  return api.createArticle(body, currentSessionId());
 }
 
 export async function update(id: number, body: Record<string, unknown>) {
-  return api.updateArticle(id, body);
+  return api.updateArticle(id, body, currentSessionId());
 }
 
 export async function remove(id: number) {
-  return api.deleteArticle(id);
+  return api.deleteArticle(id, currentSessionId());
 }

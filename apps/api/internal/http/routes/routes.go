@@ -21,6 +21,11 @@ import (
 func New(cfg *config.Config, log *slog.Logger, db *gorm.DB, dia dialect.Dialect, rdb *cache.Client, files *storage.Manager) http.Handler {
 	mux := http.NewServeMux()
 
+	// Authorization for mutating routes. The service key proves the caller is
+	// one of our own apps; it does not say which person is acting, so it cannot
+	// be the only check on a write.
+	guard := middleware.RequireRole("admin")
+
 	health := &handlers.Health{DB: db, Redis: rdb, Engine: string(cfg.Engine()), Files: files}
 	mux.HandleFunc("GET /healthz", health.Live)
 	mux.HandleFunc("GET /readyz", health.Ready)
@@ -44,20 +49,22 @@ func New(cfg *config.Config, log *slog.Logger, db *gorm.DB, dia dialect.Dialect,
 	mux.HandleFunc("GET /v1/articles", articles.List)
 	mux.HandleFunc("GET /v1/articles/by-slug/{slug}", articles.BySlug)
 	mux.HandleFunc("GET /v1/articles/{id}", articles.ByID)
-	mux.HandleFunc("POST /v1/articles", articles.Create)
-	mux.HandleFunc("PUT /v1/articles/{id}", articles.Update)
-	mux.HandleFunc("DELETE /v1/articles/{id}", articles.Delete)
+	mux.Handle("POST /v1/articles", guard(http.HandlerFunc(articles.Create)))
+	mux.Handle("PUT /v1/articles/{id}", guard(http.HandlerFunc(articles.Update)))
+	mux.Handle("DELETE /v1/articles/{id}", guard(http.HandlerFunc(articles.Delete)))
 	mux.HandleFunc("GET /v1/categories", articles.Categories)
 
 	// Site chrome: branding and the header menu, already nested.
-	auth := &handlers.Auth{
-		Service: application.NewAuthService(database.NewUserRepo(db)),
-		Log:     log,
-	}
+	sessions := cache.NewSessionStore(rdb)
+	authService := application.NewAuthService(database.NewUserRepo(db), sessions)
+	auth := &handlers.Auth{Service: authService, Log: log}
+
 	mux.HandleFunc("POST /v1/auth/login", auth.Login)
+	mux.HandleFunc("GET /v1/auth/session", auth.Current)
+	mux.HandleFunc("DELETE /v1/auth/session", auth.Logout)
 
 	uploads := &handlers.Uploads{Files: files, Log: log}
-	mux.HandleFunc("POST /v1/uploads", uploads.Create)
+	mux.Handle("POST /v1/uploads", guard(http.HandlerFunc(uploads.Create)))
 
 	site := &handlers.Site{Repo: siteRepo, Log: log}
 	mux.HandleFunc("GET /v1/site/chrome", site.Chrome)
@@ -75,25 +82,25 @@ func New(cfg *config.Config, log *slog.Logger, db *gorm.DB, dia dialect.Dialect,
 	// Admin writes.
 	mux.HandleFunc("GET /v1/innovations", content.Innovations)
 	mux.HandleFunc("GET /v1/innovations/{id}", content.Innovation)
-	mux.HandleFunc("POST /v1/innovations", content.CreateInnovation)
-	mux.HandleFunc("PUT /v1/innovations/{id}", content.UpdateInnovation)
-	mux.HandleFunc("DELETE /v1/innovations/{id}", content.DeleteInnovation)
+	mux.Handle("POST /v1/innovations", guard(http.HandlerFunc(content.CreateInnovation)))
+	mux.Handle("PUT /v1/innovations/{id}", guard(http.HandlerFunc(content.UpdateInnovation)))
+	mux.Handle("DELETE /v1/innovations/{id}", guard(http.HandlerFunc(content.DeleteInnovation)))
 
 	mux.HandleFunc("GET /v1/performance-docs/{id}", content.PerformanceDoc)
-	mux.HandleFunc("POST /v1/performance-docs", content.CreatePerformanceDoc)
-	mux.HandleFunc("PUT /v1/performance-docs/{id}", content.UpdatePerformanceDoc)
-	mux.HandleFunc("DELETE /v1/performance-docs/{id}", content.DeletePerformanceDoc)
+	mux.Handle("POST /v1/performance-docs", guard(http.HandlerFunc(content.CreatePerformanceDoc)))
+	mux.Handle("PUT /v1/performance-docs/{id}", guard(http.HandlerFunc(content.UpdatePerformanceDoc)))
+	mux.Handle("DELETE /v1/performance-docs/{id}", guard(http.HandlerFunc(content.DeletePerformanceDoc)))
 
 	mux.HandleFunc("GET /v1/service-locations/{id}", content.ServiceLocation)
-	mux.HandleFunc("POST /v1/service-locations", content.CreateServiceLocation)
-	mux.HandleFunc("PUT /v1/service-locations/{id}", content.UpdateServiceLocation)
-	mux.HandleFunc("DELETE /v1/service-locations/{id}", content.DeleteServiceLocation)
+	mux.Handle("POST /v1/service-locations", guard(http.HandlerFunc(content.CreateServiceLocation)))
+	mux.Handle("PUT /v1/service-locations/{id}", guard(http.HandlerFunc(content.UpdateServiceLocation)))
+	mux.Handle("DELETE /v1/service-locations/{id}", guard(http.HandlerFunc(content.DeleteServiceLocation)))
 
 	mux.HandleFunc("GET /v1/about-contents", content.AboutContents)
 	mux.HandleFunc("GET /v1/about-contents/{id}", content.AboutContent)
-	mux.HandleFunc("POST /v1/about-contents", content.CreateAboutContent)
-	mux.HandleFunc("PUT /v1/about-contents/{id}", content.UpdateAboutContent)
-	mux.HandleFunc("DELETE /v1/about-contents/{id}", content.DeleteAboutContent)
+	mux.Handle("POST /v1/about-contents", guard(http.HandlerFunc(content.CreateAboutContent)))
+	mux.Handle("PUT /v1/about-contents/{id}", guard(http.HandlerFunc(content.UpdateAboutContent)))
+	mux.Handle("DELETE /v1/about-contents/{id}", guard(http.HandlerFunc(content.DeleteAboutContent)))
 
 	// Composite page payloads.
 	contentRepo := database.NewContentRepo(db)
@@ -110,9 +117,9 @@ func New(cfg *config.Config, log *slog.Logger, db *gorm.DB, dia dialect.Dialect,
 	announcements := &handlers.Announcements{Repo: database.NewAnnouncementRepo(db), Log: log}
 	mux.HandleFunc("GET /v1/announcements", announcements.List)
 	mux.HandleFunc("GET /v1/announcements/{id}", announcements.ByID)
-	mux.HandleFunc("POST /v1/announcements", announcements.Create)
-	mux.HandleFunc("PUT /v1/announcements/{id}", announcements.Update)
-	mux.HandleFunc("DELETE /v1/announcements/{id}", announcements.Delete)
+	mux.Handle("POST /v1/announcements", guard(http.HandlerFunc(announcements.Create)))
+	mux.Handle("PUT /v1/announcements/{id}", guard(http.HandlerFunc(announcements.Update)))
+	mux.Handle("DELETE /v1/announcements/{id}", guard(http.HandlerFunc(announcements.Delete)))
 
 	// Health endpoints stay reachable without the service key so that container
 	// orchestration can probe them.
@@ -127,5 +134,6 @@ func New(cfg *config.Config, log *slog.Logger, db *gorm.DB, dia dialect.Dialect,
 		middleware.Recover(log),
 		middleware.Logging(log),
 		middleware.ServiceAuth(cfg.ServiceKey, skipAuth),
+		middleware.Session(authService),
 	)
 }

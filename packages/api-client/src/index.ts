@@ -20,6 +20,7 @@ export type Category = Schemas["Category"];
 export type MenuNode = Schemas["MenuNode"];
 export type SiteChrome = Schemas["SiteChrome"];
 export type User = Schemas["User"];
+export type SessionInfo = Schemas["Session"];
 export type Innovation = Schemas["Innovation"];
 export type AboutContent = Schemas["AboutContent"];
 export type Upload = Schemas["Upload"];
@@ -57,9 +58,9 @@ const DEFAULT_TIMEOUT_MS = 5_000;
 
 async function request<T>(
   path: string,
-  init: RequestInit & { timeoutMs?: number } = {}
+  init: RequestInit & { timeoutMs?: number; sessionId?: string } = {}
 ): Promise<ApiResult<T>> {
-  const { timeoutMs = intEnv("API_TIMEOUT_MS", DEFAULT_TIMEOUT_MS), ...rest } = init;
+  const { timeoutMs = intEnv("API_TIMEOUT_MS", DEFAULT_TIMEOUT_MS), sessionId, ...rest } = init;
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -72,6 +73,10 @@ async function request<T>(
         Accept: "application/json",
         // Authenticates this process as one of our own Astro apps.
         "X-Internal-Key": requireEnv("API_SERVICE_KEY"),
+        // Identifies the signed-in administrator. The API resolves it against
+        // its session store and authorizes writes on it; the service key alone
+        // only proves the caller is one of our own apps.
+        ...(sessionId ? { "X-Session-Id": sessionId } : {}),
         ...(rest.headers ?? {}),
       },
     });
@@ -99,9 +104,10 @@ async function request<T>(
 }
 
 /** JSON-bodied request helper. */
-function send<T>(method: string, path: string, body?: unknown) {
+function send<T>(method: string, path: string, body?: unknown, sessionId?: string) {
   return request<T>(path, {
     method,
+    sessionId,
     headers: body === undefined ? {} : { "Content-Type": "application/json" },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
@@ -147,7 +153,7 @@ export const api = {
   },
 
   login(username: string, password: string) {
-    return request<User>("/v1/auth/login", {
+    return request<SessionInfo>("/v1/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
@@ -161,42 +167,42 @@ export const api = {
   innovation(id: number) {
     return request<Innovation>(`/v1/innovations/${id}`);
   },
-  createInnovation(body: Partial<Innovation>) {
-    return send<Innovation>("POST", "/v1/innovations", body);
+  createInnovation(body: Partial<Innovation>, sessionId?: string) {
+    return send<Innovation>("POST", "/v1/innovations", body, sessionId);
   },
-  updateInnovation(id: number, body: Partial<Innovation>) {
-    return send<Innovation>("PUT", `/v1/innovations/${id}`, body);
+  updateInnovation(id: number, body: Partial<Innovation>, sessionId?: string) {
+    return send<Innovation>("PUT", `/v1/innovations/${id}`, body, sessionId);
   },
-  deleteInnovation(id: number) {
-    return send<null>("DELETE", `/v1/innovations/${id}`);
+  deleteInnovation(id: number, sessionId?: string) {
+    return send<null>("DELETE", `/v1/innovations/${id}`, undefined, sessionId);
   },
 
   // --- performance docs ---
   performanceDoc(id: number) {
     return request<PerformanceDoc>(`/v1/performance-docs/${id}`);
   },
-  createPerformanceDoc(body: Partial<PerformanceDoc>) {
-    return send<PerformanceDoc>("POST", "/v1/performance-docs", body);
+  createPerformanceDoc(body: Partial<PerformanceDoc>, sessionId?: string) {
+    return send<PerformanceDoc>("POST", "/v1/performance-docs", body, sessionId);
   },
-  updatePerformanceDoc(id: number, body: Partial<PerformanceDoc>) {
-    return send<PerformanceDoc>("PUT", `/v1/performance-docs/${id}`, body);
+  updatePerformanceDoc(id: number, body: Partial<PerformanceDoc>, sessionId?: string) {
+    return send<PerformanceDoc>("PUT", `/v1/performance-docs/${id}`, body, sessionId);
   },
-  deletePerformanceDoc(id: number) {
-    return send<null>("DELETE", `/v1/performance-docs/${id}`);
+  deletePerformanceDoc(id: number, sessionId?: string) {
+    return send<null>("DELETE", `/v1/performance-docs/${id}`, undefined, sessionId);
   },
 
   // --- service locations ---
   serviceLocation(id: number) {
     return request<ServiceLocation>(`/v1/service-locations/${id}`);
   },
-  createServiceLocation(body: Partial<ServiceLocation>) {
-    return send<ServiceLocation>("POST", "/v1/service-locations", body);
+  createServiceLocation(body: Partial<ServiceLocation>, sessionId?: string) {
+    return send<ServiceLocation>("POST", "/v1/service-locations", body, sessionId);
   },
-  updateServiceLocation(id: number, body: Partial<ServiceLocation>) {
-    return send<ServiceLocation>("PUT", `/v1/service-locations/${id}`, body);
+  updateServiceLocation(id: number, body: Partial<ServiceLocation>, sessionId?: string) {
+    return send<ServiceLocation>("PUT", `/v1/service-locations/${id}`, body, sessionId);
   },
-  deleteServiceLocation(id: number) {
-    return send<null>("DELETE", `/v1/service-locations/${id}`);
+  deleteServiceLocation(id: number, sessionId?: string) {
+    return send<null>("DELETE", `/v1/service-locations/${id}`, undefined, sessionId);
   },
 
   // --- about contents ---
@@ -206,25 +212,25 @@ export const api = {
   aboutContent(id: number) {
     return request<AboutContent>(`/v1/about-contents/${id}`);
   },
-  createAboutContent(body: Partial<AboutContent>) {
-    return send<AboutContent>("POST", "/v1/about-contents", body);
+  createAboutContent(body: Partial<AboutContent>, sessionId?: string) {
+    return send<AboutContent>("POST", "/v1/about-contents", body, sessionId);
   },
-  updateAboutContent(id: number, body: Partial<AboutContent>) {
-    return send<AboutContent>("PUT", `/v1/about-contents/${id}`, body);
+  updateAboutContent(id: number, body: Partial<AboutContent>, sessionId?: string) {
+    return send<AboutContent>("PUT", `/v1/about-contents/${id}`, body, sessionId);
   },
-  deleteAboutContent(id: number) {
-    return send<null>("DELETE", `/v1/about-contents/${id}`);
+  deleteAboutContent(id: number, sessionId?: string) {
+    return send<null>("DELETE", `/v1/about-contents/${id}`, undefined, sessionId);
   },
 
   // --- articles (admin writes) ---
-  createArticle(body: Record<string, unknown>) {
-    return send<Article>("POST", "/v1/articles", body);
+  createArticle(body: Record<string, unknown>, sessionId?: string) {
+    return send<Article>("POST", "/v1/articles", body, sessionId);
   },
-  updateArticle(id: number, body: Record<string, unknown>) {
-    return send<Article>("PUT", `/v1/articles/${id}`, body);
+  updateArticle(id: number, body: Record<string, unknown>, sessionId?: string) {
+    return send<Article>("PUT", `/v1/articles/${id}`, body, sessionId);
   },
-  deleteArticle(id: number) {
-    return send<null>("DELETE", `/v1/articles/${id}`);
+  deleteArticle(id: number, sessionId?: string) {
+    return send<null>("DELETE", `/v1/articles/${id}`, undefined, sessionId);
   },
 
   /**
@@ -233,13 +239,23 @@ export const api = {
    * The stored name is generated by the API; the client's filename only
    * influences the extension when the sniffed type is unrecognised.
    */
-  upload(file: File | Blob, opts: { prefix?: string; visibility?: "public" | "private"; filename?: string } = {}) {
+  upload(file: File | Blob, opts: { prefix?: string; visibility?: "public" | "private"; filename?: string; sessionId?: string } = {}) {
     const form = new FormData();
     form.append("file", file, opts.filename ?? "upload");
     if (opts.prefix) form.append("prefix", opts.prefix);
     if (opts.visibility) form.append("visibility", opts.visibility);
     // No Content-Type header: fetch sets the multipart boundary itself.
-    return request<Upload>("/v1/uploads", { method: "POST", body: form, timeoutMs: 60_000 });
+    return request<Upload>("/v1/uploads", {
+      method: "POST", body: form, timeoutMs: 60_000, sessionId: opts.sessionId,
+    });
+  },
+
+  currentSession(sessionId: string) {
+    return request<SessionInfo>("/v1/auth/session", { sessionId });
+  },
+
+  logout(sessionId: string) {
+    return send<null>("DELETE", "/v1/auth/session", undefined, sessionId);
   },
 
   siteChrome() {
@@ -301,7 +317,7 @@ export const api = {
     return request<Announcement>(`/v1/announcements/${id}`);
   },
 
-  createAnnouncement(body: AnnouncementInput) {
+  createAnnouncement(body: AnnouncementInput, sessionId?: string) {
     return request<Announcement>("/v1/announcements", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -309,7 +325,7 @@ export const api = {
     });
   },
 
-  updateAnnouncement(id: number, body: AnnouncementInput) {
+  updateAnnouncement(id: number, body: AnnouncementInput, sessionId?: string) {
     return request<Announcement>(`/v1/announcements/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -317,7 +333,7 @@ export const api = {
     });
   },
 
-  deleteAnnouncement(id: number) {
+  deleteAnnouncement(id: number, sessionId?: string) {
     return request<null>(`/v1/announcements/${id}`, { method: "DELETE" });
   },
 

@@ -475,13 +475,13 @@ paths:
                 password: { type: string }
       responses:
         "200":
-          description: authenticated
+          description: authenticated; the session id is returned once
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  data: { $ref: "#/components/schemas/User" }
+                  data: { $ref: "#/components/schemas/Session" }
         "401":
           description: |
             Wrong password and unknown user return the same response, so the
@@ -489,6 +489,33 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Error" }
+
+  /v1/auth/session:
+    get:
+      tags: [auth]
+      summary: Resolve the current session
+      description: |
+        Reads X-Session-Id and reports who it belongs to. Sessions live in the
+        API's store, so revoking one takes effect immediately.
+      responses:
+        "200":
+          description: the session
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: "#/components/schemas/Session" }
+        "401":
+          description: no valid session
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+    delete:
+      tags: [auth]
+      summary: Revoke the current session
+      responses:
+        "204": { description: revoked, or there was nothing to revoke }
 
   /v1/site/chrome:
     get:
@@ -923,6 +950,20 @@ components:
         content_type:
           type: string
           description: Detected from the file's bytes, not the client's claim.
+
+    Session:
+      type: object
+      required: [user_id, username, role, expires_at]
+      properties:
+        session_id:
+          type: string
+          description: |
+            Returned by login only. Astro stores it and sends it back as
+            X-Session-Id; it is never returned again.
+        user_id: { type: integer, format: int64 }
+        username: { type: string }
+        role: { type: string }
+        expires_at: { type: string, format: date-time }
 
     User:
       type: object

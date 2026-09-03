@@ -2,12 +2,19 @@ package application
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/base64"
 	"errors"
+	"fmt"
 	"strings"
+	"time"
 
 	"dpmptsp/api/internal/domain"
 	"dpmptsp/api/internal/security"
 )
+
+// SessionTTL bounds how long a signed-in session lasts.
+const SessionTTL = 8 * time.Hour
 
 // ErrInvalidCredentials is returned for every authentication failure.
 //
@@ -16,10 +23,13 @@ import (
 var ErrInvalidCredentials = errors.New("invalid credentials")
 
 type AuthService struct {
-	users domain.UserRepository
+	users    domain.UserRepository
+	sessions domain.SessionStore
 }
 
-func NewAuthService(u domain.UserRepository) *AuthService { return &AuthService{users: u} }
+func NewAuthService(u domain.UserRepository, s domain.SessionStore) *AuthService {
+	return &AuthService{users: u, sessions: s}
+}
 
 // Authenticate verifies a username and password.
 func (s *AuthService) Authenticate(ctx context.Context, username, password string) (*domain.User, error) {
@@ -56,4 +66,47 @@ func (s *AuthService) Authenticate(ctx context.Context, username, password strin
 
 	u.PasswordHash = ""
 	return u, nil
+}
+
+// Login authenticates and opens a session, returning its id.
+func (s *AuthService) Login(ctx context.Context, username, password string) (*domain.Session, error) {
+	u, err := s.Authenticate(ctx, username, password)
+	if err != nil {
+		return nil, err
+	}
+
+	id, err := newSessionID()
+	if err != nil {
+		return nil, err
+	}
+	now := time.Now()
+	sess := domain.Session{
+		ID: id, UserID: u.ID, Username: u.Username, Role: u.Role,
+		CreatedAt: now, ExpiresAt: now.Add(SessionTTL),
+	}
+	if err := s.sessions.Create(ctx, sess); err != nil {
+		return nil, fmt.Errorf("open session: %w", err)
+	}
+	return &sess, nil
+}
+
+// Session resolves a session id.
+func (s *AuthService) Session(ctx context.Context, id string) (*domain.Session, error) {
+	if strings.TrimSpace(id) == "" {
+		return nil, domain.ErrNotFound
+	}
+	return s.sessions.Get(ctx, id)
+}
+
+// Logout revokes one session.
+func (s *AuthService) Logout(ctx context.Context, id string) error {
+	return s.sessions.Delete(ctx, id)
+}
+
+func newSessionID() (string, error) {
+	buf := make([]byte, 32)
+	if _, err := rand.Read(buf); err != nil {
+		return "", fmt.Errorf("generate session id: %w", err)
+	}
+	return base64.RawURLEncoding.EncodeToString(buf), nil
 }

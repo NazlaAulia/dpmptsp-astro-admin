@@ -994,14 +994,14 @@ export interface paths {
                 };
             };
             responses: {
-                /** @description authenticated */
+                /** @description authenticated; the session id is returned once */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
                         "application/json": {
-                            data?: components["schemas"]["User"];
+                            data?: components["schemas"]["Session"];
                         };
                     };
                 };
@@ -1020,6 +1020,75 @@ export interface paths {
             };
         };
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Resolve the current session
+         * @description Reads X-Session-Id and reports who it belongs to. Sessions live in the
+         *     API's store, so revoking one takes effect immediately.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description the session */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data?: components["schemas"]["Session"];
+                        };
+                    };
+                };
+                /** @description no valid session */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        /** Revoke the current session */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description revoked */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
         options?: never;
         head?: never;
         patch?: never;
@@ -1415,6 +1484,19 @@ export interface components {
             size: number;
             /** @description Detected from the file's bytes, not the client's claim. */
             content_type: string;
+        };
+        Session: {
+            /**
+             * @description Returned by login only. Astro stores it and sends it back as
+             *     X-Session-Id; it is never returned again.
+             */
+            session_id?: string;
+            /** Format: int64 */
+            user_id: number;
+            username: string;
+            role: string;
+            /** Format: date-time */
+            expires_at: string;
         };
         User: {
             /** Format: int64 */

@@ -1,6 +1,5 @@
-// Login use case.
+// Login and logout.
 //
-// Astro authenticates and holds the session cookie; the API decides whether the
-// credentials are valid.
+// Astro holds the cookie; the API owns the session and decides what it may do.
 
-export { verifyCredentials } from "../repositories/auth.repository";
+export { verifyCredentials, revokeSession } from "../repositories/auth.repository";

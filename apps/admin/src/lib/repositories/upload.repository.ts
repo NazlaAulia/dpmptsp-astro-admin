@@ -4,6 +4,7 @@
 // more than one replica and the web process no longer needs write access to the
 // directory it serves.
 
+import { currentSessionId } from "../request-context";
 import { api } from "@dpmptsp/api-client";
 
 export type UploadResult =
@@ -15,7 +16,9 @@ export async function uploadFile(
   prefix: string,
   visibility: "public" | "private" = "public"
 ): Promise<UploadResult> {
-  const res = await api.upload(file, { prefix, visibility, filename: file.name });
+  const res = await api.upload(file, {
+    prefix, visibility, filename: file.name, sessionId: currentSessionId(),
+  });
   if (res.ok) return { ok: true, key: res.data.key, url: res.data.url ?? res.data.key };
 
   if (res.status === 415) return { ok: false, message: "Format file tidak didukung." };

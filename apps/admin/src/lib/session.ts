@@ -6,9 +6,13 @@ import type { AstroCookies } from "astro";
 const MAX_AGE_SECONDS = 60 * 60 * 8; // 8 hours
 
 export type Session = {
-  /** Who logged in. Carries no role: authorization is never Astro's decision. */
+  /** Who logged in. Carries no role: authorization is the API's decision. */
   sub: string;
-  /** Random per-session id. CSRF tokens are derived from it. */
+  /**
+   * The API's session id. Sent as X-Session-Id on every call, so the API can
+   * resolve it against its store and authorize writes. Revoking it there takes
+   * effect immediately.
+   */
   sid: string;
   /** Issued at, epoch seconds. */
   iat: number;
@@ -62,13 +66,18 @@ function safeEqual(a: string, b: string): boolean {
   return crypto.timingSafeEqual(ab, bb);
 }
 
-export function issueSession(cookies: AstroCookies, sub: string): Session {
+export function issueSession(
+  cookies: AstroCookies,
+  sub: string,
+  sid: string,
+  expiresAt?: number
+): Session {
   const now = Math.floor(Date.now() / 1000);
   const session: Session = {
     sub,
-    sid: crypto.randomBytes(32).toString("base64url"),
+    sid,
     iat: now,
-    exp: now + MAX_AGE_SECONDS,
+    exp: expiresAt ?? now + MAX_AGE_SECONDS,
   };
   const payload = b64url(JSON.stringify(session));
   cookies.set(cookieName(), `${payload}.${sign(payload)}`, {
@@ -76,7 +85,7 @@ export function issueSession(cookies: AstroCookies, sub: string): Session {
     secure: isSecure(),
     sameSite: "lax",
     path: "/",
-    maxAge: MAX_AGE_SECONDS,
+    maxAge: Math.max(1, session.exp - now),
   });
   return session;
 }

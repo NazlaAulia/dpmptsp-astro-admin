@@ -2,6 +2,7 @@
 
 import { defineMiddleware } from "astro:middleware";
 import { readSession, csrfToken } from "./lib/session";
+import { runWithContext } from "./lib/request-context";
 
 /** Exact paths reachable without a session. Everything else is guarded. */
 const PUBLIC_PATHS = new Set(["/admin/login", "/admin/logout"]);
@@ -45,7 +46,8 @@ function wantsJson(request: Request): boolean {
   return (request.headers.get("accept") ?? "").includes("application/json");
 }
 
-export const onRequest = defineMiddleware(async (context, next) => {
+export const onRequest = defineMiddleware(async (context, next) =>
+  runWithContext({ sessionId: readSession(context.cookies)?.sid }, async () => {
   const { request, url, cookies } = context;
   const method = request.method.toUpperCase();
 
@@ -83,4 +85,5 @@ export const onRequest = defineMiddleware(async (context, next) => {
   response.headers.set("x-frame-options", "DENY");
   response.headers.set("referrer-policy", "same-origin");
   return response;
-});
+  })
+);

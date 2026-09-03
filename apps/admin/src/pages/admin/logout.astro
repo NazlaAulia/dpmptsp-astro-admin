@@ -2,7 +2,8 @@
 // Logout. POST only.
 export const prerender = false;
 
-import { clearSession } from "../../lib/session";
+import { clearSession, readSession } from "../../lib/session";
+import { revokeSession } from "../../lib/services/auth.service";
 
 if (Astro.request.method !== "POST") {
   return new Response("Method Not Allowed", {
@@ -10,6 +11,11 @@ if (Astro.request.method !== "POST") {
     headers: { allow: "POST" },
   });
 }
+
+// Revoke in the API first: clearing only the cookie would leave the id
+// usable by anyone who had copied it.
+const current = readSession(Astro.cookies);
+if (current?.sid) await revokeSession(current.sid);
 
 clearSession(Astro.cookies);
 return Astro.redirect("/admin/login", 303);

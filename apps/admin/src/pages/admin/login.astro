@@ -29,7 +29,12 @@ if (Astro.request.method === "POST") {
     const result = await verifyCredentials(String(username ?? ""), String(password ?? ""));
 
     if (result.ok) {
-      issueSession(Astro.cookies, result.user.username);
+      issueSession(
+        Astro.cookies,
+        result.session.username,
+        result.session.session_id ?? "",
+        Math.floor(new Date(result.session.expires_at).getTime() / 1000)
+      );
       return Astro.redirect(safeNext(formData.get("next")));
     }
 

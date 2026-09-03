@@ -19,10 +19,13 @@ function fakeCookies() {
 
 test("a session round-trips", () => {
   const c = fakeCookies();
-  const issued = issueSession(c, "admin");
+  const issued = issueSession(c, "admin", "api-session-id");
   const read = readSession(c);
   assert.equal(read?.sub, "admin");
   assert.equal(read?.sid, issued.sid);
+  // The cookie must carry the API's session id, since that is what the API
+  // resolves and can revoke.
+  assert.equal(read?.sid, "api-session-id");
 });
 
 test("no cookie means no session", () => {
@@ -39,7 +42,7 @@ test("a forged cookie is rejected", () => {
 
 test("a tampered payload is rejected", () => {
   const c = fakeCookies();
-  issueSession(c, "admin");
+  issueSession(c, "admin", "api-session-id");
   const raw = c.get(cookieName()).value;
   const [payload, mac] = [raw.slice(0, raw.lastIndexOf(".")), raw.slice(raw.lastIndexOf(".") + 1)];
   // Same signature, different payload.
@@ -49,7 +52,7 @@ test("a tampered payload is rejected", () => {
 
 test("a tampered signature is rejected", () => {
   const c = fakeCookies();
-  issueSession(c, "admin");
+  issueSession(c, "admin", "api-session-id");
   const raw = c.get(cookieName()).value;
   c.set(cookieName(), `${raw.slice(0, raw.lastIndexOf("."))}.deadbeef`);
   assert.equal(readSession(c), null);
@@ -57,7 +60,7 @@ test("a tampered signature is rejected", () => {
 
 test("an expired session is rejected", () => {
   const c = fakeCookies();
-  issueSession(c, "admin");
+  issueSession(c, "admin", "api-session-id");
   const raw = c.get(cookieName()).value;
   const payload = JSON.parse(
     Buffer.from(raw.slice(0, raw.lastIndexOf(".")), "base64url").toString("utf8")
@@ -71,7 +74,7 @@ test("an expired session is rejected", () => {
 
 test("clearing removes the session", () => {
   const c = fakeCookies();
-  issueSession(c, "admin");
+  issueSession(c, "admin", "api-session-id");
   clearSession(c);
   assert.equal(readSession(c), null);
 });
@@ -79,8 +82,8 @@ test("clearing removes the session", () => {
 test("csrf token matches its own session and nothing else", () => {
   const a = fakeCookies();
   const b = fakeCookies();
-  const sa = issueSession(a, "admin");
-  const sb = issueSession(b, "admin");
+  const sa = issueSession(a, "admin", "sid-a");
+  const sb = issueSession(b, "admin", "sid-b");
 
   assert.ok(verifyCsrf(sa, csrfToken(sa)));
   assert.ok(!verifyCsrf(sa, csrfToken(sb)), "a token from another session must not verify");
