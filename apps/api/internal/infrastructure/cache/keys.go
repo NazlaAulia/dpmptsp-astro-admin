@@ -19,6 +19,10 @@ const (
 	ResourceArticles Resource = "articles"
 	// The rarely-written content tables: regulasi, ppid, pelayanan, inovasi…
 	ResourceContent Resource = "content"
+	// The homepage composite. It embeds articles, announcements and content, so
+	// it needs its own counter: keying it under any one of them leaves it stale
+	// when either of the others is written.
+	ResourceHome Resource = "home"
 )
 
 // TTLs. Keys built from a superseded version expire on their own.
@@ -27,6 +31,7 @@ const (
 	TTLArticles = 10 * time.Minute
 	TTLDetail   = 30 * time.Minute
 	TTLContent  = time.Hour
+	TTLHome     = 10 * time.Minute
 )
 
 // VersionedKey builds a cache key carrying the resource's current version.

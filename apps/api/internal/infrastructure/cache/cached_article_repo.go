@@ -98,6 +98,10 @@ func (r *CachedArticleRepo) IncrementHits(ctx context.Context, id int64) error {
 // delete is performed.
 func (r *CachedArticleRepo) invalidate(ctx context.Context, a *domain.Article) {
 	Invalidate(ctx, r.rdb, ResourceArticles)
+	// The homepage embeds the article list, so publishing an article has to
+	// retire it too — otherwise the front page keeps the old headline for a
+	// full TTL while every other page is already current.
+	Invalidate(ctx, r.rdb, ResourceHome)
 	if a != nil && a.Slug != "" {
 		Del(ctx, r.rdb, EntityKey(ResourceArticles, "slug:"+a.Slug))
 	}
@@ -151,9 +155,4 @@ func (r *CachedSiteRepo) MenuTree(ctx context.Context) ([]domain.MenuNode, []dom
 	}
 	SetJSON(ctx, r.rdb, key, menuPair{Nav: nav, Contact: contact}, TTLChrome)
 	return nav, contact, nil
-}
-
-// InvalidateChrome retires cached branding and navigation.
-func InvalidateChrome(ctx context.Context, rdb *Client) {
-	Invalidate(ctx, rdb, ResourceChrome)
 }

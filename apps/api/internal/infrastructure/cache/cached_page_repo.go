@@ -23,7 +23,7 @@ func NewCachedPageRepo(inner domain.PageRepository, rdb *Client) *CachedPageRepo
 var _ domain.PageRepository = (*CachedPageRepo)(nil)
 
 func (r *CachedPageRepo) Home(ctx context.Context) (domain.HomeContent, error) {
-	key, ok := VersionedKey(ctx, r.rdb, ResourceContent, "home")
+	key, ok := VersionedKey(ctx, r.rdb, ResourceHome, "home")
 	if !ok {
 		return r.inner.Home(ctx)
 	}
@@ -34,7 +34,7 @@ func (r *CachedPageRepo) Home(ctx context.Context) (domain.HomeContent, error) {
 	if err != nil {
 		return v, err
 	}
-	SetJSON(ctx, r.rdb, key, v, TTLContent)
+	SetJSON(ctx, r.rdb, key, v, TTLHome)
 	return v, nil
 }
 

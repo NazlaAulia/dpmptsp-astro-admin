@@ -115,6 +115,8 @@ func (r *CachedContentRepo) invalidate(ctx context.Context, err error) error {
 		return err
 	}
 	Invalidate(ctx, r.rdb, ResourceContent)
+	// The homepage embeds these lists as well.
+	Invalidate(ctx, r.rdb, ResourceHome)
 	return nil
 }
 

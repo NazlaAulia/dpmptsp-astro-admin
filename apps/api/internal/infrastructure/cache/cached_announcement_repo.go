@@ -49,6 +49,8 @@ func (r *CachedAnnouncementRepo) Create(ctx context.Context, a *domain.Announcem
 		return err
 	}
 	Invalidate(ctx, r.rdb, ResourceContent)
+	// Announcements are the homepage notification strip and modal.
+	Invalidate(ctx, r.rdb, ResourceHome)
 	return nil
 }
 
@@ -57,6 +59,8 @@ func (r *CachedAnnouncementRepo) Update(ctx context.Context, a *domain.Announcem
 		return err
 	}
 	Invalidate(ctx, r.rdb, ResourceContent)
+	// Announcements are the homepage notification strip and modal.
+	Invalidate(ctx, r.rdb, ResourceHome)
 	return nil
 }
 
@@ -65,5 +69,7 @@ func (r *CachedAnnouncementRepo) Delete(ctx context.Context, id int64) error {
 		return err
 	}
 	Invalidate(ctx, r.rdb, ResourceContent)
+	// Announcements are the homepage notification strip and modal.
+	Invalidate(ctx, r.rdb, ResourceHome)
 	return nil
 }
