@@ -40,6 +40,8 @@ if (Astro.request.method === "POST") {
   }
   error = result.message;
 }
+
+const csrf = Astro.locals.csrfToken ?? "";
 ---
 
 <AdminDocument title="Edit Artikel">
@@ -173,6 +175,7 @@ textarea{
 
 
                 <form method="POST">
+                    <input type="hidden" name="_csrf" value={csrf} />
 
                     <div class="form-group">
 

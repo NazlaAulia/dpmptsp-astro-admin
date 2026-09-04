@@ -5,6 +5,7 @@ import { slugify } from "../utils/slugify";
   import Pdf from "../components/Pdf.astro";
 import { getHomeContent, getAnnouncements } from "../lib/services/content.service";
 import PemberitahuanModal from "../components/PemberitahuanModal.astro";
+import { excerpt } from "@dpmptsp/ui";
 
 export const prerender = false;
 
@@ -2284,7 +2285,7 @@ function formatTanggal(value) {
             >
               {berita[0].category_title || "BERITA"}
               •
-              {formatDate(berita[0].date)}
+              {formatTanggal(berita[0].date)}
             </div>
 
 

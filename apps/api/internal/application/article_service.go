@@ -87,6 +87,18 @@ func (s *ArticleService) UpdateArticle(ctx context.Context, a *domain.Article) e
 	if err != nil {
 		return err
 	}
+	// An update carries the whole row, so any field the caller left out would
+	// otherwise be written back as a zero value. These two are never something
+	// an edit meant to erase: a missing publication date reaches MySQL as
+	// '0000-00-00' and is rejected outright, and on Postgres it would silently
+	// succeed and move the article to year 1.
+	if a.PublishedAt.IsZero() {
+		a.PublishedAt = existing.PublishedAt
+	}
+	if a.Editor == "" {
+		a.Editor = existing.Editor
+	}
+
 	// Only re-slug when the title actually changed: a slug is a URL, and
 	// changing it silently breaks every existing link to the article.
 	if existing.Title != a.Title {

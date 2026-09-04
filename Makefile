@@ -186,5 +186,8 @@ smoke: ## Check the running stack, including that the api is NOT reachable from 
 	echo -n "api reachable from gateway (must be NO):   "; \
 	$(COMPOSE) exec -T gateway wget -qO- http://api:8080/healthz >/dev/null 2>&1 && echo "YES - ISOLATION BROKEN" || echo no
 
+crawl: ## Render every page and check the body, not just the status
+	@ADMIN_USER=$${ADMIN_USER:-} ADMIN_PASSWORD=$${ADMIN_PASSWORD:-} ./scripts/crawl.sh
+
 clean: ## Stop and remove volumes. Destroys local database contents.
 	$(COMPOSE) down -v

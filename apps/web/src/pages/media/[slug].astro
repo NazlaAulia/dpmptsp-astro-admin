@@ -13,6 +13,7 @@ if (!page) {
   return new Response(null, { status: 404, statusText: "Artikel tidak ditemukan" });
 }
 
+const slug = Astro.params.slug ?? "";
 const post = page.article;
 const namaKategori = page.categoryName;
 const beritaList = page.berita;

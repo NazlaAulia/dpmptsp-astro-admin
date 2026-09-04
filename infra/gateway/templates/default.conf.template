@@ -1,7 +1,13 @@
 # Rendered by nginx:alpine's built-in envsubst hook at container start.
 
-upstream web_upstream   { server web:3000;   keepalive 16; }
-upstream admin_upstream { server admin:3000; keepalive 16; }
+# Docker's embedded DNS, re-consulted while nginx runs.
+#
+# nginx resolves a name in `upstream` or a literal proxy_pass exactly once, at
+# startup. Recreating a container gives it a new address, and compose reuses
+# addresses freely, so after `up -d web` the gateway kept sending the public
+# site to whatever now held web's old address — which was the admin app.
+# Naming the target through a variable forces a lookup per request.
+resolver 127.0.0.11 valid=10s ipv6=off;
 
 include /etc/nginx/includes/realip.conf;
 
@@ -33,7 +39,8 @@ server {
     }
 
     location / {
-        proxy_pass http://web_upstream;
+        set $web_upstream web:3000;
+        proxy_pass http://$web_upstream;
         include /etc/nginx/includes/proxy.conf;
     }
 }
@@ -65,7 +72,8 @@ server {
         if ($is_cms_path) { set $deny_cms $admin_ip_ok; }
         if ($deny_cms = 0) { return 403; }
 
-        proxy_pass http://admin_upstream;
+        set $admin_upstream admin:3000;
+        proxy_pass http://$admin_upstream;
         include /etc/nginx/includes/proxy.conf;
     }
 }
