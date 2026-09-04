@@ -36,6 +36,8 @@ export type ServiceStandard = Schemas["ServiceStandard"];
 export type InfoSection = Schemas["InfoSection"];
 export type Photo = Schemas["Photo"];
 export type Announcement = Schemas["Announcement"];
+export type Slider = Schemas["Slider"];
+export type SliderInput = Schemas["SliderInput"];
 export type ContactMessageInput = Schemas["ContactMessageInput"];
 export type ContactTicket = Schemas["ContactTicket"];
 export type ContactStatus = Schemas["ContactStatus"];
@@ -330,6 +332,26 @@ export const api = {
 
   deleteAnnouncement(id: number, sessionId?: string) {
     return send<null>("DELETE", `/v1/announcements/${id}`, undefined, sessionId);
+  },
+
+  sliders() {
+    return request<Slider[]>("/v1/sliders");
+  },
+
+  slider(id: number) {
+    return request<Slider>(`/v1/sliders/${id}`);
+  },
+
+  createSlider(body: SliderInput, sessionId?: string) {
+    return send<Slider>("POST", "/v1/sliders", body, sessionId);
+  },
+
+  updateSlider(id: number, body: SliderInput, sessionId?: string) {
+    return send<Slider>("PUT", `/v1/sliders/${id}`, body, sessionId);
+  },
+
+  deleteSlider(id: number, sessionId?: string) {
+    return send<null>("DELETE", `/v1/sliders/${id}`, undefined, sessionId);
   },
 
   photos(page = 1, perPage = 8) {

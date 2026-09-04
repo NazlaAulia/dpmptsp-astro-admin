@@ -53,11 +53,18 @@ type sliderModel struct {
 	Urutan    int    `gorm:"column:urutan"`
 }
 
-type berandaSliderModel struct{ sliderModel }
+// Named and exported, not embedded anonymously: reflection reports an
+// anonymous field of an unexported type as unexported, so GORM skipped it —
+// reads came back as empty structs and inserts as a bare VALUES().
+type berandaSliderModel struct {
+	Slider sliderModel `gorm:"embedded"`
+}
 
 func (berandaSliderModel) TableName() string { return "beranda_slider" }
 
-type tentangSliderModel struct{ sliderModel }
+type tentangSliderModel struct {
+	Slider sliderModel `gorm:"embedded"`
+}
 
 func (tentangSliderModel) TableName() string { return "tentang_slider" }
 
@@ -228,7 +235,7 @@ func (r *PageRepo) Home(ctx context.Context) (domain.HomeContent, error) {
 			return fmt.Errorf("home sliders: %w", err)
 		}
 		for _, m := range rows {
-			out.Sliders = append(out.Sliders, toSlider(m.sliderModel))
+			out.Sliders = append(out.Sliders, toSlider(m.Slider))
 		}
 		return nil
 	})
@@ -319,7 +326,7 @@ func (r *PageRepo) About(ctx context.Context) (domain.AboutContentPage, error) {
 			return fmt.Errorf("about sliders: %w", err)
 		}
 		for _, m := range rows {
-			out.Sliders = append(out.Sliders, toSlider(m.sliderModel))
+			out.Sliders = append(out.Sliders, toSlider(m.Slider))
 		}
 		return nil
 	})

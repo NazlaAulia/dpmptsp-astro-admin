@@ -72,6 +72,17 @@ func New(cfg *config.Config, log *slog.Logger, db *gorm.DB, dia dialect.Dialect,
 	mux.HandleFunc("POST /v1/contact-messages", contact.Create)
 	mux.HandleFunc("GET /v1/contact-messages/track", contact.Track)
 
+	// Homepage carousel.
+	sliders := &handlers.Sliders{
+		Repo: cache.NewCachedSliderRepo(database.NewSliderRepo(db), rdb),
+		Log:  log,
+	}
+	mux.HandleFunc("GET /v1/sliders", sliders.List)
+	mux.HandleFunc("GET /v1/sliders/{id}", sliders.Get)
+	mux.Handle("POST /v1/sliders", guard(http.HandlerFunc(sliders.Create)))
+	mux.Handle("PUT /v1/sliders/{id}", guard(http.HandlerFunc(sliders.Update)))
+	mux.Handle("DELETE /v1/sliders/{id}", guard(http.HandlerFunc(sliders.Delete)))
+
 	uploads := &handlers.Uploads{Files: files, Log: log}
 	mux.Handle("POST /v1/uploads", guard(http.HandlerFunc(uploads.Create)))
 

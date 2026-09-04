@@ -382,6 +382,76 @@ paths:
                   data: { type: array, items: { $ref: "#/components/schemas/Photo" } }
                   meta: { $ref: "#/components/schemas/PageMeta" }
 
+  /v1/sliders:
+    get:
+      tags: [sliders]
+      summary: List homepage carousel slides
+      responses:
+        "200":
+          description: slides, in display order
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Slider" } }
+    post:
+      tags: [sliders]
+      summary: Add a slide
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SliderInput" }
+      responses:
+        "201":
+          description: created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { data: { $ref: "#/components/schemas/Slider" } }
+        "422": { $ref: "#/components/responses/ValidationFailed" }
+
+  /v1/sliders/{id}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: integer, format: int64 } }
+    get:
+      tags: [sliders]
+      summary: Get one slide
+      responses:
+        "200":
+          description: the slide
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { data: { $ref: "#/components/schemas/Slider" } }
+        "404": { $ref: "#/components/responses/NotFound" }
+    put:
+      tags: [sliders]
+      summary: Update a slide
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SliderInput" }
+      responses:
+        "200":
+          description: updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { data: { $ref: "#/components/schemas/Slider" } }
+        "404": { $ref: "#/components/responses/NotFound" }
+    delete:
+      tags: [sliders]
+      summary: Remove a slide
+      responses:
+        "204": { description: removed }
+        "404": { $ref: "#/components/responses/NotFound" }
+
   /v1/contact-messages:
     post:
       tags: [contact]
@@ -638,6 +708,19 @@ components:
         checks:
           type: object
           additionalProperties: { type: string }
+
+    SliderInput:
+      type: object
+      required: [gambar]
+      properties:
+        gambar:
+          type: string
+          description: |
+            Storage key from POST /v1/uploads. Required — a slide without an
+            image renders as an empty box across the top of the homepage.
+        judul: { type: string }
+        deskripsi: { type: string }
+        urutan: { type: integer, description: "Display order, ascending." }
 
     ContactMessageInput:
       type: object

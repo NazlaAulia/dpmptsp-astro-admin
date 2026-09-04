@@ -1,0 +1,26 @@
+---
+// POST-only. A GET delete is triggered by any crawler prefetch, and the image
+// itself is the API's to remove — this page never touches the filesystem.
+export const prerender = false;
+
+import { deleteSlider } from "../../lib/services/slider.service";
+import { verifyCsrf } from "../../lib/session";
+
+if (Astro.request.method !== "POST") {
+  return new Response("Method not allowed", { status: 405, headers: { Allow: "POST" } });
+}
+
+const data = await Astro.request.formData();
+
+if (!verifyCsrf(Astro.locals.session, data.get("_csrf"))) {
+  return new Response("Invalid CSRF token.", { status: 403 });
+}
+
+const id = Number(data.get("id"));
+if (Number.isInteger(id) && id > 0) {
+  const res = await deleteSlider(id);
+  if (!res.ok) console.error("delete slider failed:", res.message);
+}
+
+return Astro.redirect("/admin/carousel", 303);
+---

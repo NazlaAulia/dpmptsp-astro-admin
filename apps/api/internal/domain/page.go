@@ -20,6 +20,15 @@ type Slider struct {
 	Urutan    int
 }
 
+// SliderRepository manages the homepage carousel.
+type SliderRepository interface {
+	List(ctx context.Context) ([]Slider, error)
+	ByID(ctx context.Context, id int64) (*Slider, error)
+	Create(ctx context.Context, s *Slider) error
+	Update(ctx context.Context, s *Slider) error
+	Delete(ctx context.Context, id int64) error
+}
+
 type Advantage struct {
 	ID        int64
 	Judul     string

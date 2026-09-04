@@ -802,6 +802,164 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/sliders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List homepage carousel slides */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description slides, in display order */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data?: components["schemas"]["Slider"][];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** Add a slide */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SliderInput"];
+                };
+            };
+            responses: {
+                /** @description created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data?: components["schemas"]["Slider"];
+                        };
+                    };
+                };
+                422: components["responses"]["ValidationFailed"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/sliders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        /** Get one slide */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description the slide */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data?: components["schemas"]["Slider"];
+                        };
+                    };
+                };
+                404: components["responses"]["NotFound"];
+            };
+        };
+        /** Update a slide */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SliderInput"];
+                };
+            };
+            responses: {
+                /** @description updated */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data?: components["schemas"]["Slider"];
+                        };
+                    };
+                };
+                404: components["responses"]["NotFound"];
+            };
+        };
+        post?: never;
+        /** Remove a slide */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description removed */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                404: components["responses"]["NotFound"];
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/contact-messages": {
         parameters: {
             query?: never;
@@ -1267,6 +1425,17 @@ export interface components {
             checks?: {
                 [key: string]: string;
             };
+        };
+        SliderInput: {
+            /**
+             * @description Storage key from POST /v1/uploads. Required — a slide without an
+             *     image renders as an empty box across the top of the homepage.
+             */
+            gambar: string;
+            judul?: string;
+            deskripsi?: string;
+            /** @description Display order, ascending. */
+            urutan?: number;
         };
         ContactMessageInput: {
             nama: string;
