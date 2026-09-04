@@ -23,19 +23,30 @@ if (Astro.request.method === "POST") {
       } else if (file.size > 5 * 1024 * 1024) {
         errorMsg = "Ukuran file maksimal 5MB.";
       } else {
-        const ext = file.name.split(".").pop();
-        const fileName = Date.now() + "-" + Math.random().toString(36).slice(2, 8) + "." + ext;
-        const uploadDir = path.join(process.cwd(), "public", "uploads");
-        await fs.mkdir(uploadDir, { recursive: true });
-        const buffer = Buffer.from(await file.arrayBuffer());
-        await fs.writeFile(path.join(uploadDir, fileName), buffer);
-        const publicPath = "/uploads/" + fileName;
-
+          const ext = file.name.split(".").pop();
+          const fileName =
+            Date.now() +
+            "-" +
+            Math.random().toString(36).slice(2, 8) +
+            "." +
+            ext;
+          const uploadDir = path.join(
+            process.cwd(),
+            "public",
+            "uploads",
+            "slider"
+          );
+          await fs.mkdir(uploadDir, { recursive: true });
+          const buffer = Buffer.from(await file.arrayBuffer());
+          await fs.writeFile(
+            path.join(uploadDir, fileName),
+            buffer
+          );
+          const publicPath = "/uploads/slider/" + fileName;
         await db.execute(
           "INSERT INTO beranda_slider (gambar, judul, deskripsi, urutan) VALUES (?, ?, ?, ?)",
           [publicPath, judul, deskripsi, urutan]
         );
-
         return Astro.redirect("/admin/carousel");
       }
     }
@@ -45,7 +56,6 @@ if (Astro.request.method === "POST") {
   }
 }
 ---
-
 
 <AdminShell
   title="Tambah Slide"
