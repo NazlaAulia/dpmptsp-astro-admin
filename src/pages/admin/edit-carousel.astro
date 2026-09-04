@@ -1,0 +1,161 @@
+---
+import AdminShell from "../../components/admin/AdminShell.astro";
+import { db } from "../../lib/db.js";
+import fs from "fs/promises";
+import path from "path";
+
+const id = Astro.url.searchParams.get("id");
+let errorMsg = "";
+let slide = null;
+
+if (!id) {
+  return Astro.redirect("/admin/carousel");
+}
+
+if (Astro.request.method === "POST") {
+  try {
+    const formData = await Astro.request.formData();
+
+    const judul = formData.get("judul") || "";
+    const deskripsi = formData.get("deskripsi") || "";
+    const urutan = Number(formData.get("urutan")) || 0;
+    const file = formData.get("gambar");
+    const gambarLama = formData.get("gambar_lama");
+
+    let publicPath = gambarLama;
+
+    if (file && typeof file !== "string" && file.size > 0) {
+      const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+      if (!allowedTypes.includes(file.type)) {
+        errorMsg = "Format file tidak didukung (jpg/png/webp saja).";
+      } else if (file.size > 5 * 1024 * 1024) {
+        errorMsg = "Ukuran file maksimal 5MB.";
+      } else {
+        const ext = file.name.split(".").pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
+        const uploadDir = path.join(process.cwd(), "public", "uploads", "slider");
+        await fs.mkdir(uploadDir, { recursive: true });
+
+        const buffer = Buffer.from(await file.arrayBuffer());
+        await fs.writeFile(path.join(uploadDir, fileName), buffer);
+
+        publicPath = `/uploads/slider/${fileName}`;
+
+        if (gambarLama) {
+          const oldPath = path.join(process.cwd(), "public", gambarLama.toString());
+          await fs.unlink(oldPath).catch(() => {});
+        }
+      }
+    }
+
+    if (!errorMsg) {
+      await db.execute(
+        `UPDATE beranda_slider SET gambar = ?, judul = ?, deskripsi = ?, urutan = ? WHERE id = ?`,
+        [publicPath, judul, deskripsi, urutan, id]
+      );
+      return Astro.redirect("/admin/carousel");
+    }
+  } catch (error) {
+    console.error("Edit slider error:", error);
+    errorMsg = "Terjadi kesalahan saat menyimpan perubahan.";
+  }
+}
+
+try {
+  const [rows] = await db.execute(`SELECT * FROM beranda_slider WHERE id = ?`, [id]);
+  slide = rows[0] || null;
+} catch (error) {
+  console.error("Fetch slide error:", error);
+}
+
+if (!slide) {
+  return Astro.redirect("/admin/carousel");
+}
+---
+
+<AdminShell
+  title="Edit Slide"
+  subtitle="Perbarui banner carousel beranda."
+  actionLabel="Kembali ke Carousel"
+  actionHref="/admin/carousel"
+  actionIcon="<"
+>
+  <div class="panel">
+    {errorMsg && <p class="error">{errorMsg}</p>}
+
+    <div class="preview">
+      <img src={slide.gambar} alt={slide.judul} />
+      <span>Gambar saat ini</span>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="slide-form">
+      <input type="hidden" name="gambar_lama" value={slide.gambar} />
+
+      <div class="field">
+        <label>Ganti Gambar (opsional)</label>
+        <input type="file" name="gambar" accept="image/jpeg,image/png,image/webp" />
+      </div>
+      <div class="field">
+        <label>Judul</label>
+        <input type="text" name="judul" value={slide.judul} />
+      </div>
+      <div class="field">
+        <label>Deskripsi</label>
+        <textarea name="deskripsi" rows="3">{slide.deskripsi}</textarea>
+      </div>
+      <div class="field small">
+        <label>Urutan</label>
+        <input type="number" name="urutan" value={slide.urutan} />
+      </div>
+      <button type="submit" class="btn-primary">Simpan Perubahan</button>
+    </form>
+  </div>
+</AdminShell>
+
+<style>
+.panel {
+  background: white;
+  padding: 20px;
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+  max-width: 560px;
+}
+.preview { margin-bottom: 18px; }
+.preview img {
+  width: 100%;
+  max-width: 320px;
+  border-radius: 10px;
+  display: block;
+  margin-bottom: 6px;
+}
+.preview span { font-size: 0.8rem; color: #94a3b8; }
+.slide-form { display: grid; gap: 14px; }
+.field label { display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 4px; color: #475569; }
+.field input, .field textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font: inherit;
+}
+.field.small input { max-width: 120px; }
+.btn-primary {
+  justify-self: start;
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 10px;
+  background: #1d4ed8;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+.error {
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  font-size: 0.85rem;
+}
+</style>

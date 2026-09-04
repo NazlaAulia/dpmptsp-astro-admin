@@ -1,0 +1,129 @@
+---
+import AdminShell from "../../components/admin/AdminShell.astro";
+import { db } from "../../lib/db.js";
+import fs from "fs/promises";
+import path from "path";
+
+let errorMsg = "";
+
+if (Astro.request.method === "POST") {
+  try {
+    const formData = await Astro.request.formData();
+    const file = formData.get("gambar");
+    const judul = formData.get("judul") || "";
+    const deskripsi = formData.get("deskripsi") || "";
+    const urutan = Number(formData.get("urutan")) || 0;
+
+    if (!file || typeof file === "string" || file.size === 0) {
+      errorMsg = "File gambar wajib diisi.";
+    } else {
+      const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+      if (!allowedTypes.includes(file.type)) {
+        errorMsg = "Format file tidak didukung (jpg/png/webp saja).";
+      } else if (file.size > 5 * 1024 * 1024) {
+        errorMsg = "Ukuran file maksimal 5MB.";
+      } else {
+        const ext = file.name.split(".").pop();
+        const fileName = Date.now() + "-" + Math.random().toString(36).slice(2, 8) + "." + ext;
+        const uploadDir = path.join(process.cwd(), "public", "uploads");
+        await fs.mkdir(uploadDir, { recursive: true });
+        const buffer = Buffer.from(await file.arrayBuffer());
+        await fs.writeFile(path.join(uploadDir, fileName), buffer);
+        const publicPath = "/uploads/" + fileName;
+
+        await db.execute(
+          "INSERT INTO beranda_slider (gambar, judul, deskripsi, urutan) VALUES (?, ?, ?, ?)",
+          [publicPath, judul, deskripsi, urutan]
+        );
+
+        return Astro.redirect("/admin/carousel");
+      }
+    }
+  } catch (error) {
+    console.error("Tambah slider error:", error);
+    errorMsg = "Terjadi kesalahan saat menyimpan data.";
+  }
+}
+---
+
+
+<AdminShell
+  title="Tambah Slide"
+  subtitle="Tambahkan banner baru untuk carousel beranda."
+  actionLabel="Kembali ke Carousel"
+  actionHref="/admin/carousel"
+  actionIcon="<"
+>
+  <div class="panel">
+    {errorMsg && <p class="error">{errorMsg}</p>}
+    <form method="POST" enctype="multipart/form-data" class="slide-form">
+      <div class="field">
+        <label>Gambar</label>
+        <input type="file" name="gambar" accept="image/jpeg,image/png,image/webp" required />
+      </div>
+      <div class="field">
+        <label>Judul</label>
+        <input type="text" name="judul" placeholder="Judul slide" />
+      </div>
+      <div class="field">
+        <label>Deskripsi</label>
+        <textarea name="deskripsi" rows="3" placeholder="Deskripsi singkat"></textarea>
+      </div>
+      <div class="field small">
+        <label>Urutan</label>
+        <input type="number" name="urutan" value="0" />
+      </div>
+      <button type="submit" class="btn-primary">Simpan Slide</button>
+    </form>
+  </div>
+</AdminShell>
+
+<style>
+  .panel {
+    background: white;
+    padding: 20px;
+    border-radius: 18px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+    max-width: 560px;
+  }
+  .slide-form {
+    display: grid;
+    gap: 14px;
+  }
+  .field label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: #475569;
+  }
+  .field input,
+  .field textarea {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font: inherit;
+  }
+  .field.small input {
+    max-width: 120px;
+  }
+  .btn-primary {
+    justify-self: start;
+    padding: 10px 18px;
+    border: 0;
+    border-radius: 10px;
+    background: #1d4ed8;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .error {
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+    font-size: 0.85rem;
+  }
+</style>  

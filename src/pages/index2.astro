@@ -1,0 +1,1290 @@
+  ---
+  import MainLayout from "../layouts/MainLayout.astro";
+  import Pdf from "../components/Pdf.astro";
+  import { db } from '../lib/db.js';
+  import { slugify } from "../utils/slugify";
+  import { isRenderTemplateResult } from "astro/runtime/server/render/astro/render-template.js";
+
+  let tentang = [];
+  let slider = [];
+
+  const [t] = await db.execute(
+    "SELECT * FROM beranda_dpmptsp ORDER BY urutan ASC"
+  );
+  tentang = t;
+
+  const [s] = await db.execute(
+    "SELECT * FROM beranda_slider ORDER BY urutan ASC"
+  );
+  slider = s;
+
+  let rows = [];
+  try {
+    const [result] = await db.execute('SELECT * FROM post WHERE  id_category IN (1,8) ORDER BY date desc limit 10');
+    rows = result;
+  } catch (e) {
+    console.error("DB error:", e);
+  }
+
+  let artikel = [];
+  try {
+    const [result] = await db.execute('SELECT * FROM post WHERE id_category IN (2,3) ORDER BY date desc limit 10');
+    artikel = result;
+  } catch (e) {
+    console.error("DB error:", e);
+  }
+
+  let peta = [];
+  try {
+    const [result] = await db.execute('SELECT * FROM peta_investasi limit 1');
+    peta = result;
+  } catch (e) {
+    console.error("DB error:", e);
+  }
+
+
+  let renstra = [];
+  try {
+    const [result] = await db.execute('SELECT * FROM renstra_investasi');
+    renstra = result;
+  } catch (e) {
+    console.error("DB error:", e);
+  }
+
+  let unggul = [];
+  try {
+    const [result] = await db.execute('SELECT * FROM keunggulan ORDER BY tanggal asc limit 6');
+    unggul = result;
+  } catch (e) {
+    console.error("DB error:", e);
+  }
+  const pdfData = unggul.map(item => ({
+    file: item.link,   // URL PDF
+    title: item.judul  // Judul PDF
+  }));
+
+  let videos = [];
+  try {
+    const [result] = await db.execute('SELECT * FROM videos ORDER BY tanggal DESC');
+    videos = result;
+  } catch (e) {
+    console.error("DB error:", e);
+  }
+  ---
+  <style>
+  .slider-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0,0,0,.15);
+  }
+
+  .slider-track {
+    display: flex;
+    transition: transform .6s ease;
+  }
+
+  .slider-item {
+    min-width: 100%;
+    position: relative;
+  }
+  .slider-track {
+    will-change: transform;
+  }
+
+  .slider-item img {
+    width: 100%;
+    height: 380px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .caption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 20px;
+    background: linear-gradient(transparent, rgba(0,0,0,.7));
+    color: #fff;
+  }
+
+  .caption h3 {
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  .caption p {
+    font-size: 14px;
+    opacity: .9;
+  }
+
+  /* NAV */
+  .nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,.9);
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+  }
+
+  .nav:hover {
+    background: #ffd41d;
+  }
+
+  .prev { left: 12px; }
+  .next { right: 12px; }
+
+
+          .slider-container {
+              position: relative;
+              overflow: hidden;
+              border-radius: 1rem;
+          }
+
+          .slider-track {
+              display: flex;
+              transition: transform 0.5s ease-in-out;
+          }
+
+          .slider-slide {
+              min-width: 100%;
+              position: relative;
+          }
+
+          .slider-img {
+              width: 100%;
+              height: 64vh;
+              max-height: 400px;
+              object-fit: cover;
+              border-radius: 0.5rem;
+          }
+
+          .slider-caption {
+              position: absolute;
+              bottom: 0;
+              left: 0;
+              right: 0;
+              background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+              color: white;
+              padding: 1.5rem;
+              border-bottom-left-radius: 0.5rem;
+              border-bottom-right-radius: 0.5rem;
+          }
+
+          .slider-nav {
+              position: absolute;
+              top: 50%;
+              transform: translateY(-50%);
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              cursor: pointer;
+              z-index: 10;
+              transition: all 0.3s;
+          }
+
+          .slider-nav:hover {
+              background: rgba(255, 255, 255, 1);
+              transform: translateY(-50%) scale(1.1);
+          }
+
+          .slider-prev {
+              left: 10px;
+          }
+
+          .slider-next {
+              right: 10px;
+          }
+
+          .slider-dots {
+              display: flex;
+              justify-content: center;
+              margin-top: 1rem;
+              gap: 0.5rem;
+          }
+
+          .slider-dot {
+              width: 10px;
+              height: 10px;
+              border-radius: 50%;
+              background-color: rgba(59, 130, 246, 0.5);
+              cursor: pointer;
+              transition: all 0.3s;
+          }
+
+          .slider-dot.active {
+              background-color: rgb(59, 130, 246);
+              transform: scale(1.2);
+          }
+
+          .slider-dot:hover {
+              background-color: rgb(59, 130, 246);
+          }
+
+          /* Bingkai biru dan kuning solid */
+          .blue-yellow-frame {
+              border: 3px solid #1d4ed8;
+              /* Biru tua */
+              border-top-width: 3px;
+              border-left-width: 3px;
+              border-right: 3px solid #fbbf24;
+              /* Kuning */
+              border-bottom: 3px solid #fbbf24;
+              /* Kuning */
+              border-bottom-right-radius: 1.5rem;
+              border-top-left-radius: 1.5rem;
+              box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+              position: relative;
+              overflow: hidden;
+          }
+
+          /*pdf viewer */
+
+          
+  </style>
+
+
+  <MainLayout title="DPMPTSP Kota Surabaya">
+  <!-- ================= NAVBAR ================= -->
+  <nav class="bg-dpmBlue text-white sticky top-0 z-50 shadow">
+    <div class="max-w-7xl mx-auto px-6">
+      <!-- menu dan mobile menu -->
+      <div id="mobileMenu" class="hidden md:hidden pb-6">
+        <div class="flex flex-col gap-4 font-medium">
+          <a href="#beranda" class="hover:text-dpmYellow">Beranda</a>
+          <a href="/Tentang" class="hover:text-dpmYellow">Profil</a>
+          <a href="#layanan" class="hover:text-dpmYellow">Layanan</a>
+          <a href="#kontak" class="hover:text-dpmYellow">Kontak</a>
+          <a href="#" class="mt-4 bg-dpmYellow text-dpmBlue px-4 py-2 rounded-lg font-semibold text-center">
+            OSS / Perizinan
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ================= HERO (VERSI BARU) ================= -->
+  <section class="relative h-screen min-h-[640px] overflow-hidden bg-[#0a1330]">
+
+    <!-- Background image dengan Ken Burns zoom halus -->
+    <img
+      id="bg"
+      src="/hero/hero-kantor.webp"
+      class="absolute inset-0 w-full h-full object-cover scale-100 opacity-100 transition-[opacity,transform] duration-[1200ms] ease-out"
+      alt=""
+    >
+
+    <!-- Layered gradient overlay untuk depth + tint brand -->
+    <div class="absolute inset-0 bg-gradient-to-t from-[#0a1330] via-[#0a1330]/55 to-[#0a1330]/10"></div>
+    <div class="absolute inset-0 bg-gradient-to-r from-[#0a1330]/75 via-[#0a1330]/25 to-transparent"></div>
+
+    <div class="relative z-10 h-full container mx-auto px-6 flex flex-col justify-center">
+
+      <div class="grid md:grid-cols-[1.2fr_0.8fr] gap-12 items-center w-full">
+
+        <!-- TEXT -->
+        <div class="text-white max-w-xl hero-slide-left">
+
+          <div class="flex items-center gap-3 mb-6">
+            <span class="w-10 h-[3px] bg-[#FFC72C]"></span>
+            <span class="text-xs font-semibold tracking-[4px] uppercase text-[#FFC72C]">
+              DPMPTSP Kota Surabaya
+            </span>
+          </div>
+
+          <h1 id="heroTitle" class="text-[clamp(2.5rem,5vw,4rem)] font-extrabold leading-[1.05] tracking-tight mb-5">
+            Pelayanan Publik
+          </h1>
+
+          <p id="heroSub" class="text-lg md:text-xl text-white/80 font-light mb-9 max-w-md">
+            di Kota Surabaya — cepat, transparan, dan terpadu satu pintu.
+          </p>
+
+          <div class="flex flex-wrap items-center gap-4">
+            <a href="/Pelayanan"
+              class="group inline-flex items-center gap-2 bg-[#FFC72C] text-[#0a1330] font-bold px-7 py-3.5 rounded-full hover:bg-white transition-all duration-300">
+              Baca Selengkapnya
+              <i class="fas fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- APP SWITCHER PANEL (single icon slider, full besar) -->
+        <div class="w-full hero-slide-right flex flex-col items-center gap-6">
+
+          <div class="relative w-[clamp(260px,28vw,440px)] h-[clamp(260px,28vw,440px)] overflow-hidden rounded-full">
+            <div id="appTrack" class="flex h-full transition-transform duration-700 ease-[cubic-bezier(.22,1,.36,1)]">
+
+              <div class="app-slide w-[clamp(260px,28vw,440px)] h-[clamp(260px,28vw,440px)] flex-shrink-0"
+                  data-bg="/hero/hero-kantor.webp"
+                  data-title="Pelayanan Publik"
+                  data-sub="di Kota Surabaya — cepat, transparan, dan terpadu satu pintu.">
+                <img src="https://epmal.surabaya.go.id/simpedal/assets2/TAKON-SOBAT.png"
+                    class="w-full h-full rounded-full object-cover border-4 border-white/40">
+              </div>
+
+              <div class="app-slide w-[clamp(260px,28vw,440px)] h-[clamp(260px,28vw,440px)] flex-shrink-0"
+                  data-bg="/hero/hero-kantor.webp"
+                  data-title="Lapis Lupis"
+                  data-sub="Layanan pengaduan investasi dan perizinan terintegrasi.">
+                <img src="https://epmal.surabaya.go.id/simpedal/assets2/lapis_lupis_baru.png"
+                    class="w-full h-full rounded-full object-cover border-4 border-white/40">
+              </div>
+
+              <div class="app-slide w-[clamp(260px,28vw,440px)] h-[clamp(260px,28vw,440px)] flex-shrink-0"
+                  data-bg="/hero/hero-kantor.webp"
+                  data-title="Wani Ngurus Izin"
+                  data-sub="Pendampingan pengurusan izin usaha untuk warga Surabaya.">
+                <img src="https://epmal.surabaya.go.id/simpedal/assets2/Wani Ngurus Izin.jpeg"
+                    class="w-full h-full rounded-full object-cover border-4 border-white/40">
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Navigasi geser -->
+          <div class="flex items-center gap-5">
+            <button id="appPrev" aria-label="Sebelumnya"
+                    class="w-10 h-10 rounded-full bg-white/10 border border-white/20 text-white flex items-center justify-center hover:bg-white/20 transition">
+              <i class="fas fa-chevron-left text-sm"></i>
+            </button>
+            <div id="appDots" class="flex items-center gap-2"></div>
+            <button id="appNext" aria-label="Berikutnya"
+                    class="w-10 h-10 rounded-full bg-white/10 border border-white/20 text-white flex items-center justify-center hover:bg-white/20 transition">
+              <i class="fas fa-chevron-right text-sm"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Scroll cue -->
+      <div class="absolute left-1/2 -translate-x-1/2 bottom-8 hidden md:flex flex-col items-center gap-2 text-white/50">
+        <span class="text-[10px] tracking-[3px] uppercase">Scroll</span>
+        <span class="w-[1px] h-8 bg-white/40 animate-pulse"></span>
+      </div>
+
+    </div>
+  </section>
+
+  <style>
+  .fadeChange {
+    animation: fadeChange .5s ease;
+  }
+  @keyframes fadeChange {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Entrance animation: masuk dari luar layar */
+  .hero-slide-left {
+    animation: heroSlideLeft 1.8s cubic-bezier(.22,1,.36,1) both;
+  }
+  .hero-slide-right {
+    animation: heroSlideRight 1.8s cubic-bezier(.22,1,.36,1) both;
+    animation-delay: .25s;
+  }
+  @keyframes heroSlideLeft {
+    from { opacity: 0; transform: translateX(-100vw); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes heroSlideRight {
+    from { opacity: 0; transform: translateX(100vw); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #bg { transition: none !important; }
+    .fadeChange { animation: none !important; }
+    .hero-slide-left, .hero-slide-right { animation: none !important; }
+  }
+  </style>
+
+  <script is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+    const track = document.getElementById('appTrack');
+    const slides = document.querySelectorAll('.app-slide');
+    const dotsWrap = document.getElementById('appDots');
+    const prevBtn = document.getElementById('appPrev');
+    const nextBtn = document.getElementById('appNext');
+    const heroBg = document.getElementById('bg');
+    const heroTitle = document.getElementById('heroTitle');
+    const heroSub = document.getElementById('heroSub');
+
+    if (!track || slides.length === 0) return;
+
+    let idx = 0;
+
+    // buat dot indicator sejumlah slide
+    slides.forEach((_, i) => {
+      const dot = document.createElement('button');
+      dot.setAttribute('aria-label', `Ke item ${i + 1}`);
+      dot.className = 'w-2.5 h-2.5 rounded-full transition-all duration-300 ' +
+        (i === 0 ? 'bg-[#FFC72C] w-6' : 'bg-white/30');
+      dot.addEventListener('click', () => goTo(i));
+      dotsWrap.appendChild(dot);
+    });
+    const dots = dotsWrap.querySelectorAll('button');
+
+    function updateHeroText(el) {
+      if (el.dataset.bg) heroBg.src = el.dataset.bg;
+      [heroTitle, heroSub].forEach(t => {
+        t.classList.remove('fadeChange');
+        void t.offsetWidth;
+        t.classList.add('fadeChange');
+      });
+      heroTitle.textContent = el.dataset.title;
+      heroSub.textContent = el.dataset.sub;
+    }
+
+    function goTo(i) {
+      idx = (i + slides.length) % slides.length;
+      track.style.transform = `translateX(-${idx * 100}%)`;
+
+      dots.forEach((d, di) => {
+        d.className = 'h-2.5 rounded-full transition-all duration-300 ' +
+          (di === idx ? 'bg-[#FFC72C] w-6' : 'bg-white/30 w-2.5');
+      });
+
+      updateHeroText(slides[idx]);
+    }
+
+    prevBtn.addEventListener('click', () => goTo(idx - 1));
+    nextBtn.addEventListener('click', () => goTo(idx + 1));
+
+    goTo(0);
+
+    // Auto-slide
+    let autoSlide = setInterval(() => goTo(idx + 1), 4000);
+
+    const wrapper = track.closest('.hero-slide-right');
+    wrapper?.addEventListener('mouseenter', () => clearInterval(autoSlide));
+    wrapper?.addEventListener('mouseleave', () => {
+      autoSlide = setInterval(() => goTo(idx + 1), 4000);
+    });
+  });
+  </script>
+
+  <!-- ================= TENTANG ================= -->
+  <section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <!-- Text Content -->
+        <div class="animate__animated animate__fadeInUp">
+          <h2 class="text-3xl font-bold text-blue-800 mb-6">
+            {tentang.find(t => t.tipe === 'judul')?.konten}
+          </h2>
+
+          {tentang
+            .filter(t => t.tipe === 'paragraf')
+            .map(p => (
+              <p class="text-gray-700 text-justify mb-6">
+                {p.konten}
+              </p>
+          ))}
+          <a href={tentang.find(t => t.tipe === 'link')?.konten} class="inline-flex items-center bg-blue-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-[#0900C3] hover:text-[#FFF100] transition duration-300">
+            Baca Selengkapnya <i class="fas fa-arrow-right ml-2"></i>
+          </a>
+
+        </div>
+
+        <!-- Image Content -->
+        <div class="relative animate__animated animate__fadeInRight">
+          <div class="blue-yellow-frame p-1 rounded-2xl shadow-custom">
+            <div class="corner-decoration corner-top-left"></div>
+            <div class="corner-decoration corner-bottom-right"></div>
+            <div class="corner-decoration corner-top-right"></div>
+            <div class="corner-decoration corner-bottom-left"></div>
+
+            <!-- Slider Container -->
+            <div class="slider-container">
+                <div class="slider-track" id="sliderTrack">
+                  {slider.map(item => (
+                    <div class="slider-slide">
+                        <img src={item.gambar} alt={item.judul} class="slider-img">
+                        <div class="slider-caption">
+                            <h3 class="font-bold text-lg">{item.judul}</h3>
+                            <p class="text-sm">{item.deskripsi}</p>
+                        </div>
+                    </div>
+                  ))}
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="slider-nav slider-prev" id="prevBtn">
+                    <i class="fas fa-chevron-left text-blue-800"></i>
+                </div>
+                <div class="slider-nav slider-next" id="nextBtn">
+                    <i class="fas fa-chevron-right text-blue-800"></i>
+                </div>
+            </div>
+            <!-- Dots Indicator -->
+          </div>
+          <div class="slider-dots" id="sliderDots">
+              <!-- Dots will be generated by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4">
+
+      <!-- JUDUL -->
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold text-blue-800 mb-4">
+          Mengapa Berinvestasi di Surabaya?
+        </h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">
+          Kota Surabaya menawarkan berbagai keunggulan sebagai destinasi investasi
+          terbaik di Indonesia.
+        </p>
+      </div>
+
+      <!-- GRID CARD -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {unggul.map(item => (
+          <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300">
+          
+            <!-- ICON -->
+            <div class={`w-16 h-16 bg-${item.warna_bg} rounded-full flex items-center justify-center mb-6`}>
+              <i class={`${item.icon} text-${item.warna_icon} text-2xl`}></i>
+            </div>
+          
+            <!-- CONTENT -->
+            <h3 class="text-xl font-bold text-blue-800 mb-3">
+              {item.judul}
+            </h3>
+          
+            <p class="text-gray-600 mb-6 leading-relaxed">
+              {item.deskripsi}
+            </p>
+          
+            <!-- Button untuk membuka PDF -->
+            <button class="text-blue-600 font-semibold inline-flex items-center hover:text-blue-800 transition-colors" onClick={`openPDF('${item.link}', '${item.judul}')`}>
+              Pelajari Lebih Lanjut <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+          
+          
+          </div>
+        ))}
+      </div>
+        {unggul.map(item => (
+          <!-- Komponen PDF untuk setiap item -->
+          <Pdf file={item.link} title={item.judul} />
+        ))}
+    </div>
+  </section>
+
+
+
+  <section class="py-16">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+        <!-- KIRI : PETA -->
+        <div class="order-2 lg:order-1">
+          <div class="relative overflow-hidden h-full">
+            <div class="order-2 lg:order-1">
+              <div class="rounded-2xl overflow-hidden">
+                <img src={peta[0]?.gambar} alt="Peta Potensi Investasi Surabaya" class="w-full h-auto"/>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- KANAN : RENCANA STRATEGIS -->
+        <div class="order-1 lg:order-2">
+          <h2 class="text-3xl font-bold text-blue-800 mb-6">
+            {renstra.find(r => r.tipe === 'judul')?.konten}
+          </h2>
+
+          {renstra
+            .filter(r => r.tipe === 'paragraf')
+            .map(item => (
+              <p class="text-gray-700 text-left mb-6 mr-8">
+                {item.konten}
+              </p>
+          ))}
+
+          <div class="mb-8">
+            <h3 class="font-bold text-blue-800 mb-4">Wilayah Unggulan:</h3>
+            <div class="flex flex-wrap gap-2">
+              {renstra
+                .filter(r => r.tipe === 'wilayah')
+                .map(item => (
+                  <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                    {item.konten}
+                  </span>
+              ))}
+            </div>
+          </div>
+
+          <a
+            href={renstra.find(r => r.tipe === 'link')?.konten}
+            class="inline-flex items-center bg-[#FFD41D] text-[#0014FF] font-bold px-6 py-3 rounded-lg hover:bg-[#FFC400] transition duration-300"
+          >
+            Jelajahi Peta <i class="fas fa-map-marked-alt ml-2"></i>
+          </a>
+
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 bg-gradient-to-b from-white to-gray-50">
+    <div class="container mx-auto px-4">
+
+      <!-- Heading -->
+      <div class="text-center mb-12">
+        <span class="text-sm font-semibold tracking-wider text-blue-600 uppercase">
+          Media Informasi
+        </span>
+        <h2 class="text-3xl md:text-4xl font-bold text-blue-800 mt-2 mb-4">
+          Video Terupdate
+        </h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">
+          Ikuti perkembangan terbaru seputar investasi dan pelayanan perizinan
+          di Kota Surabaya.
+        </p>
+      </div>
+      <!-- Video Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {videos.map(video => (
+        <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 card-hover">
+          <div class="relative">
+              <a href={video.url_video} target="_blank" rel="noopener noreferrer" class="block relative h-48 overflow-hidden group cursor-pointer">
+                  <img src={video.thumbnail} alt={video.judul} class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                  <div class="absolute inset-0 group-hover:from-blue-900/60 transition duration-300">
+                  </div>
+                  <div class="absolute inset-0 flex items-center justify-center">
+                      <div class="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center group-hover:bg-white transition duration-300 transform group-hover:scale-110">
+                          <i class="fas fa-play text-blue-600 text-2xl ml-1 group-hover:text-blue-700"></i>
+                      </div>
+                  </div>
+                  <div class="hidden absolute bottom-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                      {video.durasi}
+                  </div>
+                  <div class="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-lg flex items-center">
+                      <i class="fab fa-youtube mr-1"></i> {video.status}
+                  </div>
+              </a>
+          </div>
+          <div class="p-6">
+              <h3 class="text-[20px] font-bold text-blue-800 mb-3">{video.judul}</h3>
+              <p class="text-gray-600 text-[14px] mb-4 line-clamp-3">{video.deskripsi}</p>
+              <div class="flex items-center justify-between">
+                  <a href={video.url_video} target="_blank" rel="noopener noreferrer" class="text-blue-600 font-semibold inline-flex items-center text-[15px] hover:text-blue-800 group"> 
+                    Tonton video
+                      <i class="fas fa-arrow-right ml-2 text-xs group-hover:ml-3 transition-all duration-300"></i>
+                  </a>
+              </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+
+
+  <!-- ================= BERITA & ARTIKEL ================= -->
+  <section class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-6">
+
+      <!-- HEADING -->
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-dpmBlue mb-4">Berita Terbaru</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">
+          Informasi terkini seputar perizinan, investasi, dan perkembangan Kota Surabaya.
+        </p>
+      </div>
+
+      <!-- ================= FEATURED ARTIKEL ================= -->
+  <!-- BERITA / CAROUSEL -->
+  <section class="relative mt-8">
+
+    <div
+      class="relative rounded-3xl px-10 py-10 overflow-hidden bg-[#0868b5] bg-cover bg-center"
+      style="background-image: url('/hero/bg-berita-dpmptsp.jpeg'); background-position: left center; background-repeat: no-repeat; background-size: 40% 100%;"
+    >
+
+      <!-- Overlay gradasi: transparan di kiri (biar gambar kelihatan) -> biru solid di kanan -->
+    <div class="absolute inset-0 bg-gradient-to-r from-[#0868b5]/50 via-[#0868b5]/95 to-[#0868b5]"></div>
+
+      <!-- Ornamen dekoratif di pojok kanan bawah -->
+      <div class="absolute -right-6 -bottom-6 w-40 opacity-20 pointer-events-none">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#ffffff" stroke-width="6">
+          <circle cx="70" cy="70" r="50" />
+          <circle cx="140" cy="140" r="35" />
+          <circle cx="150" cy="60" r="20" />
+        </svg>
+      </div>
+
+      <!-- Tombol kiri -->
+      <button
+        id="prevNews"
+        type="button"
+        aria-label="Berita sebelumnya"
+        class="absolute left-3 top-1/2 -translate-y-1/2 z-20
+              w-11 h-11 rounded-full bg-white text-blue-600
+              shadow-lg flex items-center justify-center
+              hover:bg-blue-50 transition"
+      >
+        <i class="fas fa-chevron-left"></i>
+      </button>
+
+      <!-- Container berita -->
+      <div
+        id="newsCarousel"
+        class="relative z-10 flex gap-6 overflow-x-auto scroll-smooth
+              snap-x snap-mandatory scrollbar-hide px-2"
+      >
+
+        {rows.map(post => (
+          <article
+            class="group bg-white rounded-xl overflow-hidden shadow-lg
+                  flex-shrink-0 snap-start
+                  w-[280px] sm:w-[300px] lg:w-[calc(25%-18px)]
+                  min-h-[360px]
+                  hover:shadow-2xl transition-all duration-300"
+          >
+
+            <!-- Gambar -->
+            <div class="relative h-48 overflow-hidden bg-gray-100">
+
+              <img
+                src={`https://dpm-ptsp.surabaya.go.id/fileberita/${post.picture}`}
+                alt={post.judul}
+                class="absolute inset-0 w-full h-full object-cover
+                      group-hover:scale-105 transition-transform duration-500"
+                style="object-position: center 30%;"
+              />
+
+              <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+
+            </div>
+
+            <!-- Isi kartu -->
+            <div class="p-5 flex flex-col min-h-[190px]">
+
+              <h3
+                class="text-lg font-semibold text-gray-800 leading-snug
+                      line-clamp-2 group-hover:text-blue-600 transition-colors"
+              >
+                {post.judul}
+              </h3>
+
+              <p class="text-sm text-gray-500 mt-2 line-clamp-2">
+                {post.content}
+              </p>
+
+              <!-- Footer -->
+              <div
+                class="mt-auto pt-4 flex items-center justify-between
+                      border-t border-gray-100"
+              >
+
+                <span class="text-xs text-gray-400">
+                  <i class="far fa-calendar-alt mr-1"></i>
+                  {new Date(post.date).toLocaleDateString("id-ID")}
+                </span>
+
+                <a
+                  href={`/media/${slugify(post.content)}`}
+                  class="text-blue-600 font-semibold text-sm
+                        hover:text-blue-800 flex items-center gap-1"
+                >
+                  Selengkapnya
+                  <i class="fas fa-arrow-right text-xs"></i>
+                </a>
+
+              </div>
+            </div>
+
+          </article>
+        ))}
+
+      </div>
+
+      <!-- Tombol kanan -->
+      <button
+        id="nextNews"
+        type="button"
+        aria-label="Berita berikutnya"
+        class="absolute right-3 top-1/2 -translate-y-1/2 z-20
+              w-11 h-11 rounded-full bg-white text-blue-600
+              shadow-lg flex items-center justify-center
+              hover:bg-blue-50 transition"
+      >
+        <i class="fas fa-chevron-right"></i>
+      </button>
+
+    </div>
+  </section>
+
+
+  <script>
+    const carousel = document.getElementById("newsCarousel");
+    const prevButton = document.getElementById("prevNews");
+    const nextButton = document.getElementById("nextNews");
+
+    if (carousel && prevButton && nextButton) {
+      nextButton.addEventListener("click", () => {
+        carousel.scrollBy({
+          left: 320,
+          behavior: "smooth"
+        });
+      });
+
+      prevButton.addEventListener("click", () => {
+        carousel.scrollBy({
+          left: -320,
+          behavior: "smooth"
+        });
+      });
+    }
+  </script>
+
+  <style>
+    .scrollbar-hide {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+
+  <script>
+    const carousel = document.getElementById("newsCarousel");
+    const prevButton = document.getElementById("prevNews");
+    const nextButton = document.getElementById("nextNews");
+
+    if (carousel && prevButton && nextButton) {
+      const scrollAmount = 320;
+
+      nextButton.addEventListener("click", () => {
+        carousel.scrollBy({
+          left: scrollAmount,
+          behavior: "smooth"
+        });
+      });
+
+      prevButton.addEventListener("click", () => {
+        carousel.scrollBy({
+          left: -scrollAmount,
+          behavior: "smooth"
+        });
+      });
+    }
+  </script>
+
+  <style>
+    .scrollbar-hide {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+
+      <!-- BUTTON LENGKAP -->
+      <div class="text-center mt-12">
+        <a href="/beritalist" class="inline-flex items-center bg-dpmYellow text-dpmBlue font-bold px-8 py-3 rounded-lg hover:bg-yellow-300 transition">
+          Lihat Semua Berita 📰
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+
+  <section class="py-10 bg-white overflow-hidden">
+    <div class="container mx-auto px-4">
+
+      <!-- JUDUL -->
+      <h2 class="text-3xl font-bold text-gray-800 mb-4">
+        Artikel Terbaru
+      </h2>
+
+      <!-- CAROUSEL -->
+      <div class="relative">
+
+        <!-- TRACK -->
+        <div
+          id="berita-slider"
+          class="flex gap-8 overflow-hidden scroll-smooth"
+        >
+
+          <!-- PANEL INTRO -->
+          <div
+            class="shrink-0 w-[380px] lg:w-[420px] min-h-[640px]
+                  bg-[#0868b5] rounded-l-2xl
+                  flex flex-col items-center justify-center
+                  text-white px-10 text-center"
+          >
+            <!-- ICON -->
+            <div
+              class="w-14 h-14 bg-white rounded-full
+                    flex items-center justify-center mb-8"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-7 h-7 text-[#0868b5]"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M7 8h10M7 12h10M7 16h6"
+                />
+              </svg>
+            </div>
+
+            <p class="text-xl font-semibold leading-relaxed mb-10">
+              Informasi terkini tentang DPMPTSP Surabaya
+            </p>
+
+            <a
+              href="/beritalist"
+              class="border border-white rounded-lg
+                    px-10 py-4 font-semibold text-sm
+                    hover:bg-white hover:text-[#0868b5]
+                    transition duration-300"
+            >
+              INDEKS ARTIKEL<br />
+              TERBARU
+            </a>
+          </div>
+
+
+          <!-- CARD BERITA -->
+          {artikel.map((item) => (
+            <article
+              class="shrink-0 w-[470px] lg:w-[470px]
+                    rounded-2xl overflow-hidden
+                    bg-[#0868b5]
+                    shadow-md"
+            >
+
+              <!-- GAMBAR -->
+              <div class="h-[435px] overflow-hidden">
+                <img
+                  src={`https://dpm-ptsp.surabaya.go.id/fileberita/${item.picture}`}
+                  alt={item.judul}
+                  class="w-full h-full object-cover
+                        hover:scale-105 transition duration-500"
+                  loading="lazy"
+                />
+              </div>
+
+              <!-- CONTENT -->
+              <div
+                class="h-[205px] bg-[#0868b5]
+                      text-white px-6 py-6
+                      flex flex-col justify-between"
+              >
+
+                <h3
+                  class="text-2xl font-semibold leading-relaxed
+                        line-clamp-2"
+                >
+                  {item.content}
+                </h3>
+
+                <div
+                  class="flex items-center justify-between
+                        text-sm font-medium"
+                >
+                  <span>
+                    {new Date(item.date).toLocaleDateString('id-ID', {day:'numeric', month:'short', year:'numeric'})}
+                  </span>
+
+                  <span class="flex items-center gap-2">
+                  <a
+                  href={`/media/${slugify(item.content)}`}
+                  class="text-white-600 font-semibold text-sm
+                        hover:text-blue-800 flex items-center gap-1"
+                >
+                  Selengkapnya
+                  <i class="fas fa-arrow-right text-xs"></i>
+                </a>
+
+                  </span>
+
+                </div>
+  
+              </div>
+            </article>
+          ))}
+
+        </div>
+
+
+        <!-- TOMBOL KIRI -->
+        <button
+          id="berita-prev"
+          type="button"
+          aria-label="Berita sebelumnya"
+          class="absolute left-[390px] lg:left-[400px] top-1/2
+                -translate-y-1/2 z-10
+                w-14 h-14 rounded-full bg-white
+                shadow-lg flex items-center justify-center
+                text-[#0868b5]
+                hover:bg-gray-100 transition"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-7 h-7"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+        </button>
+
+
+        <!-- TOMBOL KANAN -->
+        <button
+          id="berita-next"
+          type="button"
+          aria-label="Berita berikutnya"
+          class="absolute right-0 top-1/2
+                -translate-y-1/2 z-10
+                w-14 h-14 rounded-full bg-white
+                shadow-lg flex items-center justify-center
+                text-[#0868b5]
+                hover:bg-gray-100 transition"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-7 h-7"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </button>
+
+      </div>
+    </div>
+
+
+    <!-- SCRIPT CAROUSEL -->
+    <script>
+      const slider = document.getElementById("berita-slider");
+      const next = document.getElementById("berita-next");
+      const prev = document.getElementById("berita-prev");
+
+      if (slider && next && prev) {
+        next.addEventListener("click", () => {
+          slider.scrollBy({
+            left: 500,
+            behavior: "smooth"
+          });
+        });
+
+        prev.addEventListener("click", () => {
+          slider.scrollBy({
+            left: -500,
+            behavior: "smooth"
+          });
+        });
+      }
+    </script>
+  </section>
+
+
+
+  <script is:inline>
+    const track = document.getElementById('sliderTrack');
+    const slides = track.children;
+    let index = 0;
+
+    function slide() {
+      track.style.transform = `translateX(-${index * 100}%)`;
+    }
+
+    document.getElementById('nextBtn').onclick = () => {
+      index = (index + 1) % slides.length;
+      slide();
+    };
+
+    document.getElementById('prevBtn').onclick = () => {
+      index = (index - 1 + slides.length) % slides.length;
+      slide();
+    };
+
+    setInterval(() => {
+      index = (index + 1) % slides.length;
+      slide();
+    }, 5000);
+  </script>
+
+  <script>
+    function openPDF(url, title) {
+      document.getElementById('pdfModal').classList.remove('hidden');
+      document.getElementById('pdfModal').classList.add('flex');
+
+      document.getElementById('pdfFrame').src = url;
+      document.getElementById('pdfTitle').innerText = title;
+      document.getElementById('pdfDownload').href = url;
+    }
+
+    function closePDF() {
+      document.getElementById('pdfModal').classList.add('hidden');
+      document.getElementById('pdfModal').classList.remove('flex');
+      document.getElementById('pdfFrame').src = '';
+    }
+  </script>
+  <script client:load>
+    const track = document.getElementById('sliderTrack');
+    const slides = track.children;
+    let index = 0;
+
+    function moveSlide() {
+      track.style.transform = `translateX(-${index * 100}%)`;
+    }
+
+    setInterval(() => {
+      index = (index + 1) % slides.length;
+      moveSlide();
+    }, 4000);
+  </script>
+  <!-- Start of Qontak Webchat Script -->
+  <script>
+    const qchatInit = document.createElement('script');
+    qchatInit.src = "https://webchat.qontak.com/qchatInitialize.js";
+    const qchatWidget = document.createElement('script');
+    qchatWidget.src = "https://webchat.qontak.com/js/app.js";
+    document.head.prepend(qchatInit);
+    document.head.prepend(qchatWidget);
+    qchatInit.onload = function() { qchatInitialize({
+      id: "375d205f-d586-424a-9d14-d058756e8545", 
+      code: "o-ddpbmeTRNkrFkEkZUieQ"  
+    })};
+  </script>
+  <!-- End of Qontak Webchat Script -->
+  <script is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+
+    //iki slider
+    const sliderTrack = document.getElementById('sliderTrack');
+    const slides = document.querySelectorAll('.slider-slide');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const sliderDots = document.getElementById('sliderDots');
+
+    let currentSlide = 0;
+    const totalSlides = slides.length;
+
+    // Create dots
+    for (let i = 0; i < totalSlides; i++) {
+        const dot = document.createElement('div');
+        dot.classList.add('slider-dot');
+        if (i === 0) dot.classList.add('active');
+
+        dot.addEventListener('click', () => {
+            goToSlide(i);
+        });
+
+        sliderDots.appendChild(dot);
+    }
+
+    const dots = document.querySelectorAll('.slider-dot');
+
+    // Function to update slider position
+    function updateSlider() {
+        sliderTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+
+        // Update active dot
+        dots.forEach((dot, index) => {
+          if (index === currentSlide) {
+            dot.classList.add('active');
+          } else {
+            dot.classList.remove('active');
+          }
+        });
+    }
+
+    // Function to go to specific slide
+    function goToSlide(slideIndex) {
+        currentSlide = slideIndex;
+        updateSlider();
+    }
+
+    // Next slide function
+    function nextSlide() {
+        currentSlide = (currentSlide + 1) % totalSlides;
+        updateSlider();
+    }
+
+    // Previous slide function
+    function prevSlide() {
+        currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+        updateSlider();
+    }
+
+    // Event listeners for buttons
+    nextBtn.addEventListener('click', nextSlide);
+    prevBtn.addEventListener('click', prevSlide);
+
+    // Auto slide every 5 seconds
+    let slideInterval = setInterval(nextSlide, 3000);
+
+    // Pause auto slide on hover
+    const sliderContainer = document.querySelector('.slider-container');
+    sliderContainer.addEventListener('mouseenter', () => {
+        clearInterval(slideInterval);
+    });
+
+    sliderContainer.addEventListener('mouseleave', () => {
+        slideInterval = setInterval(nextSlide, 5000);
+    });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') prevSlide();
+      if (e.key === 'ArrowRight') nextSlide();
+    });
+
+    // Initialize slider
+    updateSlider();
+  });
+  </script>
+  </MainLayout>

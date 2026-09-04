@@ -1,0 +1,28 @@
+---
+import { db } from "../../lib/db.js";
+import fs from "fs/promises";
+import path from "path";
+
+if (Astro.request.method === "POST") {
+  try {
+    const formData = await Astro.request.formData();
+    const id = formData.get("id");
+
+    if (id) {
+      const [rows] = await db.execute(`SELECT gambar FROM beranda_slider WHERE id = ?`, [id]);
+      const slide = rows[0];
+
+      await db.execute(`DELETE FROM beranda_slider WHERE id = ?`, [id]);
+
+      if (slide?.gambar) {
+        const filePath = path.join(process.cwd(), "public", slide.gambar);
+        await fs.unlink(filePath).catch(() => {});
+      }
+    }
+  } catch (error) {
+    console.error("Hapus slider error:", error);
+  }
+}
+
+return Astro.redirect("/admin/carousel");
+---
