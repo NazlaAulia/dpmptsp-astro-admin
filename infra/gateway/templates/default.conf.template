@@ -38,6 +38,10 @@ server {
         try_files $uri =404;
     }
 
+    # Selected by docker-entrypoint.d/41-admin-routing.sh from ADMIN_ROUTING.
+    # Empty for `separate`; adds the CMS locations for `path`.
+    include /etc/nginx/conf.d/admin-routing.inc;
+
     location / {
         set $web_upstream web:3000;
         proxy_pass http://$web_upstream;

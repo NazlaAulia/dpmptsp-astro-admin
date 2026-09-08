@@ -5,8 +5,9 @@ FROM nginx:1.27-alpine
 COPY templates/ /etc/nginx/templates/
 COPY includes/  /etc/nginx/includes/
 COPY policy/    /etc/nginx/policy/
-COPY docker-entrypoint.d/40-admin-policy.sh /docker-entrypoint.d/40-admin-policy.sh
-RUN chmod +x /docker-entrypoint.d/40-admin-policy.sh
+COPY routing/   /etc/nginx/routing/
+COPY docker-entrypoint.d/ /docker-entrypoint.d/
+RUN chmod +x /docker-entrypoint.d/40-admin-policy.sh /docker-entrypoint.d/41-admin-routing.sh
 
 # $connection_upgrade is needed by includes/proxy.conf for websocket passthrough.
 RUN printf 'map $http_upgrade $connection_upgrade {\n  default upgrade;\n  ""      close;\n}\n' \

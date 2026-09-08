@@ -27,13 +27,18 @@ services:
       # Do not set `public` while the admin app still authenticates against
       # plaintext passwords.
       ADMIN_ACCESS: ${ADMIN_ACCESS:-allowed_ips}
+      # separate = CMS hanya di port admin.
+      # path     = CMS juga di /admin pada port publik, di balik kebijakan IP.
+      ADMIN_ROUTING: ${ADMIN_ROUTING:-separate}
     ports:
-      # Bound to loopback only. cloudflared runs on the host network and proxies
-      # to 127.0.0.1. Publishing on 0.0.0.0 would let a direct caller forge
-      # CF-Connecting-IP and walk through the IP policy — see
-      # infra/gateway/includes/realip.conf.
-      - "127.0.0.1:8017:80"
-      - "127.0.0.1:8018:81"
+      # GATEWAY_BIND defaults to loopback. cloudflared runs on the host network
+      # and proxies to 127.0.0.1, so nothing needs a wider bind. Publishing on
+      # 0.0.0.0 would let a direct caller forge CF-Connecting-IP and walk
+      # through the IP policy — see infra/gateway/includes/realip.conf.
+      - "${GATEWAY_BIND:-127.0.0.1}:${PUBLIC_PORT:-8017}:80"
+      # The CMS port. With ADMIN_ROUTING=path the CMS is also reachable at
+      # /admin on the public port, and this one can be dropped entirely.
+      - "${GATEWAY_BIND:-127.0.0.1}:${ADMIN_PORT:-8018}:81"
     volumes:
       - ./infra/gateway/policy/allowed_ips.list:/etc/nginx/policy/allowed_ips.list:ro
       # Read-only: the gateway serves what the API wrote, and must never be able
