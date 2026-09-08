@@ -32,5 +32,7 @@ export type SiteChrome = {
 
 export const FALLBACK_SETTINGS: SiteSettings = {
   nama: "DPM-PTSP Surabaya",
-  logo: "https://github.com/arbagasdanangh/pps/blob/main/logo.png?raw=true",
+  // Local file: the fallback is what renders when the API is unreachable, so
+  // it must not depend on a third-party host being up.
+  logo: "/logo.png",
 };
