@@ -12,15 +12,30 @@ if [ ! -f "$src" ]; then
     exit 1
 fi
 
-# Serving the CMS on the public port with no address restriction puts the
-# login form in front of the whole internet. Refuse rather than assume it was
-# meant.
-if [ "$ADMIN_ROUTING" = "path" ] && [ "${ADMIN_ACCESS:-allowed_ips}" = "public" ]; then
-    echo "gateway: ADMIN_ROUTING=path with ADMIN_ACCESS=public would expose the CMS to everyone." >&2
-    echo "gateway: pick an ADMIN_ACCESS that restricts by address, or keep ADMIN_ROUTING=separate." >&2
-    exit 1
+# The prefix the CMS answers on. A leading slash, no trailing one.
+: "${ADMIN_PREFIX:=/admin}"
+case "$ADMIN_PREFIX" in
+    /*/) echo "gateway: ADMIN_PREFIX must not end in a slash: $ADMIN_PREFIX" >&2; exit 1 ;;
+    /*)  ;;
+    *)   echo "gateway: ADMIN_PREFIX must start with a slash: $ADMIN_PREFIX" >&2; exit 1 ;;
+esac
+
+# These belong to the public site. Taking one would make part of it
+# unreachable, which is the kind of mistake that only shows up in production.
+case "$ADMIN_PREFIX" in
+    /|/api|/api/*|/_astro|/_astro/*|/storage|/storage/*)
+        echo "gateway: ADMIN_PREFIX=$ADMIN_PREFIX collides with the public site." >&2
+        exit 1 ;;
+esac
+
+sed "s|__PREFIX__|${ADMIN_PREFIX}|g" "$src" > /etc/nginx/conf.d/admin-routing.inc
+
+if [ "$ADMIN_ROUTING" = "path" ]; then
+    echo "gateway: admin_routing = path, prefix = ${ADMIN_PREFIX}"
+    if [ "${ADMIN_ACCESS:-allowed_ips}" = "public" ]; then
+        echo "gateway: the CMS login form is reachable from the internet (ADMIN_ACCESS=public)." >&2
+        echo "gateway: rate limited to 5 attempts/minute per address." >&2
+    fi
+else
+    echo "gateway: admin_routing = separate"
 fi
-
-cp "$src" /etc/nginx/conf.d/admin-routing.inc
-
-echo "gateway: admin_routing = ${ADMIN_ROUTING}"

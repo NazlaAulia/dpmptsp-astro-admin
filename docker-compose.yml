@@ -30,6 +30,9 @@ services:
       # separate = CMS hanya di port admin.
       # path     = CMS juga di /admin pada port publik, di balik kebijakan IP.
       ADMIN_ROUTING: ${ADMIN_ROUTING:-separate}
+      # Prefix the CMS answers on when ADMIN_ROUTING=path. Leading slash, no
+      # trailing one. Refused if it collides with the public site.
+      ADMIN_PREFIX: ${ADMIN_PREFIX:-/admin}
     ports:
       # GATEWAY_BIND defaults to loopback. cloudflared runs on the host network
       # and proxies to 127.0.0.1, so nothing needs a wider bind. Publishing on

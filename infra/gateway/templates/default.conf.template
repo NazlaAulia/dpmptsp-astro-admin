@@ -10,10 +10,20 @@
 resolver 127.0.0.11 valid=10s ipv6=off;
 
 include /etc/nginx/includes/realip.conf;
+include /etc/nginx/includes/ratelimit.conf;
 
 # The admin access policy defines $admin_ip_ok. Selected by
 # docker-entrypoint.d/40-admin-policy.sh from ADMIN_ACCESS.
 include /etc/nginx/conf.d/admin-policy.inc;
+
+# nginx listens on plain HTTP inside the container, so $scheme is always
+# "http". The scheme the visitor actually used arrives in a header, and a
+# redirect built from $scheme would downgrade every hop.
+map $http_x_forwarded_proto $public_scheme {
+    default  $scheme;
+    https    https;
+    http     http;
+}
 
 map $uri $is_cms_path {
     default                 0;
