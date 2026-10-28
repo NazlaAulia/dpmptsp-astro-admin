@@ -20,11 +20,15 @@ if (!hasAuthCookie) {
     <Navbar />
 
     <div class="content">
-      <h1>Dashboard Admin</h1>
+      <div class="page-header">
+        <h1>Dashboard Utama</h1>
+        <p class="subtitle">Pantau performa publikasi dan aktivitas layanan dalam satu visualisasi modern.</p>
+      </div>
 
       <!-- Kartu Statistik -->
       <div class="cards">
-        <div class="card">
+        <div class="card card-glow-blue">
+          <div class="card-glass-bg"></div>
           <div class="card-header-info">
             <h3>Artikel</h3>
             <span class="badge-blue">Total</span>
@@ -32,7 +36,8 @@ if (!hasAuthCookie) {
           <p>20</p>
         </div>
 
-        <div class="card">
+        <div class="card card-glow-gold">
+          <div class="card-glass-bg"></div>
           <div class="card-header-info">
             <h3>Carousel</h3>
             <span class="badge-yellow">Total</span>
@@ -40,7 +45,8 @@ if (!hasAuthCookie) {
           <p>5</p>
         </div>
 
-        <div class="card">
+        <div class="card card-glow-dark">
+          <div class="card-glass-bg"></div>
           <div class="card-header-info">
             <h3>Konten</h3>
             <span class="badge-blue">Total</span>
@@ -53,7 +59,7 @@ if (!hasAuthCookie) {
       <div class="charts-grid">
         
         <!-- Grafik 1: Tren Artikel & Publikasi (Tema Biru) -->
-        <div class="chart-section">
+        <div class="chart-section chart-blue-theme">
           <div class="chart-header">
             <div>
               <h3>Statistik Publikasi Artikel</h3>
@@ -63,19 +69,19 @@ if (!hasAuthCookie) {
           </div>
           
           <div class="chart-container">
-            <div class="chart-bar blue" style="height: 45%;"><span>Jan</span></div>
-            <div class="chart-bar blue" style="height: 60%;"><span>Feb</span></div>
-            <div class="chart-bar blue" style="height: 55%;"><span>Mar</span></div>
-            <div class="chart-bar blue" style="height: 75%;"><span>Apr</span></div>
-            <div class="chart-bar blue" style="height: 85%;"><span>Mei</span></div>
-            <div class="chart-bar blue" style="height: 70%;"><span>Jun</span></div>
-            <div class="chart-bar blue" style="height: 90%;"><span>Jul</span></div>
-            <div class="chart-bar blue active" style="height: 100%;"><span>Agu</span></div>
+            <div class="chart-bar blue" style="--height: 45%;"><span class="val-tooltip">Jan, 20</span><span>Jan</span></div>
+            <div class="chart-bar blue" style="--height: 60%;"><span class="val-tooltip">Feb, 20</span><span>Feb</span></div>
+            <div class="chart-bar blue" style="--height: 55%;"><span class="val-tooltip">Feb, 20</span><span>Mar</span></div>
+            <div class="chart-bar blue" style="--height: 75%;"><span class="val-tooltip">Mei, 58</span><span>Apr</span></div>
+            <div class="chart-bar blue" style="--height: 85%;"><span class="val-tooltip">Mei, 20</span><span>Mei</span></div>
+            <div class="chart-bar blue" style="--height: 70%;"><span class="val-tooltip">Mel, 20</span><span>Jun</span></div>
+            <div class="chart-bar blue" style="--height: 90%;"><span class="val-tooltip">Jul, 16</span><span>Jul</span></div>
+            <div class="chart-bar blue active" style="--height: 100%;"><span class="val-tooltip">Agu, 50</span><span>Agu</span></div>
           </div>
         </div>
 
         <!-- Grafik 2: Tren Layanan & Investasi (Tema Kuning/Gold) -->
-        <div class="chart-section">
+        <div class="chart-section chart-gold-theme">
           <div class="chart-header">
             <div>
               <h3>Aktivitas Layanan & Investasi</h3>
@@ -85,14 +91,14 @@ if (!hasAuthCookie) {
           </div>
           
           <div class="chart-container">
-            <div class="chart-bar yellow" style="height: 35%;"><span>Jan</span></div>
-            <div class="chart-bar yellow" style="height: 50%;"><span>Feb</span></div>
-            <div class="chart-bar yellow" style="height: 65%;"><span>Mar</span></div>
-            <div class="chart-bar yellow" style="height: 60%;"><span>Apr</span></div>
-            <div class="chart-bar yellow" style="height: 80%;"><span>Mei</span></div>
-            <div class="chart-bar yellow" style="height: 75%;"><span>Jun</span></div>
-            <div class="chart-bar yellow" style="height: 85%;"><span>Jul</span></div>
-            <div class="chart-bar yellow active" style="height: 95%;"><span>Agu</span></div>
+            <div class="chart-bar yellow" style="--height: 35%;"><span>Jan</span></div>
+            <div class="chart-bar yellow" style="--height: 50%;"><span>Feb</span></div>
+            <div class="chart-bar yellow" style="--height: 65%;"><span class="val-tooltip">Mar, 12</span><span>Mar</span></div>
+            <div class="chart-bar yellow" style="--height: 60%;"><span>Apr</span></div>
+            <div class="chart-bar yellow" style="--height: 80%;"><span class="val-tooltip">Mei, 12</span><span>Mei</span></div>
+            <div class="chart-bar yellow" style="--height: 75%;"><span>Jun</span></div>
+            <div class="chart-bar yellow" style="--height: 85%;"><span>Jul</span></div>
+            <div class="chart-bar yellow active" style="--height: 95%;"><span class="val-tooltip">Agu, 19</span><span>Agu</span></div>
           </div>
         </div>
 
@@ -103,118 +109,196 @@ if (!hasAuthCookie) {
 </div>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --bg-gradient: linear-gradient(135deg, #10192d 0%, #1a2a4a 40%, #20355b 100%);
+  --panel-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --shadow-soft: 0 20px 40px -15px rgba(10, 25, 50, 0.25);
+  --blue-grad: linear-gradient(180deg, #38bdf8 0%, #2563eb 100%);
+  --gold-grad: linear-gradient(180deg, #facc15 0%, #d97706 100%);
+}
+
 .admin {
   display: flex;
   min-height: 100vh;
-  background: #f4f7fb;
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .main {
   flex: 1;
-  background: #f8fafc;
+  background: rgba(241, 245, 249, 0.92);
+  backdrop-filter: blur(20px);
   display: flex;
   flex-direction: column;
 }
 
 .content {
-  padding: 28px 32px 36px;
+  padding: 32px 40px 48px;
+}
+
+.page-header {
+  margin-bottom: 28px;
 }
 
 .content h1 {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 800;
-  color: #172033;
-  letter-spacing: -0.03em;
-  margin: 0 0 24px;
+  color: #0f172a;
+  letter-spacing: -0.04em;
+  margin: 0 0 6px;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, #0f172a, #2563eb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
+.subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Cards Modern Glass Styling */
 .cards {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-  margin-bottom: 24px;
+  gap: 22px;
+  margin-bottom: 28px;
 }
 
 .card {
-  background: white;
-  padding: 22px;
-  border-radius: 12px;
-  width: auto;
-  box-shadow: 0 10px 24px rgba(15,23,42,0.05);
-  border: 1px solid #e5eaf2;
+  position: relative;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 24px;
+  border-radius: 20px;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
+}
+
+.card-glow-blue::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.card-glow-gold::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(250, 204, 21, 0.15) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.card-glow-dark {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-glow-dark h3 {
+  color: #94a3b8 !important;
+}
+
+.card-glow-dark p {
+  color: #ffffff !important;
 }
 
 .card-header-info {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 14px;
 }
 
 .card h3 {
-  font-size: 13px;
-  color: #64748b;
+  font-size: 14px;
+  color: #475569;
   margin: 0;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .card p {
-  font-size: 28px;
+  font-size: 36px;
   font-weight: 800;
   color: #0f172a;
   margin: 0;
+  line-height: 1;
+  letter-spacing: -0.03em;
 }
 
-/* Badge Warna */
+/* Badges Premium */
 .badge-blue { 
-  background: #e0f2fe; 
-  color: #0369a1; 
+  background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); 
+  color: #0284c7; 
   font-size: 11px; 
-  font-weight: 700; 
-  padding: 2px 8px; 
-  border-radius: 20px; 
+  font-weight: 800; 
+  padding: 4px 12px; 
+  border-radius: 30px;
+  box-shadow: inset 0 0 0 1px rgba(2, 132, 199, 0.2);
 }
 
 .badge-yellow { 
-  background: #fef3c7; 
-  color: #b45309; 
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); 
+  color: #d97706; 
   font-size: 11px; 
-  font-weight: 700; 
-  padding: 2px 8px; 
-  border-radius: 20px; 
+  font-weight: 800; 
+  padding: 4px 12px; 
+  border-radius: 30px; 
+  box-shadow: inset 0 0 0 1px rgba(217, 119, 6, 0.2);
 }
 
-/* Layout 2 Grafik Berdampingan */
+/* Layout Charts */
 .charts-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(320px, 1fr);
-  gap: 20px;
+  grid-template-columns: minmax(0, 1.4fr) minmax(320px, 1fr);
+  gap: 24px;
 }
 
 .chart-section {
-  background: white;
-  padding: 24px;
-  border-radius: 12px;
-  border: 1px solid #e5eaf2;
-  box-shadow: 0 10px 24px rgba(15,23,42,0.05);
+  background: rgba(255, 255, 255, 0.95);
+  padding: 28px;
+  border-radius: 24px;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(12px);
+  position: relative;
 }
 
 .chart-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 25px;
+  margin-bottom: 35px;
 }
 
 .chart-header h3 {
-  font-size: 15px;
-  font-weight: 700;
-  color: #1e293b;
-  margin: 0 0 4px 0;
+  font-size: 17px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 6px 0;
 }
 
 .chart-header p {
-  font-size: 12px;
+  font-size: 13px;
   color: #64748b;
   margin: 0;
 }
@@ -223,50 +307,75 @@ if (!hasAuthCookie) {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  height: 180px;
-  padding: 0 5px 30px 5px;
-  border-bottom: 1px solid #e2e8f0;
-  gap: 12px;
+  height: 210px;
+  padding: 0 10px 36px 10px;
+  border-bottom: 2px dashed #e2e8f0;
+  gap: 14px;
 }
 
+/* Custom 3D Bars */
 .chart-bar {
   flex: 1;
-  border-radius: 6px 6px 0 0;
-  transition: all 0.3s ease;
+  border-radius: 8px 8px 4px 4px;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   position: relative;
   display: flex;
   justify-content: center;
+  height: var(--height);
+  cursor: pointer;
 }
 
-/* Grafik Tema Biru */
 .chart-bar.blue {
-  background: #93c5fd;
+  background: linear-gradient(180deg, #93c5fd 0%, #3b82f6 100%);
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.25);
 }
+
 .chart-bar.blue:hover, .chart-bar.blue.active {
-  background: #2563eb;
+  background: var(--blue-grad);
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.45);
+  transform: scaleY(1.05);
 }
 
-/* Grafik Tema Kuning (Gold/Amber) */
 .chart-bar.yellow {
-  background: #fde047;
-}
-.chart-bar.yellow:hover, .chart-bar.yellow.active {
-  background: #d97706;
+  background: linear-gradient(180deg, #fef08a 0%, #eab308 100%);
+  box-shadow: 0 8px 16px rgba(234, 179, 8, 0.2);
 }
 
+.chart-bar.yellow:hover, .chart-bar.yellow.active {
+  background: var(--gold-grad);
+  box-shadow: 0 12px 24px rgba(217, 119, 6, 0.4);
+  transform: scaleY(1.05);
+}
+
+/* Tooltip floating pill */
+.val-tooltip {
+  position: absolute;
+  top: -32px;
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  opacity: 0.9;
+}
+
+.chart-bar span:last-child {
+  position: absolute;
+  bottom: -28px;
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 700;
+}
+
+/* Responsive Rules */
 @media (max-width: 1100px) {
   .cards, .charts-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 900px) {
-  .content { padding: 22px 18px 28px; }
-}
-
-.chart-bar span {
-  position: absolute;
-  bottom: -25px;
-  font-size: 11px;
-  color: #64748b;
-  font-weight: 600;
+  .content { padding: 24px 20px 32px; }
 }
 </style>

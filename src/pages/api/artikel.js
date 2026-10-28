@@ -1,4 +1,3 @@
----
 export const prerender = false;
 
 import { db } from "../../lib/db";
@@ -9,37 +8,39 @@ export async function POST({ request }) {
 
     const formData = await request.formData();
 
-    const title = formData.get("title")?.toString() || "";
-    const category = formData.get("category")?.toString() || "";
-    const content = formData.get("content")?.toString() || "";
-    const active = formData.get("active")?.toString() || "Y";
-
-    // Ambil file gambar
+    const title = formData.get("title");
+    const category = formData.get("category");
+    const content = formData.get("content");
+    const active = formData.get("active");
     const picture = formData.get("picture");
 
-    let namaFile = "";
+    let fileName = null;
 
+    // =========================
+    // UPLOAD GAMBAR
+    // =========================
     if (picture instanceof File && picture.size > 0) {
 
-        // Ambil nama file asli
-        namaFile = picture.name;
-
-        // Lokasi folder public/uploads
         const uploadDir = path.join(process.cwd(), "public", "uploads");
 
-        // Pastikan folder uploads ada
+        // Buat folder uploads kalau belum ada
         await fs.mkdir(uploadDir, { recursive: true });
 
+        // Buat nama file unik
+        const ext = path.extname(picture.name);
+        fileName = `${Date.now()}${ext}`;
+
         // Simpan file
+        const filePath = path.join(uploadDir, fileName);
         const buffer = Buffer.from(await picture.arrayBuffer());
 
-        await fs.writeFile(
-            path.join(uploadDir, namaFile),
-            buffer
-        );
+        await fs.writeFile(filePath, buffer);
     }
 
-    // Simpan ke database
+
+    // =========================
+    // SIMPAN KE DATABASE
+    // =========================
     await db.query(
         `
         INSERT INTO post
@@ -63,13 +64,13 @@ export async function POST({ request }) {
             1,
             active,
             0,
-            namaFile
+            fileName
         ]
     );
+
 
     return Response.redirect(
         new URL("/admin/artikel", request.url),
         302
     );
 }
----

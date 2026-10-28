@@ -11,50 +11,76 @@ const isCarousel = pathname.startsWith("/admin/carousel");
 const isPemberitahuan = pathname.startsWith("/admin/pemberitahuan");
 ---
 
-<div class="sidebar-wrapper">
-  <nav class="sidebar">
+<!-- SCRIPT ANTI-KEDIP: Jalan sebelum render -->
+<script is:inline>
+  // Cek memori. Kalau sidebar harusnya ngecil, langsung pasang class ke <html>
+  if (localStorage.getItem('admin-sidebar-collapsed') === 'true') {
+    document.documentElement.classList.add('preload-collapsed');
+  }
+</script>
+
+<div class="sidebar-wrapper" id="sidebarWrapper">
+  <nav class="sidebar" id="sidebar">
+    <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle Sidebar">
+      <svg class="toggle-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+
     <div class="brand">
       <div class="logo">D</div>
-      <div class="brand-text">DPMPTSP</div>
+      <div class="brand-text">
+        <span class="brand-title">DPMPTSP</span>
+        <span class="brand-subtitle">ADMIN PANEL</span>
+      </div>
+    </div>
+
+    <div class="sidebar-promo-card">
+      <div class="promo-glow"></div>
+      <div class="promo-content">
+        <span class="promo-badge">Live System</span>
+        <p class="promo-title">Perizinan Online</p>
+        <span class="promo-sub">Surabaya Hebat</span>
+      </div>
     </div>
 
     <ul class="menu">
-      <li><a href="/admin/dashboard" class={isDashboard ? "active" : ""} onclick="(function(){ const p=location.pathname.replace(/\/$/, ''); const h=this.getAttribute('href'); if (p===h || (p==='/admin' && h==='/admin/dashboard')) event.preventDefault(); }).call(this);">
+      <li><a href="/admin/dashboard" class={isDashboard ? "active" : ""} title="Dashboard" onclick="(function(){ const p=location.pathname.replace(/\/$/, ''); const h=this.getAttribute('href'); if (p===h || (p==='/admin' && h==='/admin/dashboard')) event.preventDefault(); }).call(this);">
         <span class="icon" aria-hidden><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></span>
         <span class="label">Dashboard</span>
       </a></li>
-      <li><a href="/admin/artikel" class={isArtikel ? "active" : ""} onclick="(function(){ const p=location.pathname.replace(/\/$/, ''); const h=this.getAttribute('href'); if (p===h) event.preventDefault(); }).call(this);">
+      <li><a href="/admin/artikel" class={isArtikel ? "active" : ""} title="Artikel / Berita" onclick="(function(){ const p=location.pathname.replace(/\/$/, ''); const h=this.getAttribute('href'); if (p===h) event.preventDefault(); }).call(this);">
         <span class="icon" aria-hidden><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg></span>
         <span class="label">Artikel / Berita</span>
       </a></li>
-      <li><a href="/admin/kinerja" class={isKinerja ? "active" : ""} onclick="(function(){ const p=location.pathname.replace(/\/$/, ''); const h=this.getAttribute('href'); if (p===h) event.preventDefault(); }).call(this);">
+      <li><a href="/admin/kinerja" class={isKinerja ? "active" : ""} title="Kinerja Investasi" onclick="(function(){ const p=location.pathname.replace(/\/$/, ''); const h=this.getAttribute('href'); if (p===h) event.preventDefault(); }).call(this);">
         <span class="icon" aria-hidden><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></span>
         <span class="label">Kinerja Investasi</span>
       </a></li>
-      <li><a href="/admin/layanan" class={isLayanan ? "active" : ""} onclick="(function(){ const p=location.pathname.replace(/\/$/, ''); const h=this.getAttribute('href'); if (p===h) event.preventDefault(); }).call(this);">
+      <li><a href="/admin/layanan" class={isLayanan ? "active" : ""} title="Tempat Layanan" onclick="(function(){ const p=location.pathname.replace(/\/$/, ''); const h=this.getAttribute('href'); if (p===h) event.preventDefault(); }).call(this);">
         <span class="icon" aria-hidden><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></span>
         <span class="label">Tempat Layanan</span>
       </a></li>
-      <li><a href="/admin/konten" class={isKonten ? "active" : ""} onclick="(function(){ const p=location.pathname.replace(/\/$/, ''); const h=this.getAttribute('href'); if (p===h) event.preventDefault(); }).call(this);">
+      <li><a href="/admin/konten" class={isKonten ? "active" : ""} title="Konten" onclick="(function(){ const p=location.pathname.replace(/\/$/, ''); const h=this.getAttribute('href'); if (p===h) event.preventDefault(); }).call(this);">
         <span class="icon" aria-hidden><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></span>
         <span class="label">Konten</span>
       </a></li>
-      <li><a href="/admin/inovasi" class={isInovasi ? "active" : ""} onclick="(function(){ const p=location.pathname.replace(/\/$/, ''); const h=this.getAttribute('href'); if (p===h) event.preventDefault(); }).call(this);">
+      <li><a href="/admin/inovasi" class={isInovasi ? "active" : ""} title="Inovasi" onclick="(function(){ const p=location.pathname.replace(/\/$/, ''); const h=this.getAttribute('href'); if (p===h) event.preventDefault(); }).call(this);">
         <span class="icon" aria-hidden><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></span>
         <span class="label">Inovasi</span>
       </a></li>
-      <li><a href="/admin/carousel" class={isCarousel ? "active" : ""} onclick="(function(){ const p=location.pathname.replace(/\/$/, ''); const h=this.getAttribute('href'); if (p===h) event.preventDefault(); }).call(this);">
+      <li><a href="/admin/carousel" class={isCarousel ? "active" : ""} title="Carousel" onclick="(function(){ const p=location.pathname.replace(/\/$/, ''); const h=this.getAttribute('href'); if (p===h) event.preventDefault(); }).call(this);">
         <span class="icon" aria-hidden><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></span>
         <span class="label">Carousel</span>
       </a></li>
-      <li><a href="/admin/pemberitahuan" class={isPemberitahuan ? "active" : ""} onclick="(function(){ const p=location.pathname.replace(/\/$/, ''); const h=this.getAttribute('href'); if (p===h) event.preventDefault(); }).call(this);">
+      <li><a href="/admin/pemberitahuan" class={isPemberitahuan ? "active" : ""} title="Pemberitahuan" onclick="(function(){ const p=location.pathname.replace(/\/$/, ''); const h=this.getAttribute('href'); if (p===h) event.preventDefault(); }).call(this);">
         <span class="icon" aria-hidden><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg></span>
         <span class="label">Pemberitahuan</span>
       </a></li>
     </ul>
 
     <div class="sidebar-footer">
-      <button type="button" class="logout" id="logout-trigger">
+      <button type="button" class="logout" id="logout-trigger" title="Logout">
         <span class="icon" aria-hidden><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></span>
         <span class="label">Logout</span>
       </button>
@@ -62,6 +88,7 @@ const isPemberitahuan = pathname.startsWith("/admin/pemberitahuan");
   </nav>
 </div>
 
+<!-- Modal Logout -->
 <div class="logout-modal" id="logout-modal" aria-hidden="true">
   <div class="logout-modal__card" role="dialog" aria-modal="true" aria-labelledby="logout-title">
     <div class="logout-modal__icon">!</div>
@@ -75,77 +102,316 @@ const isPemberitahuan = pathname.startsWith("/admin/pemberitahuan");
 </div>
 
 <style>
+/* --- TRIK ANTI-KEDIP & MULUS --- */
+/* 1. Kalau class 'preload-collapsed' ada di <html>, langsung kecilin tanpa animasi */
+html.preload-collapsed .sidebar-wrapper {
+  width: 84px;
+}
+html.preload-collapsed .sidebar-wrapper .sidebar {
+  width: 80px;
+  padding: 20px 10px 16px;
+}
+html.preload-collapsed .sidebar-wrapper .brand-text,
+html.preload-collapsed .sidebar-wrapper .sidebar-promo-card,
+html.preload-collapsed .sidebar-wrapper .menu a .label,
+html.preload-collapsed .sidebar-wrapper .logout .label {
+  display: none;
+}
+html.preload-collapsed .sidebar-wrapper .brand {
+  justify-content: center;
+}
+html.preload-collapsed .sidebar-wrapper .menu a,
+html.preload-collapsed .sidebar-wrapper .logout {
+  justify-content: center;
+  padding: 10px;
+}
+html.preload-collapsed .sidebar-wrapper .toggle-chevron {
+  transform: rotate(180deg);
+}
+
+/* 2. Matikan transisi HANYA saat preload biar gak patah-patah */
+html.preload-collapsed .sidebar-wrapper,
+html.preload-collapsed .sidebar,
+html.preload-collapsed .brand-text,
+html.preload-collapsed .sidebar-promo-card,
+html.preload-collapsed .menu a .label,
+html.preload-collapsed .logout .label {
+  transition: none !important;
+}
+
+/* --- STYLE NORMAL (SAMA KAYAK PUNYA KAMU) --- */
 .sidebar-wrapper {
-  width: 236px;
+  width: 260px;
   flex-shrink: 0;
   position: sticky;
   top: 0;
   height: 100vh;
-  padding: 0;
+  padding: 12px;
   box-sizing: border-box;
+  /* Transisi halus buat ngecil/ngebesarin */
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 50;
 }
+
 .sidebar {
-  height: 100%;
-  max-height: 100%;
+  height: calc(100vh - 24px);
   display: flex;
   flex-direction: column;
-  background: #172033;
-  border-radius: 0;
-  padding: 22px 14px 18px;
+  background: #111827;
+  border-radius: 20px;
+  padding: 20px 14px 16px;
   box-sizing: border-box;
-  box-shadow: 12px 0 30px rgba(15,23,42,0.08);
+  box-shadow: 12px 0 35px rgba(15,23,42,0.2);
   gap: 10px;
-  border: none;
-  border-left: none;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible;
 }
-.brand { display:flex; align-items:center; gap:10px; padding:2px 10px 22px; flex-shrink: 0; }
-.logo { width:40px; height:40px; background:#315eea; color:white; border-radius:12px; display:flex; align-items:center; justify-content:center; font-weight:800; box-shadow: 0 8px 18px rgba(49,94,234,.35); }
-.brand-text { font-weight:800; color:#f8fafc; letter-spacing:-.02em; }
+
+.sidebar-toggle {
+  position: absolute;
+  top: 24px;
+  right: -13px;
+  width: 28px;
+  height: 28px;
+  background: #ffffff;
+  border: 2px solid #3b82f6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #111827;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+.sidebar-toggle:hover {
+  background: #3b82f6;
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+.toggle-chevron {
+  transition: transform 0.3s ease;
+}
+
+.brand { 
+  display: flex; 
+  align-items: center; 
+  gap: 12px; 
+  padding: 2px 4px 8px; 
+  flex-shrink: 0; 
+  overflow: hidden;
+}
+
+.logo { 
+  width: 38px; 
+  height: 38px; 
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); 
+  color: white; 
+  border-radius: 12px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  font-weight: 800; 
+  box-shadow: 0 8px 18px rgba(59,130,246,.35); 
+  flex-shrink: 0;
+}
+
+.brand-text { 
+  display: flex;
+  flex-direction: column;
+  white-space: nowrap;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.brand-title { font-weight: 800; color: #ffffff; letter-spacing: -.02em; font-size: 0.95rem; }
+.brand-subtitle { font-size: 9px; font-weight: 700; color: #94a3b8; letter-spacing: 0.08em; }
+
+.sidebar-promo-card {
+  position: relative;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(234, 179, 8, 0.12) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  border-radius: 12px;
+  padding: 10px 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.sidebar-promo-card:hover {
+  border-color: rgba(234, 179, 8, 0.5);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.15);
+}
+
+.promo-glow {
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(circle, rgba(234, 179, 8, 0.4) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.promo-badge {
+  display: inline-block;
+  font-size: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #facc15;
+  background: rgba(234, 179, 8, 0.15);
+  padding: 2px 6px;
+  border-radius: 20px;
+  margin-bottom: 3px;
+}
+
+.promo-title {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.promo-sub {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
 .menu {
-  list-style:none;
-  padding:4px 2px;
-  margin:0;
-  display:flex;
-  flex-direction:column;
-  gap:4px;
+  list-style: none;
+  padding: 2px 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   overflow-y: auto;
+  overflow-x: hidden;
   min-height: 0;
   flex: 1;
 }
-.menu a { display:flex; gap:11px; align-items:center; text-decoration:none; color:#aeb9d0; padding:11px 12px; border-radius:9px; transition: all .15s ease; font-weight:600; margin-left: -2px; }
-.menu a .icon { width:18px; height:18px; display:flex; align-items:center; justify-content:center; color:#8090ad; flex-shrink: 0; }
-.menu a .label { font-size:0.92rem; }
-.menu a:hover { transform: translateX(2px); box-shadow: none; background: #222e47; color:#ffffff; }
-.menu a.active { background: #315eea; color: white; box-shadow: 0 10px 22px rgba(49,94,234,0.24); }
+
+.menu::-webkit-scrollbar {
+  width: 4px;
+}
+.menu::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
+  border-radius: 4px;
+}
+
+.menu a, .logout { 
+  display: flex; 
+  gap: 12px; 
+  align-items: center; 
+  text-decoration: none; 
+  color: #94a3b8; 
+  padding: 10px 12px;
+  height: 42px;
+  box-sizing: border-box;
+  border-radius: 10px; 
+  transition: all .2s ease; 
+  font-weight: 600; 
+  white-space: nowrap;
+  position: relative;
+}
+
+.menu a .icon, .logout .icon { 
+  width: 18px; 
+  height: 18px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  color: #94a3b8; 
+  flex-shrink: 0; 
+}
+
+.menu a .label, .logout .label { 
+  font-size: 0.86rem; 
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.menu a:hover { 
+  background: rgba(255, 255, 255, 0.05); 
+  color: #ffffff; 
+  transform: translateX(3px);
+}
+
+.menu a.active { 
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); 
+  color: white; 
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3); 
+}
 .menu a.active .icon { color: white; }
 
 .sidebar-footer {
   flex-shrink: 0;
-  padding-top: 12px;
-  border-top: 1px solid rgba(174,185,208,0.18);
-  margin-top: 6px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 2px;
 }
-.logout {
-  display:flex;
-  gap:10px;
-  align-items:center;
-  width: 100%;
-  text-decoration:none;
-  color:#ef4444;
-  padding:10px 12px;
-  border-radius:12px;
-  font-weight:800;
-  background: #222e47;
-  border:1px solid rgba(174,185,208,0.12);
-  box-shadow: none;
-  transition: all .15s ease;
-  cursor:pointer;
-  text-align:left;
-  font: inherit;
-}
-.logout .icon { color: #ef4444; }
-.logout:hover { background: rgba(239,68,68,0.06); transform: translateY(-1px); }
 
+.logout { 
+  width: 100%; 
+  color: #f87171; 
+  background: rgba(239, 68, 68, 0.08); 
+  border: 1px solid rgba(239, 68, 68, 0.15); 
+  cursor: pointer; 
+  text-align: left; 
+  font: inherit; 
+  font-weight: 700;
+  height: 42px;
+}
+
+.logout .icon { color: #f87171; }
+.logout:hover { background: rgba(239,68,68,0.18); color: #ef4444; transform: translateY(-1px); }
+
+/* --- KONDISI COLLAPSE NORMAL (PAS DIKLIK) --- */
+.sidebar-wrapper.collapsed {
+  width: 84px;
+}
+
+.sidebar-wrapper.collapsed .sidebar {
+  width: 80px;
+  padding: 20px 10px 16px;
+  overflow: visible;
+}
+
+.sidebar-wrapper.collapsed .brand-text,
+.sidebar-wrapper.collapsed .sidebar-promo-card,
+.sidebar-wrapper.collapsed .menu a .label,
+.sidebar-wrapper.collapsed .logout .label {
+  opacity: 0;
+  visibility: hidden;
+  width: 0;
+  transform: translateX(-10px);
+  display: none;
+}
+
+.sidebar-wrapper.collapsed .brand {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.sidebar-wrapper.collapsed .menu a,
+.sidebar-wrapper.collapsed .logout {
+  justify-content: center;
+  padding: 10px;
+}
+
+.sidebar-wrapper.collapsed .menu a:hover {
+  transform: none;
+}
+
+.sidebar-wrapper.collapsed .toggle-chevron {
+  transform: rotate(180deg);
+}
+
+/* Modal Logout Styles */
 .logout-modal {
   position: fixed;
   inset: 0;
@@ -235,6 +501,41 @@ const isPemberitahuan = pathname.startsWith("/admin/pemberitahuan");
 </style>
 
 <script>
+  // Fungsi utama yang dijalanin Astro (termasuk pas pindah halaman)
+  function initSidebar() {
+    const sidebarWrapper = document.getElementById('sidebarWrapper');
+    if (!sidebarWrapper) return;
+
+    // 1. Tarik data dari memori
+    const isSavedCollapsed = localStorage.getItem('admin-sidebar-collapsed') === 'true';
+    
+    // 2. Pasang class collapsed (buat ngecilin) ke wrapper
+    if (isSavedCollapsed) {
+      sidebarWrapper.classList.add('collapsed');
+    }
+
+    // 3. Hapus class 'preload-collapsed' dari <html> biar animasi transisi normal lagi
+    // (Penting: dikasih setTimeout dikit biar browser sempet nge-render dulu)
+    setTimeout(() => {
+      document.documentElement.classList.remove('preload-collapsed');
+    }, 50);
+
+    // 4. Logika Tombol Toggle
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    sidebarToggle?.addEventListener('click', () => {
+      sidebarWrapper.classList.toggle('collapsed');
+      const isNowCollapsed = sidebarWrapper.classList.contains('collapsed');
+      localStorage.setItem('admin-sidebar-collapsed', isNowCollapsed ? 'true' : 'false');
+    });
+  }
+
+  // Jalanin saat pertama kali load
+  document.addEventListener('DOMContentLoaded', initSidebar);
+  
+  // Jalanin lagi kalau pakai Astro View Transitions (pindah halaman)
+  document.addEventListener('astro:page-load', initSidebar);
+
+  // Logika Modal Logout (Tetep sama)
   const logoutTrigger = document.getElementById('logout-trigger');
   const logoutModal = document.getElementById('logout-modal');
   const logoutCancel = document.getElementById('logout-cancel');

@@ -29,19 +29,19 @@ const dataKinerja = rows as Array<{
 ---
 
 <AdminShell 
-  title="Kinerja Investasi" 
-  subtitle="Pantau pencapaian, layanan aktif, dan dokumen review dalam satu tampilan." 
-  actionLabel="Tambah Konten" 
-  actionHref="/admin/konten"
-  showHeader={false}
+    title="Kinerja Investasi" 
+    subtitle="Pantau pencapaian, layanan aktif, dan dokumen review dalam satu tampilan." 
+    actionLabel="Tambah Konten" 
+    actionHref="/admin/konten"
+    showHeader={false}
 >
 
 <div class="table-box">
 
 <div class="table-header">
 <h2>Daftar Kinerja Investasi</h2>
-<a href="/admin/tambah-kinerja">
-Tambah Kinerja
+<a href="/admin/tambah-kinerja" class="btn-tambah-gradasi">
++ Tambah Kinerja
 </a>
 </div>
 
@@ -63,7 +63,7 @@ Tambah Kinerja
 <td>{item.tw_option}</td>
 <td>
 <div class="pdf-preview">
-<iframe src={`/pdf/${item.file_path}`}></iframe>
+<iframe src={`/pdf/${item.file_path}`} title={`PDF Preview ${item.id}`}></iframe>
 </div>
 </td>
 <td>
@@ -71,6 +71,7 @@ Tambah Kinerja
 <button 
 class="edit"
 onclick={`openEditModal(${item.id})`}
+title="Edit"
 >
 <svg viewBox="0 0 24 24">
 <path d="M12 20h9"/>
@@ -81,6 +82,7 @@ onclick={`openEditModal(${item.id})`}
 <button 
 class="delete"
 onclick={`openDeleteModal(${item.id})`}
+title="Hapus"
 >
 <svg viewBox="0 0 24 24">
 <path d="M3 6h18"/>
@@ -203,14 +205,30 @@ margin-bottom:20px;
 .table-header h2 {
 margin:0;
 font-size:22px;
+color: #0f172a;
+font-weight: 800;
 }
 
-.table-header a {
-background:#2563eb;
-color:white;
-padding:10px 18px;
-border-radius:10px;
-text-decoration:none;
+/* Tombol dengan warna gradasi persis seperti halaman artikel */
+.table-header a.btn-tambah-gradasi {
+background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+color: white;
+padding: 11px 20px;
+border-radius: 30px;
+text-decoration: none;
+font-weight: 700;
+font-size: 14px;
+box-shadow: 0 8px 20px rgba(6, 182, 212, 0.25);
+transition: all 0.25s ease;
+display: inline-flex;
+align-items: center;
+gap: 6px;
+}
+
+.table-header a.btn-tambah-gradasi:hover {
+transform: translateY(-2px);
+box-shadow: 0 12px 24px rgba(6, 182, 212, 0.35);
+filter: brightness(1.05);
 }
 
 table {
@@ -248,20 +266,6 @@ height:100%;
 border:none;
 }
 
-.edit {
-color:#2563eb;
-margin-right:12px;
-}
-
-.delete {
-background:none;
-border:none;
-color:#ef4444;
-cursor:pointer;
-font-size:16px;
-text-decoration:underline;
-}
-
 .modal {
 display:none;
 position:fixed;
@@ -296,6 +300,7 @@ align-items:center;
 justify-content:center;
 font-size:32px;
 font-weight:bold;
+font-style: normal;
 }
 
 .modal-content h3 {
@@ -320,6 +325,7 @@ border:none;
 padding:10px 25px;
 border-radius:10px;
 cursor:pointer;
+font-weight: 600;
 }
 
 .confirm-delete {
@@ -329,6 +335,7 @@ border:none;
 padding:10px 25px;
 border-radius:10px;
 cursor:pointer;
+font-weight: 600;
 }
 
 .action-btn {
@@ -382,6 +389,7 @@ border:none;
 padding:10px 25px;
 border-radius:10px;
 cursor:pointer;
+font-weight: 600;
 }
 
 /* Styling untuk Pagination */
