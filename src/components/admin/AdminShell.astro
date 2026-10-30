@@ -5,6 +5,7 @@ import Navbar from "./Navbar.astro";
 const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih terarah.", actionLabel = "Tambah Artikel", actionHref = "/admin/tambah-artikel", actionIcon = "+", showHeader = true } = Astro.props;
 ---
 
+
 <div class="admin-shell">
   <Sidebar />
 
@@ -20,7 +21,7 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
             <p class="subtitle">{subtitle}</p>
           </div>
           <div class="page-actions">
-            <a href={actionHref} class="primary-action">{actionIcon} {actionLabel}</a>
+          <a href={actionHref} class="primary-action"><Fragment set:html={actionIcon} /> {actionLabel}</a>
           </div>
         </section>
       )}

@@ -2,12 +2,13 @@
 import AdminShell from "../../components/admin/AdminShell.astro";
 import { db } from "../../lib/db.js";
 
-let slides = [];
+// Tambahkan tipe data (TypeScript) agar VS Code tidak error
+let slides: any[] = [];
 try {
   const [rows] = await db.execute(
     `SELECT * FROM beranda_slider ORDER BY urutan ASC, id ASC`
   );
-  slides = rows;
+  slides = rows as any[]; // Casting ke any[]
 } catch (error) {
   console.error("Fetch slider error:", error);
 }
@@ -44,7 +45,8 @@ try {
               </td>
               <td>
                 <strong>{item.judul || "(tanpa judul)"}</strong>
-                <p>{item.deskripsi}</p>
+                {/* Gunakan set:html karena deskripsi berisi tag HTML dari editor */}
+                <p set:html={item.deskripsi || ""}></p>
               </td>
               <td>{item.urutan}</td>
               <td>
@@ -216,13 +218,6 @@ try {
   box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
 }
 
-.confirm-source {
-  margin: 0 0 6px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: #0f172a;
-}
-
 .confirm-message {
   margin: 0 0 22px;
   font-size: 0.95rem;
@@ -261,7 +256,8 @@ try {
 </style>
 
 <script>
-  let formToSubmit = null;
+  // Tambahkan TypeScript type assertion (as any) agar tidak error
+  let formToSubmit: HTMLFormElement | null = null;
 
   const overlay = document.getElementById("confirmOverlay");
   const okBtn = document.getElementById("confirmOk");
@@ -269,7 +265,7 @@ try {
 
   document.querySelectorAll("[data-delete-trigger]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      formToSubmit = btn.closest("[data-delete-form]");
+      formToSubmit = btn.closest("[data-delete-form]") as HTMLFormElement;
       overlay?.classList.add("active");
     });
   });

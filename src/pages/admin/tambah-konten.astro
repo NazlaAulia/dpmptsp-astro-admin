@@ -10,7 +10,6 @@ if (Astro.request.method === "POST") {
   try {
     const formData = await Astro.request.formData();
 
-    // Mengambil data dari name="..." HTML
     const namaKonten = formData.get("nama_konten")?.toString().trim();
     const judulKonten = formData.get("judul_konten")?.toString().trim();
     const isiKonten = formData.get("isi_konten")?.toString().trim();
@@ -18,86 +17,38 @@ if (Astro.request.method === "POST") {
     const tags = formData.get("tags")?.toString().trim();
     const file = formData.get("foto_konten");
 
-    // 1. Validasi Input Utama
     if (!namaKonten || !judulKonten || !isiKonten) {
       errorMessage = "Nama konten, judul, dan isi konten wajib diisi.";
     } else {
       let namaFile: string | null = null;
 
-      // 2. Process File Upload jika ada
       if (file && typeof file !== "string" && file.size > 0) {
-        const allowedTypes = [
-          "image/jpeg",
-          "image/png",
-          "image/webp",
-          "image/jpg",
-          "video/mp4",
-          "video/webm",
-          "video/quicktime",
-        ];
-
-        if (!allowedTypes.includes(file.type)) {
-          throw new Error("Format file tidak didukung.");
-        }
-
-        if (file.size > 50 * 1024 * 1024) {
-          throw new Error("Ukuran file maksimal 50 MB.");
-        }
+        const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg", "video/mp4", "video/webm", "video/quicktime"];
+        if (!allowedTypes.includes(file.type)) throw new Error("Format file tidak didukung.");
+        if (file.size > 50 * 1024 * 1024) throw new Error("Ukuran file maksimal 50 MB.");
 
         const originalName = file.name || "file";
         const extension = path.extname(originalName).toLowerCase();
-        const safeName = namaKonten
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, "-")
-          .replace(/^-+|-+$/g, "");
+        const safeName = namaKonten.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
         namaFile = `${safeName}-${Date.now()}${extension}`;
-
-        const uploadDir = path.join(
-          process.cwd(),
-          "public",
-          "uploads",
-          "konten"
-        );
+        const uploadDir = path.join(process.cwd(), "public", "uploads", "konten");
 
         await fs.mkdir(uploadDir, { recursive: true });
-
         const buffer = Buffer.from(await file.arrayBuffer());
         await fs.writeFile(path.join(uploadDir, namaFile), buffer);
       }
 
-      // 3. Simpan Ke Database (Nama kolom disesuaikan persis dengan phpMyAdmin)
       await db.execute(
-        `INSERT INTO tentangkamiswebv5
-        (
-          Nama_Konten,
-          Isi_Konten,
-          Foto_Konten,
-          Judul_Konten,
-          Keterangan,
-          tags
-        )
-        VALUES (?, ?, ?, ?, ?, ?)`,
-        [
-          namaKonten,
-          isiKonten,
-          namaFile,
-          judulKonten,
-          keterangan || null,
-          tags || null,
-        ]
+        `INSERT INTO tentangkamiswebv5 (Nama_Konten, Isi_Konten, Foto_Konten, Judul_Konten, Keterangan, tags) VALUES (?, ?, ?, ?, ?, ?)`,
+        [namaKonten, isiKonten, namaFile, judulKonten, keterangan || null, tags || null]
       );
 
-      // 4. Redirect kembali ke Dashboard Konten jika Sukses
       return Astro.redirect("/admin/konten?status=success");
     }
   } catch (error) {
     console.error("ERROR SIMPAN KONTEN:", error);
-    if (error instanceof Error) {
-      errorMessage = error.message;
-    } else {
-      errorMessage = "Terjadi kesalahan saat menyimpan konten.";
-    }
+    errorMessage = error instanceof Error ? error.message : "Terjadi kesalahan saat menyimpan konten.";
   }
 }
 ---
@@ -105,275 +56,135 @@ if (Astro.request.method === "POST") {
 <AdminShell
   title="Tambah Konten"
   subtitle="Tambahkan dokumen dan informasi baru yang akan ditampilkan pada website publik."
+  actionLabel="Kembali"
+  actionHref="/admin/konten"
+  actionIcon={`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right: 6px;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>`}
 >
-  <div class="page-layout">
-
-    <!-- FORM -->
-    <section class="form-card">
-
-      <div class="form-header">
+  
+  <div class="page-wrapper">
+    <div class="main-card">
+      
+      <!-- 1. HEADER (INFORMASI KONTEN) -->
+      <div class="main-header">
         <div>
           <h2>Informasi Konten</h2>
           <p>Lengkapi informasi konten yang ingin ditambahkan.</p>
         </div>
-
         <div class="header-icon">
-          <svg
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M12 5v14"></path>
-            <path d="M5 12h14"></path>
-          </svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
         </div>
       </div>
 
-      <!-- Pesan Error / Notifikasi jika ada -->
-      {errorMessage && <div class="alert alert-error">{errorMessage}</div>}
-
-      <!-- PENTING: Tambahkan method="POST" dan enctype untuk upload file -->
-      <form method="POST" enctype="multipart/form-data">
-
-        <!-- NAMA KONTEN -->
-        <div class="form-group">
-          <label for="nama">
-            Nama Konten
-            <span>*</span>
-          </label>
-
-          <input
-            id="nama"
-        name="nama_konten"
-            type="text"
-            placeholder="Contoh: Zona Integritas"
-            required
-          />
-
-          <small>
-            Nama yang digunakan untuk mengenali konten pada dashboard.
-          </small>
+      <!-- 2. BLOK INFORMASI (ANGKA 1-4) DI TENGAH -->
+      <div class="info-section">
+        <div class="info-box">
+          <div class="info-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            Panduan Pengisian
+          </div>
+          <div class="info-grid">
+            <div class="info-item"><div class="mini-icon">1</div><span>Isi informasi konten dengan lengkap.</span></div>
+            <div class="info-item"><div class="mini-icon">2</div><span>Tambahkan foto atau video jika diperlukan.</span></div>
+            <div class="info-item"><div class="mini-icon">3</div><span>Gunakan tags yang mudah dikenali.</span></div>
+            <div class="info-item"><div class="mini-icon">4</div><span>Klik Simpan Konten setelah semua data selesai.</span></div>
+          </div>
         </div>
+      </div>
 
+      <!-- 3. FORM ISIAN -->
+      <div class="form-body">
+        {errorMessage && <div class="alert alert-error">{errorMessage}</div>}
 
-        <!-- JUDUL -->
-        <div class="form-group">
-          <label for="judul">
-            Judul
-            <span>*</span>
-          </label>
+        <form method="POST" enctype="multipart/form-data">
+          
+          <div class="form-group">
+            <label for="nama">Nama Konten <span>*</span></label>
+            <input id="nama" name="nama_konten" type="text" placeholder="Contoh: Zona Integritas" required />
+            <small>Nama yang digunakan untuk mengenali konten pada dashboard.</small>
+          </div>
 
-          <input
-            id="judul"
-          name="judul_konten"
-            type="text"
-            placeholder="Masukkan judul konten"
-            required
-          />
-        </div>
+          <div class="form-group">
+            <label for="judul">Judul <span>*</span></label>
+            <input id="judul" name="judul_konten" type="text" placeholder="Masukkan judul konten" required />
+          </div>
 
-
-        <!-- ISI -->
-        <div class="form-group">
-          <label for="isi">
-            Isi Konten
-            <span>*</span>
-          </label>
-
-          <textarea
-            id="isi"
-     name="isi_konten"
-            rows="8"
-            placeholder="Tulis isi konten di sini..."
-            required
-          ></textarea>
-
-          <small>
-            Masukkan informasi atau isi utama dari konten.
-          </small>
-        </div>
-
-
-        <!-- FOTO / FILE -->
-        <div class="form-group">
-          <label for="foto">
-            Foto / Video
-          </label>
-
-          <label class="upload-box" for="foto">
-
-            <div class="upload-icon">
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="17 8 12 3 7 8"></polyline>
-                <line x1="12" y1="3" x2="12" y2="15"></line>
-              </svg>
+          <!-- RICH TEXT EDITOR -->
+          <div class="form-group">
+            <label>Isi Konten <span>*</span></label>
+            <div class="editor-toolbar">
+              <div class="toolbar-group">
+                <button type="button" onclick="document.execCommand('undo', false, null)" title="Undo"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg></button>
+                <button type="button" onclick="document.execCommand('redo', false, null)" title="Redo"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"></path><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path></svg></button>
+              </div>
+              <div class="toolbar-divider"></div>
+              <div class="toolbar-group">
+                <button type="button" onclick="let block = prompt('Format (p, h1, h2, h3):', 'p'); if(block) document.execCommand('formatBlock', false, block);" title="Format Block">Paragraf</button>
+              </div>
+              <div class="toolbar-divider"></div>
+              <div class="toolbar-group">
+                <button type="button" onclick="document.execCommand('bold', false, null)" title="Bold"><b>B</b></button>
+                <button type="button" onclick="document.execCommand('italic', false, null)" title="Italic"><i>I</i></button>
+                <button type="button" onclick="document.execCommand('underline', false, null)" title="Underline"><u>U</u></button>
+                <button type="button" onclick="document.execCommand('strikeThrough', false, null)" title="Strikethrough"><s>S</s></button>
+              </div>
+              <div class="toolbar-divider"></div>
+              <div class="toolbar-group">
+                <button type="button" onclick="document.execCommand('insertUnorderedList', false, null)" title="Bullet List"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg> List</button>
+                <button type="button" onclick="document.execCommand('insertOrderedList', false, null)" title="Numbered List">1. List</button>
+              </div>
+              <div class="toolbar-divider"></div>
+              <div class="toolbar-group">
+                <button type="button" onclick="let url = prompt('Masukkan URL Link:'); if(url) document.execCommand('createLink', false, url);" title="Link">Link</button>
+                <button type="button" onclick="document.execCommand('unlink', false, null)" title="Unlink">Unlink</button>
+                <button type="button" onclick="document.execCommand('removeFormat', false, null)" title="Clear Formatting">Tx</button>
+              </div>
             </div>
+            <div id="editorIsi" class="editor-editable" contenteditable="true"></div>
+            <input type="hidden" id="isi" name="isi_konten" required />
+          </div>
 
-            <div class="upload-text">
-              <strong id="file-label">Pilih file untuk diunggah</strong>
-              <span>JPG, PNG, MP4, atau file yang sesuai</span>
-            </div>
+          <div class="form-group">
+            <label for="foto">Foto / Video</label>
+            <label class="upload-box" for="foto">
+              <div class="upload-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              </div>
+              <div class="upload-text">
+                <strong id="file-label">Pilih file untuk diunggah</strong>
+                <span>JPG, PNG, MP4, atau file yang sesuai</span>
+              </div>
+              <input id="foto" name="foto_konten" type="file" accept="image/*,video/*" />
+            </label>
+          </div>
 
-            <input
-              id="foto"
-        name="foto_konten"
-              type="file"
-              accept="image/*,video/*"
-            />
+          <div class="form-group">
+            <label for="keterangan">Keterangan</label>
+            <textarea id="keterangan" name="keterangan" rows="4" placeholder="Contoh: Informasi mengenai Zona Integritas DPM-PTSP."></textarea>
+          </div>
 
-          </label>
-        </div>
+          <div class="form-group">
+            <label for="tags">Tags</label>
+            <input id="tags" name="tags" type="text" placeholder="Contoh: zona-integritas" />
+            <small>Gunakan tanda hubung (-) untuk memisahkan kata.</small>
+          </div>
 
-
-        <!-- KETERANGAN -->
-        <div class="form-group">
-          <label for="keterangan">
-            Keterangan
-          </label>
-
-          <textarea
-            id="keterangan"
-            name="keterangan"
-            rows="4"
-            placeholder="Contoh: Informasi mengenai Zona Integritas DPM-PTSP."
-          ></textarea>
-        </div>
-
-
-        <!-- TAGS -->
-        <div class="form-group">
-          <label for="tags">
-            Tags
-          </label>
-
-          <input
-            id="tags"
-            name="tags"
-            type="text"
-            placeholder="Contoh: zona-integritas"
-          />
-
-          <small>
-            Gunakan tanda hubung (-) untuk memisahkan kata.
-          </small>
-        </div>
-
-
-        <!-- FOOTER -->
-        <div class="form-footer">
-
-          <a
-            href="/admin/konten"
-            class="btn btn-cancel"
-          >
-            Batal
-          </a>
-
-          <button
-            type="submit"
-            class="btn btn-save"
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"></path>
-              <polyline points="17 21 17 13 7 13 7 21"></polyline>
-              <polyline points="7 3 7 8 15 8"></polyline>
-            </svg>
-
-            Simpan Konten
-          </button>
-
-        </div>
-
-      </form>
-
-    </section>
-
-
-    <!-- PREVIEW / INFO -->
-    <aside class="side-card">
-
-      <div class="side-icon">
-        <svg
-          width="22"
-          height="22"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="16" x2="12" y2="12"></line>
-          <line x1="12" y1="8" x2="12.01" y2="8"></line>
-        </svg>
+          <div class="form-footer">
+            <a href="/admin/konten" class="btn btn-cancel">Batal</a>
+            <button type="submit" class="btn btn-save">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+              Simpan Konten
+            </button>
+          </div>
+        </form>
       </div>
 
-      <h3>Informasi</h3>
-
-      <p>
-        Konten yang ditambahkan melalui halaman ini nantinya dapat
-        ditampilkan pada website publik DPM-PTSP.
-      </p>
-
-      <div class="info-list">
-
-        <div class="info-item">
-          <div class="mini-icon">1</div>
-          <span>Isi informasi konten dengan lengkap.</span>
-        </div>
-
-        <div class="info-item">
-          <div class="mini-icon">2</div>
-          <span>Tambahkan foto atau video jika diperlukan.</span>
-        </div>
-
-        <div class="info-item">
-          <div class="mini-icon">3</div>
-          <span>Gunakan tags yang mudah dikenali.</span>
-        </div>
-
-        <div class="info-item">
-          <div class="mini-icon">4</div>
-          <span>Klik Simpan Konten setelah semua data selesai.</span>
-        </div>
-
-      </div>
-
-    </aside>
-
+    </div>
   </div>
 </AdminShell>
 
 <script>
-  // Menampilkan nama file yang dipilih pada UI upload
   const fileInput = document.getElementById('foto') as HTMLInputElement;
   const fileLabel = document.getElementById('file-label');
-
   if (fileInput && fileLabel) {
     fileInput.addEventListener('change', () => {
       if (fileInput.files && fileInput.files.length > 0) {
@@ -381,293 +192,99 @@ if (Astro.request.method === "POST") {
       }
     });
   }
+
+  document.querySelector('form')?.addEventListener('submit', function() {
+    const editorIsi = document.getElementById('editorIsi') as HTMLElement;
+    const hiddenIsi = document.getElementById('isi') as HTMLInputElement;
+    if (editorIsi && hiddenIsi) {
+      hiddenIsi.value = editorIsi.innerHTML;
+    }
+  });
 </script>
 
 <style>
-.page-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 24px;
-  align-items: start;
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+/* BONGKAR KURUNGAN ADMIN SHELL */
+:global(.admin-shell), :global(.main-panel), :global(.content), :global(.content-body) { 
+  height: auto !important; 
+  min-height: 100vh !important;
+  overflow: visible !important; 
 }
 
-/* Alert Error */
-.alert {
-  padding: 12px 16px;
-  margin: 20px 28px 0;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
+.page-wrapper {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  margin-top: 24px;
+  width: 100%;
 }
 
-.alert-error {
-  background-color: #fef2f2;
-  color: #dc2626;
-  border: 1px solid #fecaca;
-}
-
-/* FORM CARD */
-.form-card {
+/* KOTAK BESAR UTAMA */
+.main-card {
   background: #ffffff;
   border: 1px solid #edf1f5;
-  border-radius: 20px;
-  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.05);
- 
+  border-radius: 24px;
+  box-shadow: 0 14px 35px rgba(15, 23, 42, 0.05);
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
-.form-header {
+/* 1. HEADER (INFORMASI KONTEN) */
+.main-header {
   padding: 24px 28px;
   border-bottom: 1px solid #edf1f5;
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-
-.form-header h2 {
-  margin: 0 0 5px;
-  color: #0f172a;
-  font-size: 20px;
-  font-weight: 750;
-}
-
-.form-header p {
-  margin: 0;
-  color: #94a3b8;
-  font-size: 13px;
-}
-
-.header-icon {
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  background: #eff6ff;
-  color: #2563eb;
-}
-
-/* FORM */
-form {
-  padding: 28px;
-}
-
-.form-group {
-  margin-bottom: 22px;
-}
-
-.form-group label:not(.upload-box) {
-  display: block;
-  margin-bottom: 8px;
-  color: #334155;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.form-group label span {
-  color: #ef4444;
-  margin-left: 2px;
-}
-
-.form-group input[type="text"],
-.form-group textarea {
-  width: 100%;
-  box-sizing: border-box;
-  border: 1px solid #dbe3ec;
-  border-radius: 10px;
   background: #ffffff;
-  padding: 12px 14px;
-  color: #334155;
-  font-family: inherit;
-  font-size: 13px;
-  outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.main-header h2 { margin: 0 0 5px; color: #0f172a; font-size: 20px; font-weight: 800; letter-spacing: -0.02em; }
+.main-header p { margin: 0; color: #64748b; font-size: 13px; font-weight: 500; }
+.header-icon { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: #eff6ff; color: #2563eb; }
+
+/* 2. BLOK PANDUAN (ANGKA 1-4) DI TENGAH */
+.info-section {
+  padding: 24px 28px;
+  background: #f8fafc; /* Warna agak abu biar beda sekat */
+  border-bottom: 1px solid #edf1f5;
 }
 
-.form-group textarea {
-  resize: vertical;
-  min-height: 100px;
-  line-height: 1.6;
+.info-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 20px;
 }
 
-.form-group input[type="text"]:focus,
-.form-group textarea:focus {
-  border-color: #93c5fd;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
-}
-
-.form-group input::placeholder,
-.form-group textarea::placeholder {
-  color: #a1a9b5;
-}
-
-.form-group small {
-  display: block;
-  margin-top: 7px;
-  color: #94a3b8;
-  font-size: 11px;
-}
-
-/* UPLOAD */
-.upload-box {
-  min-height: 110px;
+.info-title {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 18px;
-  border: 1.5px dashed #cbd5e1;
-  border-radius: 12px;
-  background: #f8fafc;
-  cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease;
-}
-
-.upload-box:hover {
-  border-color: #93c5fd;
-  background: #f8fbff;
-}
-
-.upload-box input {
-  display: none;
-}
-
-.upload-icon {
-  width: 48px;
-  height: 48px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  background: #eff6ff;
-  color: #2563eb;
-}
-
-.upload-text {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.upload-text strong {
-  color: #334155;
-  font-size: 13px;
-}
-
-.upload-text span {
-  color: #94a3b8;
-  font-size: 11px;
-}
-
-/* FOOTER */
-.form-footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-  padding-top: 24px;
-  margin-top: 8px;
-  border-top: 1px solid #edf1f5;
-}
-
-.btn {
-  min-height: 40px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   gap: 8px;
-  padding: 0 18px;
-  border-radius: 9px;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  text-decoration: none;
-  cursor: pointer;
-  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-}
-
-.btn:hover {
-  transform: translateY(-1px);
-}
-
-.btn-cancel {
-  border: 1px solid #dbe3ec;
-  background: #ffffff;
-  color: #475569;
-}
-
-.btn-cancel:hover {
-  background: #f8fafc;
-}
-
-.btn-save {
-  border: none;
-  background: #2563eb;
-  color: #ffffff;
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.18);
-}
-
-.btn-save:hover {
-  background: #1d4ed8;
-}
-
-/* SIDE CARD */
-.side-card {
-  background: #ffffff;
-  border: 1px solid #edf1f5;
-  border-radius: 20px;
-  padding: 24px;
-  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.05);
-}
-
-.side-icon {
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-size: 14px;
+  font-weight: 800;
+  color: #334155;
   margin-bottom: 16px;
-  border-radius: 12px;
-  background: #f1f5f9;
-  color: #475569;
 }
 
-.side-card h3 {
-  margin: 0 0 8px;
-  color: #0f172a;
-  font-size: 17px;
-  font-weight: 750;
-}
-
-.side-card > p {
-  margin: 0;
-  color: #64748b;
-  font-size: 12px;
-  line-height: 1.7;
-}
-
-/* INFO LIST */
-.info-list {
-  margin-top: 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  padding-top: 20px;
-  border-top: 1px solid #edf1f5;
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Dibikin 2 kolom biar rapi */
+  gap: 16px;
 }
 
 .info-item {
   display: flex;
   align-items: flex-start;
   gap: 10px;
+  font-size: 13px;
   color: #64748b;
-  font-size: 12px;
+  font-weight: 500;
   line-height: 1.5;
 }
 
 .mini-icon {
-  width: 23px;
-  height: 23px;
+  width: 24px;
+  height: 24px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -675,57 +292,62 @@ form {
   border-radius: 7px;
   background: #eff6ff;
   color: #2563eb;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
 }
 
+/* 3. FORM ISIAN */
+.form-body {
+  padding: 28px;
+}
+
+.alert { padding: 12px 16px; margin-bottom: 20px; border-radius: 8px; font-size: 13px; font-weight: 600; }
+.alert-error { background-color: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+.form-group { margin-bottom: 24px; }
+.form-group label:not(.upload-box) { display: block; margin-bottom: 8px; color: #334155; font-size: 13px; font-weight: 700; }
+.form-group label span { color: #ef4444; margin-left: 2px; }
+.form-group input[type="text"], .form-group textarea {
+  width: 100%; box-sizing: border-box; border: 1.5px solid #cbd5e1; border-radius: 14px;
+  background: #f8fafc; padding: 14px 16px; color: #0f172a; font-family: inherit; font-size: 14px; outline: none; transition: all 0.2s ease;
+}
+.form-group textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+.form-group input[type="text"]:focus, .form-group textarea:focus { border-color: #2563eb; background: #ffffff; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
+.form-group small { display: block; margin-top: 7px; color: #94a3b8; font-size: 11.5px; }
+
+/* RICH TEXT EDITOR */
+.editor-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; background: #f1f5f9; padding: 8px 12px; border: 1.5px solid #cbd5e1; border-bottom: none; border-radius: 14px 14px 0 0; }
+.toolbar-group { display: flex; gap: 4px; }
+.editor-toolbar button { background: white; border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 8px; font-size: 13px; font-weight: 600; color: #334155; cursor: pointer; transition: all 0.15s ease; display: inline-flex; align-items: center; gap: 4px; }
+.editor-toolbar button:hover { background: #e2e8f0; color: #0f172a; }
+.toolbar-divider { width: 1px; height: 22px; background: #cbd5e1; margin: 0 4px; }
+.editor-editable { width: 100%; min-height: 220px; max-height: 450px; overflow-y: auto; padding: 16px; border: 1.5px solid #cbd5e1; border-radius: 0 0 14px 14px; background: #f8fafc; font-size: 14px; font-family: inherit; color: #0f172a; box-sizing: border-box; outline: none; transition: all 0.2s ease; }
+.editor-editable:focus { border-color: #2563eb; background: #ffffff; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
+.editor-editable:empty:before { content: "Tulis isi konten di sini..."; color: #94a3b8; pointer-events: none; display: block; }
+
+/* UPLOAD */
+.upload-box { min-height: 110px; display: flex; align-items: center; gap: 14px; padding: 18px; border: 1.5px dashed #cbd5e1; border-radius: 14px; background: #f8fafc; cursor: pointer; transition: all 0.2s ease; }
+.upload-box:hover { border-color: #2563eb; background: #f1f5f9; }
+.upload-box input { display: none; }
+.upload-icon { width: 48px; height: 48px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: #eff6ff; color: #2563eb; }
+.upload-text { display: flex; flex-direction: column; gap: 5px; }
+.upload-text strong { color: #334155; font-size: 13px; }
+.upload-text span { color: #94a3b8; font-size: 11px; }
+
+/* FOOTER */
+.form-footer { display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding-top: 24px; margin-top: 8px; border-top: 1px solid #edf1f5; }
+.btn { min-height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 20px; border-radius: 12px; font-family: inherit; font-size: 14px; font-weight: 700; text-decoration: none; cursor: pointer; transition: all 0.2s ease; }
+.btn-cancel { background: #f1f5f9; color: #475569; border: none; }
+.btn-cancel:hover { background: #e2e8f0; color: #0f172a; }
+.btn-save { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: #ffffff; border: none; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25); }
+.btn-save:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(37, 99, 235, 0.35); }
+
 /* RESPONSIVE */
-@media (max-width: 1000px) {
-  .page-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .side-card {
-    order: 2;
-  }
-}
-
 @media (max-width: 650px) {
-  form {
-    padding: 20px;
-  }
-
-  .form-header {
-    padding: 20px;
-  }
-
-  .form-footer {
-    flex-direction: column-reverse;
-    align-items: stretch;
-  }
-
-  .btn {
-    width: 100%;
-  }
-}
-
-/* FIX TAMPILAN TAMBAH KONTEN */
-:global(html),
-:global(body) {
-  height: auto;
-  min-height: 100%;
-  overflow-y: auto !important;
-}
-
-:global(main) {
-  height: auto !important;
-  min-height: 100vh;
-  overflow-y: visible !important;
-}
-
-:global(.page-content) {
-  height: auto !important;
-  min-height: 100vh;
-  overflow: visible !important;
+  .main-header { padding: 20px; }
+  .info-section { padding: 20px; }
+  .info-grid { grid-template-columns: 1fr; }
+  .form-body { padding: 20px; }
+  .form-footer { flex-direction: column-reverse; align-items: stretch; }
+  .btn { width: 100%; }
 }
 </style>

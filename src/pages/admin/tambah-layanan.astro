@@ -2,373 +2,432 @@
 import AdminShell from "../../components/admin/AdminShell.astro";
 ---
 
-<AdminShell title="Tambah Tempat Layanan" subtitle="Tambahkan tempat layanan baru ke dalam sistem.">
+<AdminShell 
+  title="Tambah Tempat Layanan" 
+  subtitle="Tambahkan tempat layanan baru ke dalam sistem."
+  actionLabel="Kembali"
+  actionHref="/admin/layanan"
+  actionIcon={`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right: 6px;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>`}
+>
   <div class="form-container">
-
-    <div class="form-header">
-      <div class="form-icon">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-          <path d="M3 9h18"></path>
-          <path d="M9 21V9"></path>
-        </svg>
-      </div>
-      <h1>Tambah Tempat Layanan Website</h1>
-    </div>
-
-    <form id="layanan-form">
-
-      <div class="form-group">
-        <label for="judul">Title <span>*</span></label>
-        <input
-          type="text"
-          id="judul"
-          placeholder="Judul"
-          required
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="gambar">Gambar Layanan <span>*</span></label>
-        <p class="form-info">Format Foto: png, jpg, jpeg (Maks: 2 MB)</p>
-
-        <div class="file-upload">
-          <input
-            type="file"
-            id="gambar"
-            accept=".png,.jpg,.jpeg"
-            required
-          />
-
-          <label for="gambar" class="file-label">
-            <span id="file-name">Pilih gambar</span>
-          </label>
+    
+    <div class="form-box">
+      <div class="form-header">
+        <div class="header-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+            <path d="M3 9h18"></path>
+            <path d="M9 21V9"></path>
+          </svg>
+        </div>
+        <div>
+          <h2>Tambah Tempat Layanan Website</h2>
+          <p>Lengkapi informasi tempat layanan di bawah ini.</p>
         </div>
       </div>
 
-      <div class="form-group">
-        <label for="alt">Alt Text <span>*</span></label>
-        <input
-          type="text"
-          id="alt"
-          placeholder="Alt Text"
-          required
-        />
-      </div>
+      <form id="layanan-form">
 
-      <div class="form-group">
-        <label for="lokasi">Location <span>*</span></label>
-        <input
-          type="url"
-          id="lokasi"
-          placeholder="Lokasi"
-          required
-        />
-      </div>
+        <div class="form-group">
+          <label for="judul">Title <span class="required">*</span></label>
+          <input
+            type="text"
+            id="judul"
+            placeholder="Masukkan judul layanan"
+            required
+          />
+        </div>
 
-      <div class="form-group">
-        <label for="alamat">Alamat <span>*</span></label>
-        <textarea
-          id="alamat"
-          placeholder="Alamat"
-          required
-        ></textarea>
-      </div>
+        <div class="form-group">
+          <label for="gambar">Gambar Layanan <span class="required">*</span></label>
+          <span class="file-hint">Format Foto: png, jpg, jpeg (Maks: 2 MB)</span>
 
-      <div class="form-actions">
-        <button type="button" class="btn-kembali" id="btn-kembali">
-          Kembali
-        </button>
+          <div class="file-upload-box">
+            <input
+              type="file"
+              id="gambar"
+              accept=".png,.jpg,.jpeg"
+              required
+            />
+          </div>
+        </div>
 
-        <button type="submit" class="btn-tambah">
-          Tambah
-        </button>
-      </div>
+       <div class="form-group">
+  <label for="alt">Alt Text / Caption <span class="required">*</span></label>
+  
+  <!-- Toolbar Editor -->
+  <div class="editor-toolbar">
+    <div class="toolbar-group">
+      <button type="button" onclick="document.execCommand('undo', false, null)" title="Undo">↩</button>
+      <button type="button" onclick="document.execCommand('redo', false, null)" title="Redo">↪</button>
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+      <button type="button" onclick="let block = prompt('Format (p, h1, h2, h3):', 'p'); if(block) document.execCommand('formatBlock', false, block);" title="Format Block">Paragraf</button>
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+      <button type="button" onclick="document.execCommand('bold', false, null)" title="Bold"><b>B</b></button>
+      <button type="button" onclick="document.execCommand('italic', false, null)" title="Italic"><i>I</i></button>
+      <button type="button" onclick="document.execCommand('underline', false, null)" title="Underline"><u>U</u></button>
+      <button type="button" onclick="document.execCommand('strikeThrough', false, null)" title="Strikethrough"><s>S</s></button>
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+      <button type="button" onclick="document.execCommand('insertUnorderedList', false, null)" title="Bullet List">• List</button>
+      <button type="button" onclick="document.execCommand('insertOrderedList', false, null)" title="Numbered List">1. List</button>
+    </div>
+  </div>
 
-    </form>
+  <!-- Area Editor -->
+  <div 
+    id="editorAlt" 
+    class="editor-editable" 
+    contenteditable="true"
+  ></div>
+
+  <!-- Hidden input untuk dikirim ke backend -->
+  <input type="hidden" id="alt" name="alt" required />
+</div>
+
+        <div class="form-group">
+          <label for="lokasi">Location <span class="required">*</span></label>
+          <input
+            type="url"
+            id="lokasi"
+            placeholder="Masukkan link lokasi (URL)"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="alamat">Alamat <span class="required">*</span></label>
+          <textarea
+            id="alamat"
+            placeholder="Masukkan alamat lengkap"
+            required
+          ></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-batal" id="btn-kembali">
+            Batal
+          </button>
+
+          <button type="submit" class="btn-simpan">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Simpan Layanan
+          </button>
+        </div>
+
+      </form>
+    </div>
   </div>
 </AdminShell>
 
 <script>
 const form = document.getElementById("layanan-form") as HTMLFormElement;
 const gambarInput = document.getElementById("gambar") as HTMLInputElement;
-const fileName = document.getElementById("file-name") as HTMLElement;
-
-
-gambarInput.addEventListener("change", () => {
-  const file = gambarInput.files?.[0];
-
-  if(file){
-    fileName.innerText = file.name;
-  }else{
-    fileName.innerText = "Pilih gambar";
-  }
-});
-
 
 document.getElementById("btn-kembali")?.addEventListener("click",()=>{
   window.location.href="/admin/layanan";
 });
 
-
 form.addEventListener("submit", async(e)=>{
-
   e.preventDefault();
 
-
   const file = gambarInput.files?.[0];
-
 
   if(!file){
     alert("Pilih gambar terlebih dahulu");
     return;
   }
 
-
   if(file.size > 2 * 1024 * 1024){
     alert("Ukuran gambar maksimal 2MB");
     return;
   }
 
-
-
   const reader = new FileReader();
 
-
   reader.onload = async()=>{
-
-
     const data = {
-
-      judul:
-      (document.getElementById("judul") as HTMLInputElement).value,
-
-
-      deskripsi:"",
-
-
+      judul: (document.getElementById("judul") as HTMLInputElement).value,
+      deskripsi: "",
       gambar: reader.result,
-
-
-      alt_text:
-      (document.getElementById("alt") as HTMLInputElement).value,
-
-
-      lokasi:
-      (document.getElementById("lokasi") as HTMLInputElement).value,
-
-
-      alamat:
-      (document.getElementById("alamat") as HTMLTextAreaElement).value
-
+      alt_text: (document.getElementById("alt") as HTMLInputElement).value,
+      lokasi: (document.getElementById("lokasi") as HTMLInputElement).value,
+      alamat: (document.getElementById("alamat") as HTMLTextAreaElement).value
     };
 
-
-
     try{
-
-
-     const response = await fetch("/api/layanan", {
-  method:"POST",
-  headers:{
-    "Content-Type":"application/json"
-  },
-  body:JSON.stringify(data)
-});
-
+      const response = await fetch("/api/layanan", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(data)
+      });
 
       const result = await response.json();
 
-
-      console.log(result);
-
-
-
       if(result.success){
-        // Alert sukses dihapus, langsung pindah halaman ke depan
         window.location.href="/admin/layanan";
-
       }else{
-
         alert("Gagal menambahkan data");
-
       }
-
-
-
-}catch(error){
-
+    }catch(error){
       console.error(error);
       alert("Error: " + error);
-
     }
-
-
-
   };
 
-
   reader.readAsDataURL(file);
-
-
 });
-
 </script>
 
 <style>
-  .form-container {
-    background: white;
-    border-radius: 20px;
-    padding: 36px 42px;
-    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
-    margin-top: 20px;
-  }
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-  .form-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 42px;
-  }
+.form-container {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  width: 100%;
+  animation: fadeIn 0.3s ease-in-out;
+  margin-top: 24px; /* Jarak dari header atas */
+}
 
-  .form-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
-    background: #2563eb;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-  .form-header h1 {
-    margin: 0;
-    font-size: 1.8rem;
-    color: #0f172a;
-    font-weight: 700;
-  }
+.form-box {
+  background: white;
+  padding: 35px 40px;
+  border-radius: 24px;
+  box-shadow: 0 14px 35px rgba(15, 23, 42, 0.05);
+  border: 1px solid #e2e8f0;
+  width: 100%;
+  box-sizing: border-box;
+}
 
-  .form-group {
-    margin-bottom: 30px;
-  }
+.form-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #f1f5f9;
+}
 
-  .form-group label {
-    display: block;
-    font-size: 1rem;
-    font-weight: 700;
-    color: #172033;
-    margin-bottom: 10px;
-  }
+.header-icon {
+  width: 48px;
+  height: 48px;
+  background: #eff6ff;
+  color: #2563eb;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 
-  .form-group label span {
-    color: #ef4444;
-  }
+.form-header h2 {
+  margin: 0 0 4px 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
 
-  .form-info {
-    color: #94a3b8;
-    margin: 0 0 12px;
-    font-size: 0.9rem;
-  }
+.form-header p {
+  margin: 0;
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+}
 
-  .form-group input[type="text"],
-  .form-group input[type="url"],
-  .form-group textarea {
-    width: 100%;
-    box-sizing: border-box;
-    border: none;
-    outline: none;
-    background: #f1f5f9;
-    border-radius: 10px;
-    padding: 16px 20px;
-    font-size: 1rem;
-    color: #172033;
-    font-family: inherit;
-  }
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+}
 
-  .form-group input[type="text"],
-  .form-group input[type="url"] {
-    height: 60px;
-  }
+label {
+  font-weight: 700;
+  font-size: 13px;
+  color: #334155;
+  letter-spacing: 0.01em;
+}
 
-  .form-group textarea {
-    min-height: 120px;
-    resize: vertical;
-  }
+label .required {
+  color: #ef4444;
+}
 
-  .form-group input:focus,
-  .form-group textarea:focus {
-    box-shadow: 0 0 0 2px #bfdbfe;
-  }
+input[type="text"],
+input[type="url"],
+textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 14px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #0f172a;
+  background: #f8fafc;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  outline: none;
+}
 
-  .file-upload {
-    position: relative;
-    width: 100%;
-    min-height: 160px;
-    background: #f8fafc;
-    border-radius: 12px;
-    border: 2px dashed #e2e8f0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-  }
+textarea {
+  min-height: 120px;
+  resize: vertical;
+}
 
-  .file-upload input {
-    display: none;
-  }
+input[type="text"]:focus,
+input[type="url"]:focus,
+textarea:focus {
+  border-color: #2563eb;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
 
-  .file-label {
-    cursor: pointer;
-    width: 100%;
-    height: 160px;
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-    color: #94a3b8 !important;
-    font-weight: 500 !important;
-    margin: 0 !important;
-  }
+.file-upload-box {
+  background: #f8fafc;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 14px;
+  padding: 14px;
+  transition: all 0.2s ease;
+}
 
-  .file-label:hover {
-    background: #f1f5f9;
-  }
+.file-upload-box:hover {
+  border-color: #2563eb;
+  background: #f1f5f9;
+}
 
-  .form-actions {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 14px;
-    margin-top: 40px;
-  }
+input[type="file"] {
+  width: 100%;
+  font-family: inherit;
+  font-size: 13px;
+  color: #475569;
+}
 
-  .btn-tambah,
-  .btn-kembali {
-    border: none;
-    border-radius: 10px;
-    padding: 14px 32px;
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
+.file-hint {
+  font-size: 11.5px;
+  color: #94a3b8;
+  margin-bottom: 4px;
+}
 
-  .btn-tambah {
-    background: #0ea5e9;
-    color: white;
-  }
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 35px;
+  padding-top: 20px;
+  border-top: 1px solid #f1f5f9;
+}
 
-  .btn-tambah:hover {
-    background: #0284c7;
-  }
+.btn-batal {
+  background: #f1f5f9;
+  color: #475569;
+  padding: 12px 22px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  cursor: pointer;
+}
 
-  .btn-kembali {
-    background: #e2e8f0;
-    color: #334155;
-  }
+.btn-batal:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
 
-  .btn-kembali:hover {
-    background: #cbd5e1;
-  }
+.btn-simpan {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+  transition: all 0.2s ease;
+}
+
+.btn-simpan:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.35);
+}
+
+/* Gaya Toolbar Editor */
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  background: #f1f5f9;
+  padding: 8px 12px;
+  border: 1.5px solid #cbd5e1;
+  border-bottom: none;
+  border-radius: 14px 14px 0 0;
+}
+
+.toolbar-group { display: flex; gap: 4px; }
+
+.editor-toolbar button {
+  background: white;
+  border: 1px solid #cbd5e1;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.editor-toolbar button:hover { background: #e2e8f0; color: #0f172a; }
+.toolbar-divider { width: 1px; height: 22px; background: #cbd5e1; margin: 0 4px; }
+
+/* Gaya Area Ketik */
+.editor-editable {
+  width: 100%;
+  min-height: 120px;
+  max-height: 250px;
+  overflow-y: auto;
+  padding: 16px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 0 0 14px 14px;
+  background: #f8fafc;
+  font-size: 14px;
+  font-family: inherit;
+  color: #0f172a;
+  box-sizing: border-box;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.editor-editable:focus {
+  border-color: #2563eb;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+.editor-editable:empty:before {
+  content: "Tulis alt text di sini...";
+  color: #94a3b8;
+  pointer-events: none;
+  display: block;
+}
 </style>

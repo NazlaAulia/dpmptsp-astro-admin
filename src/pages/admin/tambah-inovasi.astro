@@ -1,17 +1,17 @@
 ---
 import AdminShell from "../../components/admin/AdminShell.astro";
 import { db } from "../../lib/db";
+import fs from "node:fs/promises";
+import path from "node:path";
 
 export const prerender = false;
 
 let errorMessage = "";
 
-// Handle Submit Form (POST Request)
 if (Astro.request.method === "POST") {
   try {
     const formData = await Astro.request.formData();
 
-    // 1. Tangkap seluruh input form sesuai kolom phpMyAdmin
     const nama = formData.get("nama")?.toString() || "";
     const singkatan = formData.get("singkatan")?.toString() || "";
     const kategori = formData.get("kategori")?.toString() || "";
@@ -24,7 +24,6 @@ if (Astro.request.method === "POST") {
     const tahapan = formData.get("tahapan")?.toString() || "Penerapan Digital";
     const jenis = formData.get("jenis")?.toString() || "Digital";
     
-    // Field Tambahan dari Database phpMyAdmin
     const url_layanan = formData.get("url_layanan")?.toString() || null;
     const url_label = formData.get("url_label")?.toString() || null;
     const icon = formData.get("icon")?.toString() || "fa-lightbulb";
@@ -32,19 +31,25 @@ if (Astro.request.method === "POST") {
     const urutan = parseInt(formData.get("urutan")?.toString() || "0");
     const status = parseInt(formData.get("status")?.toString() || "1");
 
-    // Format slug otomatis (misal: "TAKON SOBAT" -> "takon-sobat")
     const slug = nama.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
 
-    // 2. Handle Upload File Gambar
     const fileGambar = formData.get("gambar") as File;
     let gambarPath = null;
 
     if (fileGambar && fileGambar.name && fileGambar.size > 0) {
-      gambarPath = `gambar/${fileGambar.name}`;
-      // Note: Jika butuh save fisik file ke folder public, aktifkan fs.writeFile di sini
+      const originalName = fileGambar.name;
+      const extension = path.extname(originalName).toLowerCase();
+      const safeName = slug + "-" + Date.now() + extension;
+      
+      gambarPath = `gambar/${safeName}`;
+      
+      const uploadDir = path.join(process.cwd(), "public", "gambar");
+      await fs.mkdir(uploadDir, { recursive: true }); 
+
+      const buffer = Buffer.from(await fileGambar.arrayBuffer());
+      await fs.writeFile(path.join(uploadDir, safeName), buffer);
     }
 
-    // 3. Eksekusi Query MySQL Insert ke Database
     await db.query(
       `INSERT INTO inovasi_layanan 
       (slug, nama, singkatan, kategori, deskripsi, rancang_bangun, tujuan, manfaat, hasil, tahun_usulan, tahapan, jenis, gambar, url_layanan, url_label, icon, warna, urutan, status) 
@@ -56,7 +61,6 @@ if (Astro.request.method === "POST") {
       ]
     );
 
-    // Redirect setelah sukses simpan
     return Astro.redirect("/admin/inovasi?status=success");
 
   } catch (error: any) {
@@ -67,257 +71,549 @@ if (Astro.request.method === "POST") {
 ---
 
 <AdminShell title="" subtitle="" showHeader={false}>
-  <div class="page-header-simple">
-    <h2>Tambah Inovasi Layanan</h2>
-    <a href="/admin/inovasi" class="btn-back"> Kembali</a>
-  </div>
+  <div class="page-wrapper">
+    
+    <div class="page-header-simple">
+      <h2>Tambah Inovasi Layanan</h2>
+      <a href="/admin/inovasi" class="btn-back">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right: 6px;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Kembali
+      </a>
+    </div>
 
-  {errorMessage && <div class="alert-error">{errorMessage}</div>}
+    {errorMessage && <div class="alert-error">{errorMessage}</div>}
 
-  <div class="card-form-container">
-    {/* Form action mengarah ke halaman ini sendiri biar ditangkap blok handler atas */}
-    <form method="POST" enctype="multipart/form-data">
-      
-      <div class="form-row">
-        <div class="form-group flex-1">
-          <label for="nama">Nama Inovasi (Singkatan Utamamu)</label>
-          <input type="text" id="nama" name="nama" placeholder="Contoh: TAKON SOBAT" required />
+    <div class="card-form-container">
+      <form method="POST" enctype="multipart/form-data">
+        
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="nama">Nama Inovasi <span>*</span></label>
+            <input type="text" id="nama" name="nama" placeholder="Contoh: TAKON SOBAT" required />
+          </div>
+
+          <div class="form-group flex-1">
+            <label for="kategori">Kategori <span>*</span></label>
+            <input type="text" id="kategori" name="kategori" placeholder="Contoh: Perizinan" required />
+          </div>
         </div>
 
-        <div class="form-group flex-1">
-          <label for="kategori">Kategori</label>
-          <input type="text" id="kategori" name="kategori" placeholder="Contoh: Perizinan" required />
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="singkatan">Kepanjangan / Detail Singkatan</label>
-        <input type="text" id="singkatan" name="singkatan" placeholder="Contoh: Tanya Konsultasi Perizinan Solusi Dijawab..." />
-      </div>
-
-      <div class="form-row">
-        <div class="form-group flex-1">
-          <label for="tahun_usulan">Tahun Usulan</label>
-          <input type="number" id="tahun_usulan" name="tahun_usulan" value={new Date().getFullYear()} required />
+        <div class="form-group">
+          <label for="singkatan">Kepanjangan / Detail Singkatan</label>
+          <input type="text" id="singkatan" name="singkatan" placeholder="Contoh: Tanya Konsultasi Perizinan Solusi Dijawab..." />
         </div>
 
-        <div class="form-group flex-1">
-          <label for="tahapan">Tahapan</label>
-          <input type="text" id="tahapan" name="tahapan" placeholder="Contoh: Penerapan Digital" value="Penerapan Digital" />
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="tahun_usulan">Tahun Usulan</label>
+            <input type="number" id="tahun_usulan" name="tahun_usulan" value={new Date().getFullYear()} required />
+          </div>
+
+          <div class="form-group flex-1">
+            <label for="tahapan">Tahapan</label>
+            <input type="text" id="tahapan" name="tahapan" placeholder="Contoh: Penerapan Digital" value="Penerapan Digital" />
+          </div>
+
+          <div class="form-group flex-1">
+            <label for="jenis">Jenis</label>
+            <input type="text" id="jenis" name="jenis" placeholder="Contoh: Digital" value="Digital" />
+          </div>
         </div>
 
-        <div class="form-group flex-1">
-          <label for="jenis">Jenis</label>
-          <input type="text" id="jenis" name="jenis" placeholder="Contoh: Digital" value="Digital" />
-        </div>
-      </div>
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="url_layanan">URL Layanan</label>
+            <input type="text" id="url_layanan" name="url_layanan" placeholder="https://..." />
+          </div>
 
-      <!-- Tambahan Field Sesuai Database phpMyAdmin -->
-      <div class="form-row">
-        <div class="form-group flex-1">
-          <label for="url_layanan">URL Layanan (Link Web/Aplikasi)</label>
-          <input type="text" id="url_layanan" name="url_layanan" placeholder="https://epmal.surabaya.go.id/..." />
-        </div>
-
-        <div class="form-group flex-1">
-          <label for="url_label">Label URL (Teks Tombol Link)</label>
-          <input type="text" id="url_label" name="url_label" placeholder="Contoh: Akses Layanan" />
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group flex-1">
-          <label for="icon">Icon Class (FontAwesome)</label>
-          <input type="text" id="icon" name="icon" value="fa-lightbulb" placeholder="fa-lightbulb" />
+          <div class="form-group flex-1">
+            <label for="url_label">Label URL</label>
+            <input type="text" id="url_label" name="url_label" placeholder="Contoh: Akses Layanan" />
+          </div>
         </div>
 
-        <div class="form-group flex-1">
-          <label for="warna">Warna Aksen</label>
-          <input type="text" id="warna" name="warna" value="blue" placeholder="blue" />
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="icon">Icon Class</label>
+            <input type="text" id="icon" name="icon" value="fa-lightbulb" placeholder="fa-lightbulb" />
+          </div>
+
+          <div class="form-group flex-1">
+            <label for="warna">Warna Aksen</label>
+            <input type="text" id="warna" name="warna" value="blue" placeholder="blue" />
+          </div>
+
+          <div class="form-group flex-1">
+            <label for="urutan">Urutan</label>
+            <input type="number" id="urutan" name="urutan" value="0" />
+          </div>
+
+          <div class="form-group flex-1">
+            <label for="status">Status</label>
+            <select id="status" name="status" class="form-select">
+              <option value="1">Aktif (1)</option>
+              <option value="0">Nonaktif (0)</option>
+            </select>
+          </div>
         </div>
 
-        <div class="form-group flex-1">
-          <label for="urutan">Urutan Tampil</label>
-          <input type="number" id="urutan" name="urutan" value="0" />
+        <!-- ========================================== -->
+        <!-- 1. EDITOR KHUSUS UNTUK DESKRIPSI           -->
+        <!-- ========================================== -->
+        <div class="form-group">
+          <label>Deskripsi</label>
+          
+          <div class="editor-toolbar">
+            <div class="toolbar-group">
+              <button type="button" onclick="document.execCommand('undo', false, null)" title="Undo">↩</button>
+              <button type="button" onclick="document.execCommand('redo', false, null)" title="Redo">↪</button>
+            </div>
+            <div class="toolbar-divider"></div>
+            <div class="toolbar-group">
+              <select onchange="document.execCommand('formatBlock', false, this.value); this.value='';" class="format-select">
+                <option value="" disabled selected>Paragraf</option>
+                <option value="p">Paragraf (p)</option>
+                <option value="h1">Heading 1</option>
+                <option value="h2">Heading 2</option>
+                <option value="h3">Heading 3</option>
+              </select>
+            </div>
+            <div class="toolbar-divider"></div>
+            <div class="toolbar-group">
+              <button type="button" onclick="document.execCommand('bold', false, null)" title="Bold"><b>B</b></button>
+              <button type="button" onclick="document.execCommand('italic', false, null)" title="Italic"><i>I</i></button>
+              <button type="button" onclick="document.execCommand('underline', false, null)" title="Underline"><u>U</u></button>
+              <button type="button" onclick="document.execCommand('strikeThrough', false, null)" title="Strikethrough"><s>S</s></button>
+            </div>
+            <div class="toolbar-divider"></div>
+            <div class="toolbar-group">
+              <button type="button" onclick="document.execCommand('justifyLeft', false, null)" title="Rata Kiri">«</button>
+              <button type="button" onclick="document.execCommand('justifyCenter', false, null)" title="Rata Tengah">↔</button>
+              <button type="button" onclick="document.execCommand('justifyRight', false, null)" title="Rata Kanan">»</button>
+            </div>
+            <div class="toolbar-divider"></div>
+            <div class="toolbar-group">
+              <button type="button" onclick="document.execCommand('insertUnorderedList', false, null)" title="Bullet List">• List</button>
+              <button type="button" onclick="document.execCommand('insertOrderedList', false, null)" title="Numbered List">1. List</button>
+            </div>
+            <div class="toolbar-divider"></div>
+            <div class="toolbar-group">
+              <button type="button" onclick="let url = prompt('Masukkan URL Link:'); if(url) document.execCommand('createLink', false, url);" title="Link">Link</button>
+              <button type="button" onclick="document.execCommand('unlink', false, null)" title="Unlink">Unlink</button>
+              <button type="button" onclick="document.execCommand('removeFormat', false, null)" title="Clear">Tx</button>
+            </div>
+            <div class="toolbar-divider"></div>
+            <div class="toolbar-group">
+              <button type="button" onclick="toggleHTML()" title="Lihat HTML" class="btn-html">&lt;/&gt;</button>
+            </div>
+          </div>
+
+          <div id="editorDeskripsi" class="editor-editable" contenteditable="true"></div>
+          <input type="hidden" id="deskripsi" name="deskripsi" />
+
+          <div class="editor-footer">
+            <span id="statusText">Siap menulis</span>
+            <span id="wordCount">0 kata</span>
+          </div>
         </div>
 
-        <div class="form-group flex-1">
-          <label for="status">Status</label>
-          <select id="status" name="status" class="form-select">
-            <option value="1">Aktif (1)</option>
-            <option value="0">Nonaktif (0)</option>
-          </select>
+        <!-- ========================================== -->
+        <!-- 2. TEXTAREA BIASA UNTUK LAINNYA            -->
+        <!-- ========================================== -->
+        <div class="form-group">
+          <label for="rancang_bangun">Rancang Bangun</label>
+          <textarea id="rancang_bangun" name="rancang_bangun" rows="4" placeholder="Tulis rancang bangun di sini..." class="form-textarea"></textarea>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label for="deskripsi">Deskripsi</label>
-        <textarea id="deskripsi" name="deskripsi" rows="3" placeholder="Deskripsi ringkas inovasi..."></textarea>
-      </div>
+        <div class="form-group">
+          <label for="tujuan">Tujuan</label>
+          <textarea id="tujuan" name="tujuan" rows="3" placeholder="Tulis tujuan di sini..." class="form-textarea"></textarea>
+        </div>
 
-      <div class="form-group">
-        <label for="rancang_bangun">Rancang Bangun</label>
-        <textarea id="rancang_bangun" name="rancang_bangun" rows="3" placeholder="Rancang bangun inovasi..."></textarea>
-      </div>
+        <div class="form-group">
+          <label for="manfaat">Manfaat</label>
+          <textarea id="manfaat" name="manfaat" rows="3" placeholder="Tulis manfaat di sini..." class="form-textarea"></textarea>
+        </div>
 
-      <div class="form-group">
-        <label for="tujuan">Tujuan</label>
-        <textarea id="tujuan" name="tujuan" rows="2" placeholder="Tujuan inovasi..."></textarea>
-      </div>
+        <div class="form-group">
+          <label for="hasil">Hasil</label>
+          <textarea id="hasil" name="hasil" rows="3" placeholder="Tulis hasil di sini..." class="form-textarea"></textarea>
+        </div>
 
-      <div class="form-group">
-        <label for="manfaat">Manfaat</label>
-        <textarea id="manfaat" name="manfaat" rows="2" placeholder="Manfaat inovasi..."></textarea>
-      </div>
+        <!-- UPLOAD -->
+        <div class="form-group">
+          <label for="gambar">Upload Gambar</label>
+          <input type="file" id="gambar" name="gambar" accept="image/*" />
+          <small>Format gambar: JPG, PNG, WEBP.</small>
+        </div>
 
-      <div class="form-group">
-        <label for="hasil">Hasil</label>
-        <textarea id="hasil" name="hasil" rows="2" placeholder="Hasil/pencapaian inovasi..."></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="gambar">Upload Gambar</label>
-        <input type="file" id="gambar" name="gambar" accept="image/*" />
-      </div>
-
-      <div class="form-actions">
-        <a href="/admin/inovasi" class="btn-cancel">Batal</a>
-        <button type="submit" class="btn-submit">Simpan Inovasi</button>
-      </div>
-    </form>
+        <div class="form-actions">
+          <a href="/admin/inovasi" class="btn-cancel">Batal</a>
+          <button type="submit" class="btn-submit">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right: 6px;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Simpan Inovasi
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </AdminShell>
 
+<script>
+  // Sinkronisasi isi editor ke input hidden saat form disubmit
+  document.querySelector('form')?.addEventListener('submit', function() {
+    const editorEl = document.getElementById('editorDeskripsi') as HTMLElement;
+    const hiddenEl = document.getElementById('deskripsi') as HTMLInputElement;
+    if (editorEl && hiddenEl) {
+      hiddenEl.value = editorEl.innerHTML;
+    }
+  });
+
+  // Fitur Counter Kata & Status untuk Editor Deskripsi
+  const editorDeskripsi = document.getElementById('editorDeskripsi') as HTMLElement | null;
+  const wordCountEl = document.getElementById('wordCount');
+  const statusTextEl = document.getElementById('statusText');
+
+  if (editorDeskripsi && wordCountEl && statusTextEl) {
+    editorDeskripsi.addEventListener('input', function() {
+      const text = this.innerText.trim();
+      const words = text ? text.split(/\s+/).length : 0;
+      
+      wordCountEl.innerText = `${words} kata`;
+      
+      if (words > 0) {
+        statusTextEl.innerText = 'Menulis...';
+        statusTextEl.style.color = '#f59e0b'; 
+      } else {
+        statusTextEl.innerText = 'Siap menulis';
+        statusTextEl.style.color = '#64748b'; 
+      }
+    });
+  }
+
+  // Fitur Lihat HTML
+  let isHtmlMode = false;
+  // @ts-ignore
+  window.toggleHTML = function() {
+    if (!editorDeskripsi) return;
+    
+    if (!isHtmlMode) {
+      const html = editorDeskripsi.innerHTML;
+      editorDeskripsi.innerHTML = `<pre style="white-space: pre-wrap; font-family: monospace; font-size: 13px; padding: 10px; background: #f8fafc; border-radius: 8px;">${html.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>`;
+      editorDeskripsi.contentEditable = "false";
+      isHtmlMode = true;
+    } else {
+      const pre = editorDeskripsi.querySelector('pre');
+      if (pre) {
+        editorDeskripsi.innerHTML = pre.innerText;
+      }
+      editorDeskripsi.contentEditable = "true";
+      isHtmlMode = false;
+    }
+  }
+</script>
+
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:global(.admin-shell), :global(.main-panel), :global(.content), :global(.content-body) { 
+  height: auto !important; 
+  min-height: 100vh !important;
+  overflow: visible !important; 
+}
+
+.page-wrapper {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  margin-top: 24px;
+  width: 100%;
+  padding-bottom: 40px;
+}
+
 .page-header-simple {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  background: #ffffff;
+  padding: 20px 28px;
+  border-radius: 16px;
+  border: 1px solid #edf1f5;
+  box-shadow: 0 4px 15px rgba(15, 23, 42, 0.03);
 }
 
 .page-header-simple h2 {
   font-size: 22px;
-  font-weight: 700;
-  color: #1e293b;
+  font-weight: 800;
+  color: #0f172a;
   margin: 0;
+  letter-spacing: -0.02em;
 }
 
 .btn-back {
-  background: #0284c7;
+  background: #2563eb;
   color: white;
-  padding: 8px 16px;
-  border-radius: 8px;
+  padding: 10px 20px;
+  border-radius: 12px;
   text-decoration: none;
   font-size: 14px;
-  font-weight: 500;
-  transition: background 0.2s;
+  font-weight: 700;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
 }
 
 .btn-back:hover {
-  opacity: 0.9;
+  background: #1d4ed8;
+  transform: translateY(-2px);
 }
 
 .card-form-container {
   background: white;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.04);
-  border: 1px solid #f1f5f9;
-  max-height: calc(100vh - 140px);
-  overflow-y: auto;
+  border-radius: 24px;
+  padding: 32px 36px;
+  box-shadow: 0 14px 35px rgba(15, 23, 42, 0.05);
+  border: 1px solid #edf1f5;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .form-row {
   display: flex;
-  gap: 16px;
+  gap: 20px;
 }
 
 .flex-1 {
   flex: 1;
+  min-width: 0;
 }
 
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .form-group label {
   font-size: 13px;
-  font-weight: 600;
-  color: #1e293b;
+  font-weight: 700;
+  color: #334155;
 }
 
+.form-group label span {
+  color: #ef4444;
+}
+
+/* STYLE INPUT & TEXTAREA BIASA */
 .form-group input[type="text"],
 .form-group input[type="number"],
-.form-group textarea,
 .form-group input[type="file"],
-.form-select {
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
+.form-select,
+.form-textarea {
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1.5px solid #cbd5e1;
   font-size: 14px;
   outline: none;
-  color: #334155;
+  color: #0f172a;
+  font-family: inherit;
   width: 100%;
   box-sizing: border-box;
-  background-color: white;
+  background-color: #f8fafc;
+  transition: all 0.2s ease;
+}
+
+.form-textarea {
+  min-height: 100px;
+  resize: vertical;
 }
 
 .form-group input:focus,
-.form-group textarea:focus,
-.form-select:focus {
+.form-select:focus,
+.form-textarea:focus {
   border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
 }
 
+.form-group small {
+  color: #94a3b8;
+  font-size: 11.5px;
+}
+
+/* ================= RICH TEXT EDITOR ================= */
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  background: #ffffff;
+  padding: 8px 12px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 14px 14px 0 0;
+}
+
+.toolbar-group {
+  display: flex;
+  gap: 2px;
+}
+
+.editor-toolbar button, .format-select {
+  background: white;
+  border: 1px solid #e2e8f0;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.editor-toolbar button:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.format-select {
+  padding: 6px 28px 6px 12px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 20px;
+  background: #e2e8f0;
+  margin: 0 6px;
+}
+
+.editor-editable {
+  width: 100%;
+  min-height: 350px;
+  max-height: 600px;
+  overflow-y: auto;
+  padding: 20px;
+  border: 1.5px solid #cbd5e1;
+  border-top: none;
+  border-radius: 0;
+  background: #ffffff;
+  font-size: 15px;
+  font-family: inherit;
+  color: #0f172a;
+  box-sizing: border-box;
+  outline: none;
+  line-height: 1.6;
+}
+
+.editor-editable:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+.editor-editable:empty:before {
+  content: "Tulis isi deskripsi inovasi di sini...";
+  color: #94a3b8;
+  pointer-events: none;
+  display: block;
+}
+
+.editor-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border: 1.5px solid #cbd5e1;
+  border-top: none;
+  border-radius: 0 0 14px 14px;
+  font-size: 13px;
+  color: #64748b;
+  font-family: inherit;
+}
+
+/* ACTIONS */
 .form-actions {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 24px;
-  padding-top: 16px;
-  border-top: 1px solid #f1f5f9;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #edf1f5;
 }
 
 .btn-cancel {
-  padding: 9px 18px;
-  border-radius: 8px;
+  padding: 12px 24px;
+  border-radius: 12px;
   text-decoration: none;
   background: #f1f5f9;
   color: #475569;
-  font-weight: 500;
+  font-weight: 700;
   font-size: 14px;
+  transition: all 0.2s;
 }
 
 .btn-cancel:hover {
   background: #e2e8f0;
+  color: #0f172a;
 }
 
 .btn-submit {
-  padding: 9px 18px;
-  border-radius: 8px;
+  padding: 12px 24px;
+  border-radius: 12px;
   border: none;
-  background: #2563eb;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   color: white;
-  font-weight: 500;
+  font-weight: 700;
   font-size: 14px;
+  font-family: inherit;
   cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
 }
 
 .btn-submit:hover {
-  background: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.35);
 }
 
 .alert-error {
   background-color: #fef2f2;
   border: 1px solid #fca5a5;
   color: #991b1b;
-  padding: 12px 16px;
-  border-radius: 8px;
-  margin-bottom: 16px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  margin-bottom: 20px;
   font-size: 14px;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  .card-form-container {
+    padding: 20px;
+  }
+  .page-header-simple {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+  .btn-cancel, .btn-submit {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
 }
 </style>

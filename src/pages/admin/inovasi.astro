@@ -68,24 +68,21 @@ try {
                   <div class="truncate-text fw-bold" title={item.nama}>{item.nama}</div>
                 </td>
                 <td>{item.singkatan || '-'}</td>
-              <td class="text-center">
-  {(item.gambar || item.foto) ? (
-    <img 
-      src={
-        // Jika sudah berupa URL online (diawali http/https)
-        (item.gambar || item.foto).startsWith('http') 
-          ? (item.gambar || item.foto)
-          // Jika cuma nama file (misal: 'mpp.png'), arahkan ke folder public/ uploads
-          : `/uploads/${item.gambar || item.foto}` 
-      } 
-      alt={item.nama} 
-      class="table-img-preview"
-      onerror="this.onerror=null; this.src='https://via.placeholder.com/40?text=No+Img';"
-    />
-  ) : (
-    <span class="no-img-text">-</span>
-  )}
-</td>
+                
+                {/* BAGIAN FOTO UDAH DIBENERIN, NGGAK DOBEL LAGI */}
+                <td class="text-center">
+                  {item.gambar ? (
+                    <img 
+                      src={item.gambar.startsWith('http') ? item.gambar : `/${item.gambar}`} 
+                      alt={item.nama} 
+                      class="table-img-preview"
+                      onerror="this.onerror=null; this.src='https://via.placeholder.com/40?text=No+Img';"
+                    />
+                  ) : (
+                    <span class="no-img-text">-</span>
+                  )}
+                </td>
+
                 <td>
                   <div class="truncate-multiline" title={item.deskripsi}>{item.deskripsi || '-'}</div>
                 </td>
@@ -167,8 +164,6 @@ try {
 
 <style>
 /* WRAPPER KONTEN UTAMA */
-/* WRAPPER UTAMA - Bikin tinggi dinamis ngikutin layar */
-/* WRAPPER KONTEN UTAMA */
 .card-table-container {
   background: #ffffff;
   border-radius: 12px;
@@ -177,13 +172,11 @@ try {
   border: 1px solid #e2e8f0;
   width: 100%;
   box-sizing: border-box;
-  
-  /* PERBAIKAN: Gunakan height dinamis & flexbox ketat */
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 120px); /* Kunci tinggi container pas se-ukuran viewport */
+  height: calc(100vh - 120px);
   min-height: 400px;
-  overflow: hidden; /* Mencegah footer keluar dari card */
+  overflow: hidden;
 }
 
 .table-controls {
@@ -191,22 +184,20 @@ try {
   justify-content: flex-end;
   align-items: center;
   margin-bottom: 12px;
-  flex-shrink: 0; /* Header tetap di atas, gak ketekan */
+  flex-shrink: 0;
 }
 
-/* CONTAINER TABEL - BIKIN SCROLLBAR DEDIKASI */
 .table-responsive {
   width: 100%;
-  flex: 1; /* Otomatis ngisi sisa ruang antara header pencarian & pagination */
-  min-height: 0; /* PENTING: Trik flexbox biar scroll y mau jalan pas data melimpah */
-  overflow-y: auto; /* Hanya isi tabel yang di-scroll! */
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   overflow-x: auto;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   background: #ffffff;
 }
 
-/* FOOTER & PAGINATION - DIKUNCI DI PALING BAWAH */
 .table-footer {
   display: flex;
   justify-content: space-between;
@@ -215,7 +206,7 @@ try {
   margin-top: 8px;
   font-size: 12px;
   color: #64748b;
-  flex-shrink: 0; /* KUNCI UTAMA: Footer dilarang menyusut / terdorong keluar */
+  flex-shrink: 0;
   border-top: 1px solid #f1f5f9;
 }
 
@@ -240,40 +231,28 @@ try {
   border-color: #2563eb;
 }
 
-/* CONTAINER TABEL - INI YANG BISA DI-SCROLL ISI DATA TABELNYA AJA */
-.table-responsive {
-  width: 100%;
-  flex: 1; /* Mengambil sisa ruang kosong yang tersedia */
-  overflow-y: auto; /* Scroll cuma jalan di sini kalau data banyak */
-  overflow-x: auto;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background: #ffffff;
-}
-
 .data-table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
   font-size: 12px;
-  table-layout: fixed; /* Kunci lebar kolom biar rapi */
+  table-layout: fixed;
 }
 
-/* HEADER NEMPEL DI ATAS WAKTU DI-SCROLL (STICKY) */
 .data-table th {
   position: sticky;
   top: 0;
   z-index: 10;
   background: #f8fafc;
   color: #334155;
-  padding: 8px 10px; /* Padding dipersingkat biar ringkas */
+  padding: 8px 10px;
   border-bottom: 1px solid #cbd5e1;
   font-weight: 600;
   white-space: nowrap;
 }
 
 .data-table td {
-  padding: 6px 10px; /* Tingginya dipres biar 10 data muat pas */
+  padding: 6px 10px;
   border-bottom: 1px solid #f1f5f9;
   color: #475569;
   vertical-align: middle;
@@ -284,7 +263,6 @@ try {
   background-color: #f8fafc;
 }
 
-/* POTONG TEKS PANJANG BIAR BENTUK TABEL STABIL */
 .truncate-text {
   white-space: nowrap;
   overflow: hidden;
@@ -352,7 +330,6 @@ try {
   word-break: break-all;
 }
 
-/* TOMBOL AKSI COMPACT */
 .action-buttons {
   display: flex;
   gap: 4px;
@@ -377,17 +354,6 @@ try {
 
 .btn-action.delete { color: #dc2626; background: #fef2f2; }
 .btn-action.delete:hover { background: #fee2e2; }
-
-/* FOOTER & PAGINATION - TETAP DI BAWAH & GA BISA KEPOTONG */
-.table-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 12px;
-  font-size: 12px;
-  color: #64748b;
-  flex-shrink: 0; /* Mengunci footer biar gak terdorong keluar layar */
-}
 
 .pagination {
   display: flex;
@@ -569,13 +535,11 @@ try {
     if (!id) return;
 
     try {
-      // Kirim request ke backend untuk menghapus data berdasarkan ID
       const response = await fetch(`/admin/inovasi?id=${id}`, {
         method: 'DELETE',
       });
 
       if (response.ok) {
-        // Refresh halaman jika berhasil dihapus
         window.location.reload();
       } else {
         alert('Gagal menghapus data dari database.');
