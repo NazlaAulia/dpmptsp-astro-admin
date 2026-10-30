@@ -20,7 +20,6 @@ const [rows] = await db.query(`
     LIMIT ? OFFSET ?
 `, [limit, offset]);
 
-
 const dataKinerja = rows as Array<{
     id:number;
     tw_option:string;
@@ -36,448 +35,535 @@ const dataKinerja = rows as Array<{
     showHeader={false}
 >
 
-<div class="table-box">
+<!-- Container Utama -->
+<div class="dashboard-container">
 
-<div class="table-header">
-<h2>Daftar Kinerja Investasi</h2>
-<a href="/admin/tambah-kinerja" class="btn-tambah-gradasi">
-+ Tambah Kinerja
-</a>
+    <!-- Header Card -->
+    <div class="header-card">
+        <div class="header-text">
+            <h2>Daftar Kinerja Investasi</h2>
+            <p>Kelola dokumen dan laporan kinerja investasi</p>
+        </div>
+        <a href="/admin/tambah-kinerja" class="btn-tambah-biru">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Tambah Artikel/Berita
+        </a>
+    </div>
+
+    <!-- Table Card -->
+    <div class="table-card">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Judul</th>
+                        <th>Dokumen</th>
+                        <th class="text-center">Aksi</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {dataKinerja.map((item) => (
+                    <tr>
+                        <td><span class="id-badge">{item.id}</span></td>
+                        <td><span class="title-text">{item.tw_option}</span></td>
+                        <td>
+                            <div class="pdf-preview">
+                                <!-- 
+                                  Tambahan parameter #toolbar=0&navpanes=0&scrollbar=0 
+                                  untuk menghilangkan UI dan scrollbar bawaan PDF 
+                                -->
+                                <iframe src={`/pdf/${item.file_path}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`} title={`PDF Preview ${item.id}`}></iframe>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="action-btn text-center">
+                                <button 
+                                    class="btn-icon edit"
+                                    onclick={`openEditModal(${item.id})`}
+                                    title="Edit"
+                                >
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M12 20h9"/>
+                                        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+                                    </svg>
+                                </button>
+
+                                <button 
+                                    class="btn-icon delete"
+                                    onclick={`openDeleteModal(${item.id})`}
+                                    title="Hapus"
+                                >
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M3 6h18"/>
+                                        <path d="M8 6V4h8v2"/>
+                                        <path d="M19 6l-1 14H6L5 6"/>
+                                        <path d="M10 11v6"/>
+                                        <path d="M14 11v6"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container">
+            <div class="pagination-info">
+                Showing {totalData === 0 ? 0 : offset + 1} to {Math.min(offset + limit, totalData)} of {totalData} entries
+            </div>
+
+            <div class="pagination-buttons">
+                <a href={`?page=${currentPage - 1}`} class={`page-btn ${currentPage <= 1 ? 'disabled' : ''}`}>
+                    &lt;
+                </a>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <a href={`?page=${p}`} class={`page-btn ${p === currentPage ? 'active' : ''}`}>
+                    {p}
+                </a>
+                ))}
+
+                <a href={`?page=${currentPage + 1}`} class={`page-btn ${currentPage >= totalPages ? 'disabled' : ''}`}>
+                    &gt;
+                </a>
+            </div>
+        </div>
+    </div>
+
 </div>
 
-<div class="table-scroll">
-<table>
-<thead>
-<tr>
-<th>ID</th>
-<th>Judul</th>
-<th>Dokumen</th>
-<th>Aksi</th>
-</tr>
-</thead>
-
-<tbody>
-{dataKinerja.map((item) => (
-<tr>
-<td>{item.id}</td>
-<td>{item.tw_option}</td>
-<td>
-<div class="pdf-preview">
-<iframe src={`/pdf/${item.file_path}`} title={`PDF Preview ${item.id}`}></iframe>
-</div>
-</td>
-<td>
-<div class="action-btn">
-<button 
-class="edit"
-onclick={`openEditModal(${item.id})`}
-title="Edit"
->
-<svg viewBox="0 0 24 24">
-<path d="M12 20h9"/>
-<path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>
-</svg>
-</button>
-
-<button 
-class="delete"
-onclick={`openDeleteModal(${item.id})`}
-title="Hapus"
->
-<svg viewBox="0 0 24 24">
-<path d="M3 6h18"/>
-<path d="M8 6V4h8v2"/>
-<path d="M19 6l-1 14H6L5 6"/>
-<path d="M10 11v6"/>
-<path d="M14 11v6"/>
-</svg>
-</button>
-</div>
-</td>
-</tr>
-))}
-</tbody>
-</table>
-</div>
-
-<!-- BAGIAN PAGINATION TAMBAHAN -->
-<div class="pagination-container">
-<div class="pagination-info">
-Showing {totalData === 0 ? 0 : offset + 1} to {Math.min(offset + limit, totalData)} of {totalData} entries
-</div>
-
-<div class="pagination-buttons">
-<a href={`?page=${currentPage - 1}`} class={`page-btn ${currentPage <= 1 ? 'disabled' : ''}`}>
-&lt;
-</a>
-
-{Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-<a href={`?page=${p}`} class={`page-btn ${p === currentPage ? 'active' : ''}`}>
-{p}
-</a>
-))}
-
-<a href={`?page=${currentPage + 1}`} class={`page-btn ${currentPage >= totalPages ? 'disabled' : ''}`}>
-&gt;
-</a>
-</div>
-</div>
-<!-- AKHIR PAGINATION -->
-
-</div>
-
+<!-- MODAL HAPUS -->
 <div class="modal" id="deleteModal">
-<div class="modal-content">
-<div class="icon">
-<i>!</i>
-</div>
-<h3>Hapus Data?</h3>
-<p>
-Apakah Anda yakin ingin menghapus data kinerja ini?
-</p>
-<div class="modal-action">
-<button 
-class="cancel"
-onclick="closeDeleteModal()">
-Batal
-</button>
-<button 
-class="confirm-delete"
-onclick="hapusKinerja()">
-Hapus
-</button>
-</div>
-</div>
+    <div class="modal-content">
+        <div class="icon">
+            <i>!</i>
+        </div>
+        <h3>Hapus Data?</h3>
+        <p>Apakah Anda yakin ingin menghapus data kinerja ini?</p>
+        <div class="modal-action">
+            <button class="cancel" onclick="closeDeleteModal()">Batal</button>
+            <button class="confirm-delete" onclick="hapusKinerja()">Hapus</button>
+        </div>
+    </div>
 </div>
 
+<!-- MODAL EDIT -->
 <div class="modal" id="editModal">
-<div class="modal-content">
-<div class="icon">
-<i>!</i>
-</div>
-<h3>Edit Data?</h3>
-<p>
-Apakah Anda yakin ingin mengedit data kinerja ini?
-</p>
-<div class="modal-action">
-<button 
-class="cancel"
-onclick="closeEditModal()">
-Batal
-</button>
-<button 
-class="confirm-edit"
-onclick="goEdit()">
-Ya, Edit
-</button>
-</div>
-</div>
+    <div class="modal-content">
+        <div class="icon">
+            <i>!</i>
+        </div>
+        <h3>Edit Data?</h3>
+        <p>Apakah Anda yakin ingin mengedit data kinerja ini?</p>
+        <div class="modal-action">
+            <button class="cancel" onclick="closeEditModal()">Batal</button>
+            <button class="confirm-edit" onclick="goEdit()">Ya, Edit</button>
+        </div>
+    </div>
 </div>
 
 </AdminShell>
 
 <style>
-.table-box {
-background:white;
-border-radius:20px;
-padding:25px;
-box-shadow:0 12px 30px rgba(15,23,42,.06);
-display:flex;
-flex-direction:column;
-min-height:0;
+/* --- TEMA DASHBOARD BIRU --- */
+:root {
+    --bg-light: #f8fafc;
+    --card-bg: #ffffff;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
 }
 
-.table-scroll {
-max-height:calc(100vh - 330px);
-min-height:220px;
-overflow:auto;
-border:1px solid #e5eaf2;
-border-radius:12px;
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--text-main);
 }
 
-.table-header {
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:20px;
+/* Header Card */
+.header-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 24px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--border-color);
 }
 
-.table-header h2 {
-margin:0;
-font-size:22px;
-color: #0f172a;
-font-weight: 800;
+.header-text h2 {
+    margin: 0 0 6px 0;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--text-main);
 }
 
-/* Tombol dengan warna gradasi persis seperti halaman artikel */
-.table-header a.btn-tambah-gradasi {
-background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
-color: white;
-padding: 11px 20px;
-border-radius: 30px;
-text-decoration: none;
-font-weight: 700;
-font-size: 14px;
-box-shadow: 0 8px 20px rgba(6, 182, 212, 0.25);
-transition: all 0.25s ease;
-display: inline-flex;
-align-items: center;
-gap: 6px;
+.header-text p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-muted);
 }
 
-.table-header a.btn-tambah-gradasi:hover {
-transform: translateY(-2px);
-box-shadow: 0 12px 24px rgba(6, 182, 212, 0.35);
-filter: brightness(1.05);
+/* TOMBOL TAMBAH BIRU SOLID */
+.btn-tambah-biru {
+    background-color: #2563eb !important; 
+    background-image: none !important; 
+    color: #ffffff !important;
+    padding: 12px 24px !important;
+    border-radius: 12px !important; 
+    text-decoration: none !important;
+    font-weight: 700 !important;
+    font-size: 15px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2) !important;
+    border: none !important;
+}
+
+.btn-tambah-biru:hover {
+    background-color: #1d4ed8 !important; 
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3) !important;
+}
+
+/* Table Card */
+.table-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--border-color);
+}
+
+/* 
+  PERBAIKAN 1: 
+  Menghapus max-height di sini agar tabel tidak punya scrollbar sendiri. 
+  Scrollbar hanya akan mengikuti halaman utama (body).
+*/
+.table-responsive {
+    width: 100%;
+    overflow-x: auto; /* Hanya scroll ke samping kalau layar kekecilan */
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
 }
 
 table {
-width:100%;
-border-collapse:collapse;
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
 }
 
+/* Lebar kolom via CSS */
+th:nth-child(1) { width: 5%; }
+th:nth-child(2) { width: 30%; }
+th:nth-child(3) { width: 45%; }
+th:nth-child(4) { width: 20%; }
+
 th {
-text-align:left;
-padding:15px;
-border-bottom:1px solid #ddd;
-position:sticky;
-top:0;
-z-index:1;
-background:#f8fafc;
+    background-color: var(--bg-light);
+    padding: 16px 20px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-color);
 }
 
 td {
-padding:15px;
-border-bottom:1px solid #eee;
-vertical-align:top;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle; /* Konten sejajar tengah secara vertikal */
 }
 
+tr:last-child td {
+    border-bottom: none;
+}
+
+tr:hover td {
+    background-color: #f8fafc;
+}
+
+/* Elemen Tabel */
+.id-badge {
+    background: #e0f2fe;
+    color: #0369a1;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.title-text {
+    font-weight: 600;
+    color: var(--text-main);
+    font-size: 15px;
+}
+
+/* 
+  PERBAIKAN 2: 
+  Preview PDF dibuat ringkas (tinggi 140px), dengan border rapi.
+  Karena iframe pakai parameter #scrollbar=0, scrollbar PDF tidak akan muncul.
+*/
 .pdf-preview {
-width:300px;
-height:180px;
-overflow:hidden;
-border:1px solid #ddd;
-border-radius:8px;
+    width: 100%;
+    max-width: 350px;
+    height: 140px; /* Tinggi pas, tidak makan tempat */
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f1f5f9;
+    position: relative;
 }
 
 .pdf-preview iframe {
-width:100%;
-height:100%;
-border:none;
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
 }
 
-.modal {
-display:none;
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(15,23,42,.45);
-align-items:center;
-justify-content:center;
-z-index:999;
-}
-
-.modal-content {
-background:white;
-width:380px;
-padding:30px;
-border-radius:20px;
-text-align:center;
-box-shadow:0 20px 50px rgba(0,0,0,.15);
-}
-
-.icon {
-width:60px;
-height:60px;
-margin:0 auto 15px;
-border-radius:50%;
-background:#fee2e2;
-color:#ef4444;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:32px;
-font-weight:bold;
-font-style: normal;
-}
-
-.modal-content h3 {
-font-size:24px;
-margin:10px 0;
-}
-
-.modal-content p {
-color:#64748b;
-}
-
-.modal-action {
-display:flex;
-justify-content:center;
-gap:15px;
-margin-top:25px;
-}
-
-.cancel {
-background:#e5e7eb;
-border:none;
-padding:10px 25px;
-border-radius:10px;
-cursor:pointer;
-font-weight: 600;
-}
-
-.confirm-delete {
-background:#ef4444;
-color:white;
-border:none;
-padding:10px 25px;
-border-radius:10px;
-cursor:pointer;
-font-weight: 600;
+/* Tombol Aksi */
+.text-center {
+    text-align: center;
 }
 
 .action-btn {
-display:flex;
-gap:12px;
-align-items:center;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
 }
 
-.edit,
-.delete {
-width:38px;
-height:38px;
-display:flex;
-align-items:center;
-justify-content:center;
-border-radius:10px;
-cursor:pointer;
-border:none;
+.btn-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.edit {
-background:#dbeafe;
+.btn-icon svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
-.delete {
-background:#fee2e2;
+.btn-icon.edit {
+    background: #dbeafe; 
 }
 
-.edit svg,
-.delete svg {
-width:20px;
-height:20px;
-fill:none;
-stroke-width:2;
-stroke-linecap:round;
-stroke-linejoin:round;
+.btn-icon.edit svg {
+    stroke: #2563eb; 
 }
 
-.edit svg {
-stroke:#2563eb;
+.btn-icon.edit:hover {
+    background: #bfdbfe;
 }
 
-.delete svg {
-stroke:#ef4444;
+.btn-icon.delete {
+    background: #fee2e2; 
 }
 
-.confirm-edit {
-background:#2563eb;
-color:white;
-border:none;
-padding:10px 25px;
-border-radius:10px;
-cursor:pointer;
-font-weight: 600;
+.btn-icon.delete svg {
+    stroke: #ef4444; 
 }
 
-/* Styling untuk Pagination */
+.btn-icon.delete:hover {
+    background: #fecaca;
+}
+
+/* Pagination */
 .pagination-container {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-top: 25px;
-padding-top: 15px;
-border-top: 1px solid #eee;
-font-size: 14px;
-color: #64748b;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+    font-size: 14px;
+    color: var(--text-muted);
 }
 
 .pagination-buttons {
-display: flex;
-gap: 6px;
+    display: flex;
+    gap: 8px;
 }
 
 .page-btn {
-min-width: 38px;
-height: 38px;
-display: flex;
-align-items: center;
-justify-content: center;
-border: 1px solid #e2e8f0;
-border-radius: 8px;
-background: white;
-color: #334155;
-text-decoration: none;
-font-weight: 500;
-transition: all 0.2s;
+    min-width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: white;
+    color: var(--text-main);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s;
 }
 
-.page-btn:hover {
-background: #f1f5f9;
+.page-btn:hover:not(.disabled) {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
 }
 
 .page-btn.active {
-background: #2563eb;
-color: white;
-border-color: #2563eb;
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
 }
 
 .page-btn.disabled {
-opacity: 0.4;
-pointer-events: none;
+    opacity: 0.5;
+    pointer-events: none;
+    background: #f8fafc;
+}
+
+/* --- STYLE MODAL ASLI --- */
+.modal {
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(15,23,42,.45);
+    align-items:center;
+    justify-content:center;
+    z-index:999;
+    backdrop-filter: blur(2px);
+}
+
+.modal-content {
+    background:white;
+    width:380px;
+    padding:30px;
+    border-radius:20px;
+    text-align:center;
+    box-shadow:0 20px 50px rgba(0,0,0,.15);
+}
+
+.icon {
+    width:60px;
+    height:60px;
+    margin:0 auto 15px;
+    border-radius:50%;
+    background:#fee2e2;
+    color:#ef4444;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:32px;
+    font-weight:bold;
+    font-style: normal;
+}
+
+.modal-content h3 {
+    font-size:24px;
+    margin:10px 0;
+    color: #0f172a;
+}
+
+.modal-content p {
+    color:#64748b;
+}
+
+.modal-action {
+    display:flex;
+    justify-content:center;
+    gap:15px;
+    margin-top:25px;
+}
+
+.cancel {
+    background:#e5e7eb;
+    border:none;
+    padding:10px 25px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight: 600;
+    color: #475569;
+}
+
+.confirm-delete {
+    background:#ef4444;
+    color:white;
+    border:none;
+    padding:10px 25px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight: 600;
+}
+
+.confirm-edit {
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:10px 25px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight: 600;
 }
 </style>
 
 <script is:inline>
+// --- SEMUA FUNGSI JAVASCRIPT ASLI TIDAK DIUBAH ---
 let editId = null;
 let deleteId = null;
 
 function openDeleteModal(id){
-deleteId = id;
-const modal = document.getElementById("deleteModal");
-if(modal){
-modal.style.display = "flex";
-}
+    deleteId = id;
+    const modal = document.getElementById("deleteModal");
+    if(modal){
+        modal.style.display = "flex";
+    }
 }
 
 function closeDeleteModal(){
-const modal = document.getElementById("deleteModal");
-if(modal){
-modal.style.display = "none";
-}
+    const modal = document.getElementById("deleteModal");
+    if(modal){
+        modal.style.display = "none";
+    }
 }
 
 function openEditModal(id){
-editId = id;
-const modal = document.getElementById("editModal");
-if(modal){
-modal.style.display = "flex";
-}
+    editId = id;
+    const modal = document.getElementById("editModal");
+    if(modal){
+        modal.style.display = "flex";
+    }
 }
 
 function closeEditModal(){
-const modal = document.getElementById("editModal");
-if(modal){
-modal.style.display = "none";
-}
+    const modal = document.getElementById("editModal");
+    if(modal){
+        modal.style.display = "none";
+    }
 }
 
 function goEdit(){
-if(editId){
-window.location.href = `/admin/edit-kinerja?id=${editId}`;
-}
+    if(editId){
+        window.location.href = `/admin/edit-kinerja?id=${editId}`;
+    }
 }
 
 async function hapusKinerja(){
