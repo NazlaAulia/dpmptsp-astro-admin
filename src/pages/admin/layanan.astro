@@ -9,22 +9,23 @@ const [semuaLayanan] = await db.query(
 
 <AdminShell title="Tempat Layanan" subtitle="Pantau layanan yang tersedia dan status operasional harian." actionLabel="Tambah Tempat Pelayanan" actionHref="/admin/tambah-layanan">
   <div class="table-container">
-    <div class="table-scroll">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Judul</th>
-          <th>Lokasi</th>
-          <th>Alamat</th>
-          <th>Gambar</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody id="table-body">
-        <!-- Render dinamis via script -->
-      </tbody>
-    </table>
+    <!-- Class diubah agar scroll hanya ke samping jika layar kecil -->
+    <div class="table-scroll-custom">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Judul</th>
+            <th>Lokasi</th>
+            <th>Alamat</th>
+            <th>Gambar</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="table-body">
+          <!-- Render dinamis via script -->
+        </tbody>
+      </table>
     </div>
 
     <div class="pagination-footer">
@@ -120,28 +121,44 @@ const [semuaLayanan] = await db.query(
     const controls = document.getElementById("pagination-controls");
     controls.innerHTML = "";
 
+    // Style dasar Inline CSS (Paling kuat, anti ditimpa framework)
+    const baseStyle = "display: inline-flex; align-items: center; justify-content: center; min-width: 44px; height: 44px; padding: 0 12px; border-radius: 12px; font-size: 1rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; outline: none; margin: 0; box-sizing: border-box;";
+
+    // Tombol Prev (<)
     const prevBtn = document.createElement("button");
-    prevBtn.className = `page-btn ${currentPage === 1 ? 'disabled' : ''}`;
     prevBtn.innerHTML = "&lt;";
-    prevBtn.onclick = () => {
-      if (currentPage > 1) renderTable(currentPage - 1);
-    };
+    if (currentPage === 1) {
+      prevBtn.style.cssText = baseStyle + "background-color: #ffffff; color: #cbd5e1; border: 1px solid #e2e8f0; cursor: not-allowed;";
+    } else {
+      prevBtn.style.cssText = baseStyle + "background-color: #ffffff; color: #64748b; border: 1px solid #e2e8f0;";
+      prevBtn.onclick = () => renderTable(currentPage - 1);
+    }
     controls.appendChild(prevBtn);
 
+    // Tombol Angka (1, 2, 3...)
     for (let i = 1; i <= totalPages; i++) {
       const pageBtn = document.createElement("button");
-      pageBtn.className = `page-btn ${currentPage === i ? 'active' : ''}`;
       pageBtn.innerText = i;
+      if (currentPage === i) {
+        // Jika AKTIF (Warna BIRU)
+        pageBtn.style.cssText = baseStyle + "background-color: #2563eb; color: #ffffff; border: 1px solid #2563eb; font-weight: 700; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);";
+      } else {
+        // Jika TIDAK AKTIF
+        pageBtn.style.cssText = baseStyle + "background-color: #ffffff; color: #64748b; border: 1px solid #e2e8f0;";
+      }
       pageBtn.onclick = () => renderTable(i);
       controls.appendChild(pageBtn);
     }
 
+    // Tombol Next (>)
     const nextBtn = document.createElement("button");
-    nextBtn.className = `page-btn ${currentPage === totalPages ? 'disabled' : ''}`;
     nextBtn.innerHTML = "&gt;";
-    nextBtn.onclick = () => {
-      if (currentPage < totalPages) renderTable(currentPage + 1);
-    };
+    if (currentPage === totalPages) {
+      nextBtn.style.cssText = baseStyle + "background-color: #ffffff; color: #cbd5e1; border: 1px solid #e2e8f0; cursor: not-allowed;";
+    } else {
+      nextBtn.style.cssText = baseStyle + "background-color: #ffffff; color: #64748b; border: 1px solid #e2e8f0;";
+      nextBtn.onclick = () => renderTable(currentPage + 1);
+    }
     controls.appendChild(nextBtn);
   }
 
@@ -210,17 +227,22 @@ const [semuaLayanan] = await db.query(
 </script>
 
 <style>
+/* =========================================
+   1. STYLING TABEL (TETAP SEPERTI SEBELUMNYA)
+   ========================================= */
 .table-container {
   background: white;
   border-radius: 16px;
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
-  padding: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
 }
 
-.table-scroll {
-  max-height: calc(100vh - 330px);
-  min-height: 220px;
-  overflow: auto;
+.table-scroll-custom {
+  width: 100%;
+  overflow-x: auto; 
+  margin-bottom: 20px;
   border: 1px solid #e5eaf2;
   border-radius: 12px;
 }
@@ -228,122 +250,92 @@ const [semuaLayanan] = await db.query(
 :global(.data-table) {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed !important;
   font-size: 0.9rem;
+  min-width: 900px;
 }
 
-/* ATUR LEBAR KOLOM SECARA TEGAS */
-:global(.data-table th:nth-child(1)), :global(.data-table td:nth-child(1)) { width: 50px; }
-:global(.data-table th:nth-child(2)), :global(.data-table td:nth-child(2)) { width: 130px; }
-:global(.data-table th:nth-child(3)), :global(.data-table td:nth-child(3)) { width: 220px !important; max-width: 220px !important; }
-:global(.data-table th:nth-child(4)), :global(.data-table td:nth-child(4)) { width: 220px !important; max-width: 220px !important; }
-:global(.data-table th:nth-child(5)), :global(.data-table td:nth-child(5)) { width: 130px; }
-:global(.data-table th:nth-child(6)), :global(.data-table td:nth-child(6)) { width: 90px; }
+:global(.data-table th:nth-child(1)), :global(.data-table td:nth-child(1)) { width: 60px; text-align: center; }
+:global(.data-table th:nth-child(2)), :global(.data-table td:nth-child(2)) { width: 15%; }
+:global(.data-table th:nth-child(3)), :global(.data-table td:nth-child(3)) { width: 25%; }
+:global(.data-table th:nth-child(4)), :global(.data-table td:nth-child(4)) { width: 20%; }
+:global(.data-table th:nth-child(5)), :global(.data-table td:nth-child(5)) { width: 130px; text-align: center; }
+:global(.data-table th:nth-child(6)), :global(.data-table td:nth-child(6)) { width: 120px; text-align: center; }
 
 :global(.data-table th),
 :global(.data-table td) {
-  padding: 14px 8px;
+  padding: 16px 12px;
   border-bottom: 1px solid #f1f5f9;
-  vertical-align: top;
-  overflow: hidden;
+  vertical-align: middle;
 }
 
 :global(.data-table th) {
-  position: sticky;
-  top: 0;
-  z-index: 1;
   background: #f8fafc;
+  font-weight: 600;
+  color: #475569;
+  text-align: left;
 }
 
-/* PAKSA LINK MAPS AGAR TURUN KE BAWAH DAN TIDAK MELUBER */
+:global(.data-table td) {
+  text-align: left;
+}
+
+:global(.fw-bold) { font-weight: 600; color: #0f172a; }
+
 :global(.map-link) {
-  display: block !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  white-space: normal !important;
-  word-break: break-all !important;
-  overflow-wrap: anywhere !important;
+  display: block;
+  width: 100%;
+  white-space: normal;
+  word-break: break-word;
   color: #2563eb;
-  text-decoration: underline;
+  text-decoration: none;
+  line-height: 1.4;
 }
 
-:global(.map-link:hover) {
-  text-decoration: underline;
-}
-
-:global(.data-table td:nth-child(4)) {
-  white-space: normal !important;
-  word-break: break-word !important;
-}
+:global(.map-link:hover) { text-decoration: underline; }
 
 :global(.thumb-img) {
-  width: 120px !important;
-  height: 72px !important;
-  min-width: 120px !important;
-  max-width: 120px !important;
-  min-height: 72px !important;
-  max-height: 72px !important;
-  object-fit: cover !important;
-  object-position: center !important;
-  border-radius: 10px !important;
-  display: block !important;
-  margin: 0 auto !important;
-  border: 1px solid #e2e8f0 !important;
-  background: #f8fafc !important;
+  width: 110px;
+  height: 65px;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+  margin: 0 auto;
+  border: 1px solid #e2e8f0;
 }
 
-/* TOMBOL AKSI */
 :global(.action-buttons) {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   align-items: center;
+  justify-content: center;
 }
 
 :global(.btn-icon) {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 42px !important;
-  height: 42px !important;
-  padding: 0 !important;
-  border: none !important;
-  border-radius: 12px !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  box-sizing: border-box !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-:global(.btn-icon svg) {
-  width: 22px !important;
-  height: 22px !important;
-  display: block !important;
-}
+:global(.btn-icon svg) { width: 18px; height: 18px; }
+:global(.btn-edit) { color: #2563eb; background: #e0e7ff; }
+:global(.btn-edit:hover) { background: #c7d2fe; }
+:global(.btn-delete) { color: #ef4444; background: #fee2e2; }
+:global(.btn-delete:hover) { background: #fecaca; }
 
-:global(.btn-edit) {
-  color: #2563eb !important;
-  background: #dbeafe !important;
-}
-
-:global(.btn-edit:hover) {
-  background: #bfdbfe !important;
-}
-
-:global(.btn-delete) {
-  color: #ef4444 !important;
-  background: #fee2e2 !important;
-}
-
-:global(.btn-delete:hover) {
-  background: #fecaca !important;
-}
-
+/* =========================================
+   STYLING PAGINATION (FIX TOTAL - GAMBAR 2)
+   ========================================= */
 .pagination-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding-top: 16px;
-  margin-top: 8px;
-  border-top: 1px solid #f1f5f9;
   font-size: 0.85rem;
   color: #64748b;
 }
@@ -354,160 +346,94 @@ const [semuaLayanan] = await db.query(
   align-items: center;
 }
 
-.page-btn {
-  min-width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #e2e8f0;
-  background: white;
-  color: #334155;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  padding: 0 12px;
+/* Trik: Panggil parent-nya dulu (.pagination-controls) baru button-nya. 
+   Ini bikin tingkat prioritasnya sangat tinggi, mengalahkan Tailwind. */
+.pagination-controls button.page-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 42px !important;
+  height: 42px !important;
+  padding: 0 14px !important;
+  background-color: #ffffff !important; /* Latar putih */
+  color: #64748b !important; /* Teks abu-abu */
+  border: 1px solid #e2e8f0 !important; /* Border tipis */
+  border-radius: 12px !important; /* Sudut membulat */
+  font-size: 0.95rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transition: all 0.2s ease !important;
 }
 
-.page-btn:hover:not(.disabled):not(.active) {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
+/* Efek Hover (saat mouse diarahkan) */
+.pagination-controls button.page-btn:hover:not(.disabled):not(.active) {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
 }
 
-.page-btn.active {
-  background: #2563eb !important; 
+/* TOMBOL AKTIF (ANGKA 1 WARNA BIRU) */
+.pagination-controls button.page-btn.active {
+  background-color: #2563eb !important; 
   color: #ffffff !important;
   border-color: #2563eb !important;
-  font-weight: 700;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25) !important;
 }
 
-.page-btn.disabled {
-  color: #94a3b8;
-  background: #f8fafc;
-  border-color: #e2e8f0;
-  cursor: not-allowed;
+/* TOMBOL PANAH DISABLED (< dan >) */
+.pagination-controls button.page-btn.disabled {
+  color: #cbd5e1 !important;
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  cursor: not-allowed !important;
+  opacity: 0.7 !important;
 }
 
-/* Modal Styling */
+/* =========================================
+   3. STYLING MODAL (TETAP)
+   ========================================= */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0; width: 100%; height: 100%;
   background: rgba(15, 23, 42, 0.5);
   backdrop-filter: blur(4px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: flex; justify-content: center; align-items: center;
   z-index: 9999;
 }
 
 .modal-card {
-  background: white;
-  width: 100%;
-  max-width: 480px;
-  border-radius: 24px;
-  padding: 36px 32px;
-  text-align: center;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  background: white; width: 100%; max-width: 480px;
+  border-radius: 24px; padding: 36px 32px; text-align: center;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
   animation: modalScaleIn 0.25s ease-out;
 }
 
 @keyframes modalScaleIn {
-  from {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 .modal-icon-wrapper {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  margin: 0 auto 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 80px; height: 80px; border-radius: 50%;
+  margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;
 }
 
-.edit-icon-bg {
-  background: #fee2e2;
-}
-
-.delete-icon-bg {
-  background: #fee2e2;
-}
-
-.modal-exclamation {
-  font-size: 40px;
-  font-weight: 800;
-  color: #ef4444;
-  line-height: 1;
-}
-
-.modal-card h2 {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #0f172a;
-  margin: 0 0 12px;
-}
-
-.modal-card p {
-  font-size: 0.95rem;
-  color: #64748b;
-  margin: 0 0 28px;
-  line-height: 1.5;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-}
-
+.edit-icon-bg, .delete-icon-bg { background: #fee2e2; }
+.modal-exclamation { font-size: 40px; font-weight: 800; color: #ef4444; line-height: 1; }
+.modal-card h2 { font-size: 1.5rem; font-weight: 800; color: #0f172a; margin: 0 0 12px; }
+.modal-card p { font-size: 0.95rem; color: #64748b; margin: 0 0 28px; line-height: 1.5; }
+.modal-actions { display: flex; gap: 12px; justify-content: center; }
 .modal-btn {
-  padding: 12px 28px;
-  border-radius: 12px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: none;
+  padding: 12px 28px; border-radius: 12px; font-size: 0.95rem;
+  font-weight: 600; cursor: pointer; transition: all 0.2s; border: none;
 }
-
-.btn-batal {
-  background: #e2e8f0;
-  color: #1e293b;
-}
-
-.btn-batal:hover {
-  background: #cbd5e1;
-}
-
-.btn-ya-edit {
-  background: #2563eb;
-  color: white;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
-}
-
-.btn-ya-edit:hover {
-  background: #1d4ed8;
-}
-
-.btn-hapus {
-  background: #ef4444;
-  color: white;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
-}
-
-.btn-hapus:hover {
-  background: #dc2626;
-}
+.btn-batal { background: #e2e8f0; color: #1e293b; }
+.btn-batal:hover { background: #cbd5e1; }
+.btn-ya-edit { background: #2563eb; color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); }
+.btn-ya-edit:hover { background: #1d4ed8; }
+.btn-hapus { background: #ef4444; color: white; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25); }
+.btn-hapus:hover { background: #dc2626; }
 </style>
