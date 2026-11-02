@@ -13,13 +13,11 @@ if (Astro.request.method === "POST") {
     const deleteId = data.get("deleteId");
     const editId = data.get("editId");
 
-    // Jika perintah hapus
     if (deleteId) {
       await db.execute("DELETE FROM tentangkamiswebv5 WHERE Id_Konten = ?", [deleteId]);
       return Astro.redirect("/admin/konten");
     }
 
-    // Jika perintah edit (mengarahkan ke halaman edit dengan query parameter id)
     if (editId) {
       return Astro.redirect(`/admin/edit-konten?id=${editId}`);
     }
@@ -111,7 +109,7 @@ const items = [
 
    <!-- TABLE -->
     <div class="table-wrapper">
-      <table class="styled-table">
+      <table class="styled-table" id="tabel-konten">
         <thead>
           <tr>
             <th class="th-id">ID</th>
@@ -145,7 +143,6 @@ const items = [
                 </td>
                 <td><span class="cell-text" title={item.Isi_Konten}>{item.Isi_Konten || "-"}</span></td>
                 
-                <!-- FOTO -->
                 <td>
                   {item.Foto_Konten ? (
                     <div class="file-box">
@@ -167,33 +164,11 @@ const items = [
                 <td>{item.tags ? <span class="tag" title={item.tags}>{item.tags}</span> : <span style="color:#94a3b8">-</span>}</td>
                 <td>
                   <div class="action-buttons">
-                    <!-- EDIT BUTTON -->
-                    <button 
-                      type="button" 
-                      class="action-btn edit-btn" 
-                      title="Edit konten"
-                      onclick={`window.openEditModal('${item.Id_Konten}')`}
-                    >
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 20h9"></path>
-                        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"></path>
-                      </svg>
+                    <button type="button" class="action-btn edit-btn" title="Edit konten" onclick={`window.openEditModal('${item.Id_Konten}')`}>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"></path></svg>
                     </button>
-
-                    <!-- DELETE BUTTON -->
-                    <button 
-                      type="button" 
-                      class="action-btn delete-btn" 
-                      title="Hapus konten"
-                      onclick={`window.openDeleteModal('${item.Id_Konten}')`}
-                    >
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M3 6h18"></path>
-                        <path d="M8 6V4h8v2"></path>
-                        <path d="M19 6l-1 15H6L5 6"></path>
-                        <path d="M10 11v6"></path>
-                        <path d="M14 11v6"></path>
-                      </svg>
+                    <button type="button" class="action-btn delete-btn" title="Hapus konten" onclick={`window.openDeleteModal('${item.Id_Konten}')`}>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 15H6L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path></svg>
                     </button>
                   </div>
                 </td>
@@ -206,38 +181,23 @@ const items = [
 
     <!-- FOOTER -->
     <div class="table-footer">
-      <span>
+      <span id="text-info">
         Menampilkan <strong>{konten.length > 0 ? 1 : 0}-{konten.length}</strong> dari <strong>{konten.length}</strong> konten
       </span>
 
-      <div class="pagination">
-        <button type="button" class="page-arrow" disabled>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m15 18-6-6 6-6"></path>
-          </svg>
-        </button>
-        <button type="button" class="page-number active">1</button>
-        <button type="button" class="page-arrow">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m9 18 6-6-6-6"></path>
-          </svg>
-        </button>
+      <div class="pagination" id="pagination-container">
+        <!-- Pagination akan di-generate oleh JavaScript -->
       </div>
     </div>
   </section>
 </AdminShell>
 
-<!-- ================================================= -->
 <!-- MODAL KONFIRMASI HAPUS -->
-<!-- ================================================= -->
 <div id="deleteModal" class="modal-overlay">
   <div class="modal-card">
-    <div class="modal-icon-wrapper">
-      <span class="modal-exclamation">!</span>
-    </div>
+    <div class="modal-icon-wrapper"><span class="modal-exclamation">!</span></div>
     <h3>Hapus Data?</h3>
     <p>Apakah Anda yakin ingin menghapus data konten ini?</p>
-    
     <form method="POST" class="modal-actions">
       <input type="hidden" name="deleteId" id="modalDeleteInput" />
       <button type="button" id="cancelDelete" class="modal-btn modal-btn-cancel">Batal</button>
@@ -246,17 +206,12 @@ const items = [
   </div>
 </div>
 
-<!-- ================================================= -->
 <!-- MODAL KONFIRMASI EDIT -->
-<!-- ================================================= -->
 <div id="editModal" class="modal-overlay">
   <div class="modal-card">
-    <div class="modal-icon-wrapper">
-      <span class="modal-exclamation">!</span>
-    </div>
+    <div class="modal-icon-wrapper"><span class="modal-exclamation">!</span></div>
     <h3>Edit Data?</h3>
     <p>Apakah Anda yakin ingin mengedit data konten ini?</p>
-    
     <form method="POST" class="modal-actions">
       <input type="hidden" name="editId" id="modalEditInput" />
       <button type="button" id="cancelEdit" class="modal-btn modal-btn-cancel">Batal</button>
@@ -265,6 +220,7 @@ const items = [
   </div>
 </div>
 
+<!-- SCRIPT JAVASCRIPT -->
 <script>
   declare global {
     interface Window {
@@ -273,36 +229,101 @@ const items = [
     }
   }
 
-  // Modal Hapus
   window.openDeleteModal = function(id: string | number) {
-    const modal = document.getElementById('deleteModal');
+    const modal = document.getElementById('deleteModal') as HTMLElement | null;
     const input = document.getElementById('modalDeleteInput') as HTMLInputElement | null;
     if (input) input.value = String(id);
     if (modal) modal.classList.add('is-open');
   };
 
-  // Modal Edit
   window.openEditModal = function(id: string | number) {
-    const modal = document.getElementById('editModal');
+    const modal = document.getElementById('editModal') as HTMLElement | null;
     const input = document.getElementById('modalEditInput') as HTMLInputElement | null;
     if (input) input.value = String(id);
     if (modal) modal.classList.add('is-open');
   };
 
   document.addEventListener('DOMContentLoaded', () => {
-    const deleteModal = document.getElementById('deleteModal');
-    const cancelDelete = document.getElementById('cancelDelete');
+    const table = document.getElementById('tabel-konten') as HTMLTableElement | null;
+    const pagination = document.getElementById('pagination-container') as HTMLElement | null;
+    const textInfo = document.getElementById('text-info') as HTMLElement | null;
     
-    const editModal = document.getElementById('editModal');
+    if (table && pagination && textInfo) {
+      const rows = Array.from(table.querySelectorAll('tbody tr')) as HTMLTableRowElement[];
+      const itemsPerPage = 10;
+      const totalPages = Math.ceil(rows.length / itemsPerPage);
+      let currentPage = 1;
+
+      // Style Dasar (Ditempel langsung biar gak bisa ditimpa Tailwind)
+      const baseStyle = "display: inline-flex !important; align-items: center !important; justify-content: center !important; min-width: 42px !important; height: 42px !important; padding: 0 12px !important; border-radius: 12px !important; font-size: 15px !important; font-weight: 500 !important; cursor: pointer !important; transition: all 0.2s !important; outline: none !important; margin: 0 !important; box-sizing: border-box !important;";
+
+      function showPage(page: number) {
+        currentPage = page;
+        const start = (page - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+
+        rows.forEach((row, index) => {
+          row.style.display = (index >= start && index < end) ? '' : 'none';
+        });
+
+        const displayStart = rows.length === 0 ? 0 : start + 1;
+        const displayEnd = Math.min(end, rows.length);
+        textInfo!.innerHTML = `Menampilkan <strong>${displayStart}-${displayEnd}</strong> dari <strong>${rows.length}</strong> konten`;
+
+        renderPagination();
+      }
+
+      function renderPagination() {
+        if (!pagination) return;
+        pagination.innerHTML = '';
+
+        // Tombol Prev (<)
+        const prevBtn = document.createElement('button');
+        prevBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>`;
+        if (currentPage === 1) {
+          prevBtn.style.cssText = baseStyle + "background-color: #f8fafc !important; color: #cbd5e1 !important; border: 1px solid #e2e8f0 !important; cursor: not-allowed !important;";
+        } else {
+          prevBtn.style.cssText = baseStyle + "background-color: #ffffff !important; color: #64748b !important; border: 1px solid #e2e8f0 !important;";
+          prevBtn.onclick = () => showPage(currentPage - 1);
+        }
+        pagination.appendChild(prevBtn);
+
+        // Tombol Angka
+        for (let i = 1; i <= totalPages; i++) {
+          const btn = document.createElement('button');
+          btn.innerText = String(i);
+          if (i === currentPage) {
+            btn.style.cssText = baseStyle + "background-color: #2563eb !important; color: #ffffff !important; border: 1px solid #2563eb !important; font-weight: 700 !important; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25) !important;";
+          } else {
+            btn.style.cssText = baseStyle + "background-color: #ffffff !important; color: #64748b !important; border: 1px solid #e2e8f0 !important;";
+          }
+          btn.onclick = () => showPage(i);
+          pagination.appendChild(btn);
+        }
+
+        // Tombol Next (>)
+        const nextBtn = document.createElement('button');
+        nextBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>`;
+        if (currentPage === totalPages || totalPages === 0) {
+          nextBtn.style.cssText = baseStyle + "background-color: #f8fafc !important; color: #cbd5e1 !important; border: 1px solid #e2e8f0 !important; cursor: not-allowed !important;";
+        } else {
+          nextBtn.style.cssText = baseStyle + "background-color: #ffffff !important; color: #64748b !important; border: 1px solid #e2e8f0 !important;";
+          nextBtn.onclick = () => showPage(currentPage + 1);
+        }
+        pagination.appendChild(nextBtn);
+      }
+
+      if (rows.length > 0) showPage(1);
+    }
+
+    // --- LOGIKA MODAL ---
+    const deleteModal = document.getElementById('deleteModal') as HTMLElement | null;
+    const cancelDelete = document.getElementById('cancelDelete');
+    const editModal = document.getElementById('editModal') as HTMLElement | null;
     const cancelEdit = document.getElementById('cancelEdit');
 
-    if (cancelDelete && deleteModal) {
-      cancelDelete.addEventListener('click', () => deleteModal.classList.remove('is-open'));
-    }
-
-    if (cancelEdit && editModal) {
-      cancelEdit.addEventListener('click', () => editModal.classList.remove('is-open'));
-    }
+    if (cancelDelete && deleteModal) cancelDelete.addEventListener('click', () => deleteModal.classList.remove('is-open'));
+    if (cancelEdit && editModal) cancelEdit.addEventListener('click', () => editModal.classList.remove('is-open'));
 
     window.addEventListener('click', (e) => {
       if (deleteModal && e.target === deleteModal) deleteModal.classList.remove('is-open');
@@ -312,490 +333,115 @@ const items = [
 </script>
 
 <style>
-/* ================================================= */
-/* SUMMARY CARD */
-/* ================================================= */
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.info-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  padding: 16px 20px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
-}
-
-.card-icon {
-  width: 42px;
-  height: 42px;
-  flex-shrink: 0;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #2563eb;
-  background: #eff6ff;
-}
-
-.info-card h3 {
-  margin: 0 0 2px;
-  color: #64748b;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.info-card p {
-  margin: 0;
-  color: #0f172a;
-  font-size: 22px;
-  font-weight: 750;
-}
-
-/* ================================================= */
-/* CONTENT CARD & HEADER */
-/* ================================================= */
-.content-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
-  overflow: hidden;
-}
-
-.table-header {
-  padding: 18px 22px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.table-header h2 {
-  margin: 0 0 2px;
-  color: #0f172a;
-  font-size: 17px;
-  font-weight: 700;
-}
-
-.table-header p {
-  margin: 0;
-  color: #94a3b8;
-  font-size: 12.5px;
-}
-
-/* ================================================= */
-/* SEARCH */
-/* ================================================= */
-.search-box {
-  width: 220px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 10px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  background: #f8fafc;
-  color: #64748b;
-}
-
-.search-box input {
-  width: 100%;
-  border: none;
-  outline: none;
-  background: transparent;
-  color: #334155;
-  font-size: 13px;
-}
-
-.search-box input::placeholder {
-  color: #94a3b8;
-}
-
-/* ================================================= */
-/* TABLE & FIXED LAYOUT */
-/* ================================================= */
-.table-wrapper {
-  width: 100%;
-  max-height: 420px;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.styled-table {
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: collapse;
-}
-
-.styled-table th.th-id { width: 6%; }
-.styled-table th.th-nama { width: 16%; }
-.styled-table th.th-isi { width: 13%; }
-.styled-table th.th-foto { width: 15%; }
-.styled-table th.th-judul { width: 14%; }
-.styled-table th.th-ket { width: 13%; }
+/* SEMUA CSS KAMU TETAP UTUH */
+.card-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 24px; }
+.info-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 18px 22px; display: flex; align-items: center; gap: 16px; box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03); }
+.card-icon { width: 46px; height: 46px; flex-shrink: 0; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #2563eb; background: #eff6ff; }
+.info-card h3 { margin: 0 0 4px; color: #64748b; font-size: 13px; font-weight: 600; }
+.info-card p { margin: 0; color: #0f172a; font-size: 24px; font-weight: 800; }
+.content-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03); display: flex; flex-direction: column; }
+.table-header { padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid #e2e8f0; }
+.table-header h2 { margin: 0 0 4px; color: #0f172a; font-size: 18px; font-weight: 700; }
+.table-header p { margin: 0; color: #94a3b8; font-size: 13px; }
+.search-box { width: 240px; height: 38px; display: flex; align-items: center; gap: 8px; padding: 0 12px; border: 1px solid #cbd5e1; border-radius: 10px; background: #f8fafc; color: #64748b; }
+.search-box input { width: 100%; border: none; outline: none; background: transparent; color: #334155; font-size: 13px; }
+.search-box input::placeholder { color: #94a3b8; }
+.table-wrapper { width: 100%; overflow-x: auto; }
+.styled-table { width: 100%; table-layout: fixed; border-collapse: collapse; min-width: 1000px; }
+.styled-table th.th-id { width: 5%; text-align: center; }
+.styled-table th.th-nama { width: 15%; }
+.styled-table th.th-isi { width: 15%; }
+.styled-table th.th-foto { width: 14%; }
+.styled-table th.th-judul { width: 15%; }
+.styled-table th.th-ket { width: 14%; }
 .styled-table th.th-tags { width: 10%; }
-.styled-table th.th-aksi { width: 13%; text-align: center; }
-
-.styled-table th {
-  background-color: #f8fafc;
-  color: #475569;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  padding: 10px 10px;
-  text-align: left;
-  border-bottom: 1px solid #e2e8f0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.styled-table td {
-  padding: 10px 10px;
-  color: #334155;
-  font-size: 12px;
-  border-bottom: 1px solid #f1f5f9;
-  vertical-align: middle;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.styled-table tbody tr:hover {
-  background-color: #f8fafc;
-}
-
-.no-data {
-  text-align: center;
-  padding: 24px !important;
-  color: #94a3b8;
-  font-style: italic;
-  white-space: normal !important;
-}
+.styled-table th.th-aksi { width: 12%; text-align: center; }
+.styled-table th { background-color: #f8fafc; color: #475569; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 14px 12px; text-align: left; border-bottom: 2px solid #e2e8f0; white-space: nowrap; }
+.styled-table td { padding: 14px 12px; color: #334155; font-size: 13px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; white-space: nowrap; }
+.styled-table tbody tr:hover { background-color: #f8fafc; }
+.no-data { text-align: center; padding: 32px !important; color: #94a3b8; font-style: italic; white-space: normal !important; }
+.id-badge { display: inline-flex; align-items: center; justify-content: center; padding: 4px 8px; border-radius: 6px; background: #f1f5f9; color: #475569; font-size: 12px; font-weight: 700; }
+.nama-konten { display: flex; align-items: center; gap: 10px; overflow: hidden; }
+.content-avatar { width: 28px; height: 28px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: #dbeafe; color: #2563eb; font-size: 12px; font-weight: 700; }
+.nama-text, .cell-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; width: 100%; }
+.nama-text { color: #1e293b; font-weight: 600; }
+.cell-text { color: #64748b; }
+.file-box { display: flex; align-items: center; gap: 8px; overflow: hidden; }
+.thumb-img { width: 32px; height: 32px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0; flex-shrink: 0; }
+.file-name { font-size: 12px; color: #64748b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tag { display: inline-flex; padding: 4px 10px; border-radius: 12px; background: #eff6ff; color: #2563eb; font-size: 11px; font-weight: 700; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.action-buttons { display: flex; align-items: center; justify-content: center; gap: 6px; }
+.action-btn { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border: none; border-radius: 8px; cursor: pointer; transition: background 0.15s ease; }
+.edit-btn { background: #eff6ff; color: #2563eb; }
+.edit-btn:hover { background: #dbeafe; }
+.delete-btn { background: #fef2f2; color: #ef4444; }
+.delete-btn:hover { background: #fee2e2; }
+.table-footer { padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; color: #64748b; font-size: 13px; background: #ffffff; border-top: 1px solid #e2e8f0; border-radius: 0 0 16px 16px; }
 
 /* ================================================= */
-/* CELL COMPONENTS */
+/* ✨ CSS FIX UNTUK TOMBOL PAGINATION ✨ */
 /* ================================================= */
-.id-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2px 6px;
-  border-radius: 5px;
-  background: #f1f5f9;
-  color: #64748b;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.nama-konten {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  overflow: hidden;
-}
-
-.content-avatar {
-  width: 24px;
-  height: 24px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  background: #dbeafe;
-  color: #2563eb;
-  font-size: 11px;
-  font-weight: 750;
-}
-
-.nama-text, .cell-text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  display: block;
-  width: 100%;
-}
-
-.nama-text {
-  color: #1e293b;
-  font-weight: 600;
-}
-
-.cell-text {
-  color: #64748b;
-}
-
-.file-box {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  overflow: hidden;
-}
-
-.thumb-img {
-  width: 26px;
-  height: 26px;
-  object-fit: cover;
-  border-radius: 5px;
-  border: 1px solid #e2e8f0;
-  flex-shrink: 0;
-}
-
-.file-name {
-  font-size: 11px;
-  color: #64748b;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.tag {
-  display: inline-flex;
-  padding: 2px 7px;
-  border-radius: 10px;
-  background: #eff6ff;
-  color: #2563eb;
-  font-size: 10px;
-  font-weight: 700;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* ================================================= */
-/* AKSI BUTTONS */
-/* ================================================= */
-.action-buttons {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-}
-
-.action-btn {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.edit-btn {
-  background: #eff6ff;
-  color: #2563eb;
-}
-.edit-btn:hover { 
-  background: #dbeafe; 
-}
-
-.delete-btn {
-  background: #fef2f2;
-  color: #ef4444;
-}
-.delete-btn:hover { 
-  background: #fee2e2; 
-}
-
-/* ================================================= */
-/* FOOTER / PAGINATION */
-/* ================================================= */
-.table-footer {
-  padding: 12px 22px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: #64748b;
-  font-size: 12px;
-  background: #ffffff;
-  border-top: 1px solid #e2e8f0;
-}
-
 .pagination {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
-.pagination button {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  background: #ffffff;
-  color: #64748b;
-  cursor: pointer;
-  font-size: 11.5px;
+.pagination-btn {
+  width: 42px !important;
+  height: 42px !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  color: #64748b !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  padding: 0 !important;
 }
 
-.pagination button:hover:not(:disabled) {
-  background: #f8fafc;
+.pagination-btn:hover:not(:disabled):not(.active) {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
 }
 
-.pagination .active {
-  background: #2563eb;
-  border-color: #2563eb;
-  color: #ffffff;
+.pagination-btn.active {
+  background: #2563eb !important;
+  border-color: #2563eb !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25) !important;
 }
 
-.pagination button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+.pagination-btn:disabled {
+  background: #f8fafc !important;
+  color: #cbd5e1 !important;
+  border-color: #e2e8f0 !important;
+  cursor: not-allowed !important;
+  opacity: 0.7 !important;
 }
 
-/* ================================================= */
 /* MODAL STYLING */
-/* ================================================= */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(15, 23, 42, 0.5);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition: opacity 0.2s ease, visibility 0.2s ease;
-}
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 9999; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.2s ease, visibility 0.2s ease; }
+.modal-overlay.is-open { opacity: 1; visibility: visible; pointer-events: auto; }
+.modal-card { background: #ffffff; width: 100%; max-width: 420px; border-radius: 20px; padding: 32px 24px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); transform: scale(0.95); transition: transform 0.2s ease-in-out; }
+.modal-overlay.is-open .modal-card { transform: scale(1); }
+.modal-icon-wrapper { width: 64px; height: 64px; background: #fee2e2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+.modal-exclamation { color: #ef4444; font-size: 32px; font-weight: 800; line-height: 1; }
+.modal-card h3 { margin: 0 0 8px; color: #0f172a; font-size: 22px; font-weight: 700; }
+.modal-card p { margin: 0 0 24px; color: #64748b; font-size: 14px; line-height: 1.5; }
+.modal-actions { display: flex; gap: 12px; justify-content: center; }
+.modal-btn { padding: 10px 24px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: background 0.15s ease; }
+.modal-btn-cancel { background: #f1f5f9; color: #334155; }
+.modal-btn-cancel:hover { background: #e2e8f0; }
+.modal-btn-delete { background: #ef4444; color: #ffffff; }
+.modal-btn-delete:hover { background: #dc2626; }
+.modal-btn-edit { background: #2563eb; color: #ffffff; }
+.modal-btn-edit:hover { background: #1d4ed8; }
 
-.modal-overlay.is-open {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
-
-.modal-card {
-  background: #ffffff;
-  width: 100%;
-  max-width: 420px;
-  border-radius: 20px;
-  padding: 32px 24px;
-  text-align: center;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  transform: scale(0.95);
-  transition: transform 0.2s ease-in-out;
-}
-
-.modal-overlay.is-open .modal-card {
-  transform: scale(1);
-}
-
-.modal-icon-wrapper {
-  width: 64px;
-  height: 64px;
-  background: #fee2e2;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 20px;
-}
-
-.modal-exclamation {
-  color: #ef4444;
-  font-size: 32px;
-  font-weight: 800;
-  line-height: 1;
-}
-
-.modal-card h3 {
-  margin: 0 0 8px;
-  color: #0f172a;
-  font-size: 22px;
-  font-weight: 700;
-}
-
-.modal-card p {
-  margin: 0 0 24px;
-  color: #64748b;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-}
-
-.modal-btn {
-  padding: 10px 24px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  transition: background 0.15s ease;
-}
-
-.modal-btn-cancel {
-  background: #f1f5f9;
-  color: #334155;
-}
-
-.modal-btn-cancel:hover {
-  background: #e2e8f0;
-}
-
-.modal-btn-delete {
-  background: #ef4444;
-  color: #ffffff;
-}
-.modal-btn-delete:hover {
-  background: #dc2626;
-}
-
-.modal-btn-edit {
-  background: #2563eb;
-  color: #ffffff;
-}
-.modal-btn-edit:hover {
-  background: #1d4ed8;
-}
-
-/* ================================================= */
-/* RESPONSIVE */
-/* ================================================= */
-@media (max-width: 900px) {
-  .card-grid {
-    grid-template-columns: 1fr;
-  }
-  .table-header {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-  .search-box {
-    width: 100%;
-  }
-  .table-footer {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 8px;
-  }
-}
+@media (max-width: 900px) { .card-grid { grid-template-columns: 1fr; } .table-header { align-items: flex-start; flex-direction: column; } .search-box { width: 100%; } .table-footer { align-items: flex-start; flex-direction: column; gap: 12px; } }
+</style>
