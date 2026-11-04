@@ -109,7 +109,71 @@ img.thumbnail { width: 100% !important; max-width: 70px !important; height: auto
 .pages { display: flex !important; gap: 6px !important; }
 .pages a { display: flex !important; align-items: center !important; justify-content: center !important; min-width: 32px !important; height: 32px !important; border: 1px solid var(--border-th) !important; background: var(--bg-card) !important; color: var(--text-muted) !important; border-radius: 6px !important; text-decoration: none !important; font-size: 13px !important; }
 .pages a.active { background: #2563eb !important; color: white !important; border-color: #2563eb !important; }
+
+/* ========================================================= */
+/* PERBAIKAN KHUSUS UNTUK LAYAR HP (MOBILE)                  */
+/* ========================================================= */
+
+@media (max-width: 768px) {
+    /* 1. Kurangi padding card di HP agar layar lebih luas */
+    .card-table {
+        padding: 16px !important;
+        border-radius: 12px !important;
+    }
+
+    /* 2. Atur panel kontrol atas (Tampilkan & Pencarian) */
+    .top-controls {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+    }
+    .entries {
+        justify-content: space-between !important;
+    }
+    .search-box {
+        width: 100% !important;
+    }
+    .search-box input {
+        width: 100% !important;
+    }
+
+    /* 3. KUNCI UTAMA: Buat tabel bisa di-scroll ke samping */
+    .table-wrapper {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important; /* Scroll mulus di HP */
+    }
+
+    /* Paksa tabel punya lebar minimum agar kolom tidak gepeng */
+    table {
+        min-width: 900px !important; 
+        table-layout: auto !important; /* Matikan fixed layout di HP */
+    }
+
+    /* Kembalikan rasio lebar kolom normal (tidak pakai %) */
+    th:nth-child(1) { width: 50px !important; }
+    th:nth-child(2) { width: 200px !important; }
+    th:nth-child(3) { width: 250px !important; }
+    th:nth-child(4) { width: 120px !important; }
+    th:nth-child(5) { width: 150px !important; }
+    th:nth-child(6) { width: 100px !important; }
+    th:nth-child(7) { width: 80px !important; }
+
+    /* 4. Rapikan pagination di HP */
+    .pagination {
+        flex-direction: column !important;
+        gap: 16px !important;
+        align-items: center !important;
+    }
+    
+    /* 5. Pastikan modal tidak terlalu lebar di HP */
+    .modal-box {
+        width: 90% !important;
+        margin: 0 16px !important;
+    }
+}
+
 </style>
+
 
 <div class="card-table">
     <div class="top-controls">
