@@ -45,7 +45,7 @@ try {
       </div>
     </div>
 
-    <!-- Wrapper Tabel (Bebas memanjang ke bawah) -->
+    <!-- Wrapper Tabel -->
     <div class="table-responsive">
       <table class="data-table" id="inovasiTable">
         <thead>
@@ -101,16 +101,10 @@ try {
                 <td>
                   <div class="action-buttons justify-center">
                     <button class="btn-action edit" title="Edit" data-id={item.id} onclick="openEditModal(this)">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                      </svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                     </button>
                     <button class="btn-action delete" title="Hapus" data-id={item.id} onclick="openDeleteModal(this)">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="3 6 5 6 21 6"></polyline>
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                      </svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                     </button>
                   </div>
                 </td>
@@ -128,10 +122,20 @@ try {
     <!-- Footer Tabel + Pagination -->
     <div class="table-footer">
       <div class="table-info" id="tableInfo">Menampilkan 0 entri</div>
-      <div class="pagination">
-        <button class="page-btn" id="prevBtn" disabled>Sebelumnya</button>
+      
+      <!-- WRAPPER PAGINATION -->
+      <div class="pagination-wrapper-final">
+        <!-- TOMBOL PREVIOUS -->
+        <button class="page-btn nav-btn" id="prevBtn" disabled style="width: 42px; height: 42px; padding: 0; border: 1px solid #e2e8f0; background: #ffffff; border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #94a3b8; transition: all 0.2s ease;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        
         <div id="pageNumbers" class="page-numbers"></div>
-        <button class="page-btn" id="nextBtn" disabled>Selanjutnya</button>
+        
+        <!-- TOMBOL NEXT -->
+        <button class="page-btn nav-btn" id="nextBtn" disabled style="width: 42px; height: 42px; padding: 0; border: 1px solid #e2e8f0; background: #ffffff; border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #94a3b8; transition: all 0.2s ease;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
       </div>
     </div>
   </div>
@@ -164,267 +168,116 @@ try {
 </AdminShell>
 
 <style>
-/* WRAPPER KONTEN UTAMA (BEBAS TINGGI) */
-.card-table-container {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 20px 24px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-  border: 1px solid #e2e8f0;
-  width: 100%;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  /* BATASAN TINGGI DIHAPUS TOTAL */
-}
-
-.table-controls {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  margin-bottom: 16px;
-  flex-shrink: 0;
-}
-
-/* WRAPPER TABEL (Hanya scroll ke samping jika layar kecil) */
-.table-responsive {
-  width: 100%;
-  overflow-x: auto; 
-  overflow-y: visible; /* Scroll vertikal diserahkan ke halaman utama */
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background: #ffffff;
-  margin-bottom: 16px;
-}
-
-.table-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 16px;
-  font-size: 13px;
-  color: #64748b;
-  flex-shrink: 0;
-  border-top: 1px solid #f1f5f9;
-}
-
-.search-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  color: #475569;
-}
-
-.search-input {
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
-  font-size: 13px;
-  width: 250px;
-  outline: none;
-}
-
-.search-input:focus {
-  border-color: #2563eb;
-}
-
-/* TABEL */
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-  font-size: 13px;
-  table-layout: fixed;
-}
-
-.data-table th {
-  background: #f8fafc;
-  color: #334155;
-  padding: 14px 12px;
-  border-bottom: 2px solid #e2e8f0;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.data-table td {
-  padding: 12px;
-  border-bottom: 1px solid #f1f5f9;
-  color: #475569;
-  vertical-align: middle;
-  background: #ffffff;
-}
-
-.data-table tbody tr:hover td {
-  background-color: #f8fafc;
-}
-
-/* Teks dipotong rapi pakai titik-titik (nggak turun ke bawah) */
-.truncate-text {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: block;
-  width: 100%;
-}
-
-.truncate-multiline {
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  display: block !important;
-  width: 100% !important;
-  line-height: 1.4 !important;
-}
-
-.link-url {
-  display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 100%;
-  color: #2563eb;
-  text-decoration: none;
-  font-size: 12.5px;
-}
-
-.link-url:hover {
-  text-decoration: underline;
-}
-
-.table-img-preview {
-  width: 36px;
-  height: 36px;
-  object-fit: cover;
-  border-radius: 6px;
-  border: 1px solid #e2e8f0;
-  display: inline-block;
-}
-
-.no-img-text {
-  font-size: 13px;
-  color: #94a3b8;
-}
-
-.badge-tag {
-  background: #f1f5f9;
-  color: #334155;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  display: inline-block;
-  text-transform: capitalize;
-}
-
-.code-icon {
-  font-family: monospace;
-  font-size: 11px;
-  background: #f8fafc;
-  padding: 4px 8px;
-  border-radius: 6px;
-  color: #0f172a;
-  border: 1px solid #e2e8f0;
-  display: block;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 6px;
-}
-
-.justify-center {
-  justify-content: center;
-}
-
-.btn-action {
-  padding: 6px 8px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
+/* STYLE TABEL & LAYOUT */
+.card-table-container { background: #ffffff; border-radius: 12px; padding: 20px 24px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03); border: 1px solid #e2e8f0; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; }
+.table-controls { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 16px; flex-shrink: 0; }
+.table-responsive { width: 100%; overflow-x: auto; overflow-y: visible; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff; margin-bottom: 16px; }
+.table-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 16px; font-size: 13px; color: #64748b; flex-shrink: 0; border-top: 1px solid #f1f5f9; }
+.search-wrapper { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #475569; }
+.search-input { padding: 8px 14px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; width: 250px; outline: none; }
+.search-input:focus { border-color: #2563eb; }
+.data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; table-layout: fixed; }
+.data-table th { background: #f8fafc; color: #334155; padding: 14px 12px; border-bottom: 2px solid #e2e8f0; font-weight: 600; white-space: nowrap; }
+.data-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; color: #475569; vertical-align: middle; background: #ffffff; }
+.data-table tbody tr:hover td { background-color: #f8fafc; }
+.truncate-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; width: 100%; }
+.truncate-multiline { white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; display: block !important; width: 100% !important; line-height: 1.4 !important; }
+.link-url { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; color: #2563eb; text-decoration: none; font-size: 12.5px; }
+.link-url:hover { text-decoration: underline; }
+.table-img-preview { width: 36px; height: 36px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0; display: inline-block; }
+.no-img-text { font-size: 13px; color: #94a3b8; }
+.badge-tag { background: #f1f5f9; color: #334155; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; display: inline-block; text-transform: capitalize; }
+.code-icon { font-family: monospace; font-size: 11px; background: #f8fafc; padding: 4px 8px; border-radius: 6px; color: #0f172a; border: 1px solid #e2e8f0; display: block; }
+.action-buttons { display: flex; gap: 6px; }
+.justify-center { justify-content: center; }
+.btn-action { padding: 6px 8px; border-radius: 6px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .btn-action.edit { color: #2563eb; background: #eff6ff; }
 .btn-action.edit:hover { background: #dbeafe; }
 .btn-action.delete { color: #dc2626; background: #fef2f2; }
 .btn-action.delete:hover { background: #fee2e2; }
-
-/* PAGINATION */
-.pagination {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.page-numbers {
-  display: flex;
-  gap: 6px;
-}
-
-.page-btn {
-  min-width: 34px;
-  height: 34px;
-  padding: 0 10px;
-  border: 1px solid #cbd5e1;
-  background: white;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-  color: #334155;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.page-btn:hover:not(:disabled) { background: #f1f5f9; }
-.page-btn.active { background: #2563eb; color: white; border-color: #2563eb; font-weight: 700; }
-.page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
 .text-center { text-align: center; }
 .fw-bold { font-weight: 600; }
 .fw-medium { font-weight: 500; }
 .empty-msg { padding: 32px !important; color: #94a3b8; font-style: italic; }
 
+/* ========================================================= */
+/* CSS PAGINATION (ANTI TIMPA)                               */
+/* ========================================================= */
+
+.pagination-wrapper-final {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.page-numbers {
+  display: flex !important;
+  gap: 8px !important;
+}
+
+/* KITA KUNCI MATI-MATIAN PAKAI ID AGAR TIDAK BISA DITIMPA LAYOUT UTAMA */
+#pageNumbers button,
+#prevBtn,
+#nextBtn {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  min-height: 42px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 1px solid #e2e8f0 !important;
+  background: #ffffff !important;
+  border-radius: 14px !important; /* Sudut membulat squircle */
+  cursor: pointer !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  color: #64748b !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+  box-sizing: border-box !important;
+  box-shadow: none !important;
+}
+
+#pageNumbers button:hover:not(:disabled):not(.active),
+#prevBtn:hover:not(:disabled),
+#nextBtn:hover:not(:disabled) {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* TOMBOL ANGKA AKTIF (BIRU GLOW) */
+#pageNumbers button.active {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #2563eb !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4) !important; /* Efek Glow */
+}
+
+#prevBtn:disabled,
+#nextBtn:disabled {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+  background: #f8fafc !important;
+}
+
+#prevBtn svg,
+#nextBtn svg {
+  width: 16px !important;
+  height: 16px !important;
+  stroke-width: 2.5 !important;
+}
+
 /* MODAL STYLING */
-.modal-overlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  background: rgba(15, 23, 42, 0.5);
-  backdrop-filter: blur(4px);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-
-.modal-card {
-  background: white;
-  padding: 32px 24px;
-  border-radius: 20px;
-  width: 100%;
-  max-width: 380px;
-  text-align: center;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-}
-
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; z-index: 9999; }
+.modal-card { background: white; padding: 32px 24px; border-radius: 20px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
 .modal-icon-wrapper { display: flex; justify-content: center; margin-bottom: 16px; }
-.modal-icon {
-  width: 60px; height: 60px;
-  background: #fee2e2; color: #dc2626;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 28px; font-weight: bold;
-}
-
+.modal-icon { width: 60px; height: 60px; background: #fee2e2; color: #dc2626; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; }
 .modal-card h3 { font-size: 20px; margin-bottom: 8px; color: #0f172a; font-weight: 700; }
 .modal-card p { font-size: 14px; color: #64748b; margin-bottom: 24px; line-height: 1.5; }
 .modal-actions { display: flex; gap: 12px; justify-content: center; }
-
 .btn-modal-cancel { padding: 10px 24px; border-radius: 10px; border: none; background: #f1f5f9; color: #334155; cursor: pointer; font-size: 14px; font-weight: 600; }
 .btn-modal-cancel:hover { background: #e2e8f0; }
 .btn-modal-delete { padding: 10px 24px; border-radius: 10px; border: none; background: #ef4444; color: white; cursor: pointer; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25); }
@@ -435,6 +288,8 @@ try {
 
 <script>
   // ================= PAGINASI INTERAKTIF (MAX 10 DATA) =================
+  // JS TIDAK DIUBAH SAMA SEKALI
+  
   const ITEMS_PER_PAGE = 10;
   let currentPage = 1;
 
@@ -469,7 +324,6 @@ try {
       pageNumbers.innerHTML = '';
       for (let i = 1; i <= totalPages; i++) {
         const btn = document.createElement('button');
-        // TAMBAHKAN CLASS 'page-btn' DI SINI AGAR BENTUKNYA RAPI
         btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
         btn.innerText = i.toString();
         btn.addEventListener('click', () => {
@@ -507,6 +361,88 @@ try {
   });
 
   renderTable();
+
+  // ================= SIHIR: MEMAKSA INLINE STYLE PADA ANGKA JS =================
+  // Ini tidak mengubah fungsi JS, hanya "mengawasi" saat JS membuat tombol
+  // lalu langsung menempelkan style secara paksa agar tidak bisa ditimpa layout
+  const pageNumbersContainer = document.getElementById('pageNumbers');
+  if (pageNumbersContainer) {
+    const observer = new MutationObserver(() => {
+      const buttons = pageNumbersContainer.querySelectorAll('button');
+      buttons.forEach(btn => {
+        // Set inline style dasar
+        btn.style.setProperty('width', '42px', 'important');
+        btn.style.setProperty('height', '42px', 'important');
+        btn.style.setProperty('min-width', '42px', 'important');
+        btn.style.setProperty('padding', '0', 'important');
+        btn.style.setProperty('border', '1px solid #e2e8f0', 'important');
+        btn.style.setProperty('background', '#ffffff', 'important');
+        btn.style.setProperty('border-radius', '14px', 'important');
+        btn.style.setProperty('cursor', 'pointer', 'important');
+        btn.style.setProperty('font-size', '15px', 'important');
+        btn.style.setProperty('font-weight', '500', 'important');
+        btn.style.setProperty('color', '#64748b', 'important');
+        btn.style.setProperty('display', 'inline-flex', 'important');
+        btn.style.setProperty('align-items', 'center', 'important');
+        btn.style.setProperty('justify-content', 'center', 'important');
+        btn.style.setProperty('box-sizing', 'border-box', 'important');
+        btn.style.setProperty('box-shadow', 'none', 'important');
+        btn.style.setProperty('margin', '0', 'important');
+        btn.style.setProperty('transition', 'all 0.2s ease', 'important');
+
+        // Jika sedang aktif, beri warna biru + glow
+        if (btn.classList.contains('active')) {
+          btn.style.setProperty('background', '#2563eb', 'important');
+          btn.style.setProperty('color', '#ffffff', 'important');
+          btn.style.setProperty('border-color', '#2563eb', 'important');
+          btn.style.setProperty('font-weight', '600', 'important');
+          btn.style.setProperty('box-shadow', '0 4px 12px rgba(37, 99, 235, 0.4)', 'important');
+        } else {
+          // Reset jika tidak aktif
+          btn.style.setProperty('background', '#ffffff', 'important');
+          btn.style.setProperty('color', '#64748b', 'important');
+          btn.style.setProperty('border-color', '#e2e8f0', 'important');
+          btn.style.setProperty('box-shadow', 'none', 'important');
+        }
+      });
+    });
+
+    // Jalankan observer
+    observer.observe(pageNumbersContainer, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+    
+    // Panggil manual sekali untuk render pertama
+    setTimeout(() => {
+      const buttons = pageNumbersContainer.querySelectorAll('button');
+      buttons.forEach(btn => {
+        btn.style.setProperty('width', '42px', 'important');
+        btn.style.setProperty('height', '42px', 'important');
+        btn.style.setProperty('min-width', '42px', 'important');
+        btn.style.setProperty('padding', '0', 'important');
+        btn.style.setProperty('border', '1px solid #e2e8f0', 'important');
+        btn.style.setProperty('background', '#ffffff', 'important');
+        btn.style.setProperty('border-radius', '14px', 'important');
+        btn.style.setProperty('cursor', 'pointer', 'important');
+        btn.style.setProperty('font-size', '15px', 'important');
+        btn.style.setProperty('font-weight', '500', 'important');
+        btn.style.setProperty('color', '#64748b', 'important');
+        btn.style.setProperty('display', 'inline-flex', 'important');
+        btn.style.setProperty('align-items', 'center', 'important');
+        btn.style.setProperty('justify-content', 'center', 'important');
+        btn.style.setProperty('box-sizing', 'border-box', 'important');
+        btn.style.setProperty('box-shadow', 'none', 'important');
+        btn.style.setProperty('margin', '0', 'important');
+        btn.style.setProperty('transition', 'all 0.2s ease', 'important');
+
+        if (btn.classList.contains('active')) {
+          btn.style.setProperty('background', '#2563eb', 'important');
+          btn.style.setProperty('color', '#ffffff', 'important');
+          btn.style.setProperty('border-color', '#2563eb', 'important');
+          btn.style.setProperty('font-weight', '600', 'important');
+          btn.style.setProperty('box-shadow', '0 4px 12px rgba(37, 99, 235, 0.4)', 'important');
+        }
+      });
+    }, 100);
+  }
 
   // ================= LOGIKA MODAL EDIT =================
   let selectedEditId: any = null;
