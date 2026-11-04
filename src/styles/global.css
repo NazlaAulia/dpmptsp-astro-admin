@@ -901,3 +901,51 @@
             background-repeat: no-repeat;
             background-size: 1.5em 1.5em;
         }
+
+        /* =========================================
+   TAMBAHAN: RESPONSIVE UNTUK VERSI HP
+   ========================================= */
+/* =========================================
+   TRIK PALU GODAM: PAKSA HP
+   ========================================= */
+@media (max-width: 900px) {
+  
+  /* 1. Paksa sidebar hilang total (nembak class apapun) */
+  body div[class*="sidebar"], 
+  body aside,
+  .sidebar-wrapper {
+    display: none !important; 
+    width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* 2. Paksa semua pembungkus konten jadi full width */
+  body > div, 
+  .admin-shell, 
+  .main-panel, 
+  .content, 
+  main {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 12px !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+  }
+
+  /* 3. Paksa tabel bisa di-scroll geser ke kanan-kiri */
+  table {
+    display: block !important;
+    width: 100% !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+  }
+
+  /* 4. Kecilin padding header biar gak makan tempat */
+  .page-header {
+    padding: 16px !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+}

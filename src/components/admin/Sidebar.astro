@@ -13,7 +13,6 @@ const isPemberitahuan = pathname.startsWith("/admin/pemberitahuan");
 
 <!-- SCRIPT ANTI-KEDIP: Jalan sebelum render -->
 <script is:inline>
-  // Cek memori. Kalau sidebar harusnya ngecil, langsung pasang class ke <html>
   if (localStorage.getItem('admin-sidebar-collapsed') === 'true') {
     document.documentElement.classList.add('preload-collapsed');
   }
@@ -103,7 +102,6 @@ const isPemberitahuan = pathname.startsWith("/admin/pemberitahuan");
 
 <style>
 /* --- TRIK ANTI-KEDIP & MULUS --- */
-/* 1. Kalau class 'preload-collapsed' ada di <html>, langsung kecilin tanpa animasi */
 html.preload-collapsed .sidebar-wrapper {
   width: 84px;
 }
@@ -128,8 +126,6 @@ html.preload-collapsed .sidebar-wrapper .logout {
 html.preload-collapsed .sidebar-wrapper .toggle-chevron {
   transform: rotate(180deg);
 }
-
-/* 2. Matikan transisi HANYA saat preload biar gak patah-patah */
 html.preload-collapsed .sidebar-wrapper,
 html.preload-collapsed .sidebar,
 html.preload-collapsed .brand-text,
@@ -139,7 +135,7 @@ html.preload-collapsed .logout .label {
   transition: none !important;
 }
 
-/* --- STYLE NORMAL (SAMA KAYAK PUNYA KAMU) --- */
+/* --- STYLE NORMAL --- */
 .sidebar-wrapper {
   width: 260px;
   flex-shrink: 0;
@@ -148,7 +144,6 @@ html.preload-collapsed .logout .label {
   height: 100vh;
   padding: 12px;
   box-sizing: border-box;
-  /* Transisi halus buat ngecil/ngebesarin */
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 50;
 }
@@ -295,13 +290,8 @@ html.preload-collapsed .logout .label {
   flex: 1;
 }
 
-.menu::-webkit-scrollbar {
-  width: 4px;
-}
-.menu::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.1);
-  border-radius: 4px;
-}
+.menu::-webkit-scrollbar { width: 4px; }
+.menu::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
 
 .menu a, .logout { 
   display: flex; 
@@ -369,17 +359,13 @@ html.preload-collapsed .logout .label {
 .logout .icon { color: #f87171; }
 .logout:hover { background: rgba(239,68,68,0.18); color: #ef4444; transform: translateY(-1px); }
 
-/* --- KONDISI COLLAPSE NORMAL (PAS DIKLIK) --- */
-.sidebar-wrapper.collapsed {
-  width: 84px;
-}
-
+/* --- KONDISI COLLAPSE NORMAL --- */
+.sidebar-wrapper.collapsed { width: 84px; }
 .sidebar-wrapper.collapsed .sidebar {
   width: 80px;
   padding: 20px 10px 16px;
   overflow: visible;
 }
-
 .sidebar-wrapper.collapsed .brand-text,
 .sidebar-wrapper.collapsed .sidebar-promo-card,
 .sidebar-wrapper.collapsed .menu a .label,
@@ -390,26 +376,11 @@ html.preload-collapsed .logout .label {
   transform: translateX(-10px);
   display: none;
 }
-
-.sidebar-wrapper.collapsed .brand {
-  justify-content: center;
-  padding-left: 0;
-  padding-right: 0;
-}
-
+.sidebar-wrapper.collapsed .brand { justify-content: center; padding-left: 0; padding-right: 0; }
 .sidebar-wrapper.collapsed .menu a,
-.sidebar-wrapper.collapsed .logout {
-  justify-content: center;
-  padding: 10px;
-}
-
-.sidebar-wrapper.collapsed .menu a:hover {
-  transform: none;
-}
-
-.sidebar-wrapper.collapsed .toggle-chevron {
-  transform: rotate(180deg);
-}
+.sidebar-wrapper.collapsed .logout { justify-content: center; padding: 10px; }
+.sidebar-wrapper.collapsed .menu a:hover { transform: none; }
+.sidebar-wrapper.collapsed .toggle-chevron { transform: rotate(180deg); }
 
 /* Modal Logout Styles */
 .logout-modal {
@@ -422,11 +393,7 @@ html.preload-collapsed .logout .label {
   z-index: 1000;
   padding: 20px;
 }
-
-.logout-modal.show {
-  display: flex;
-}
-
+.logout-modal.show { display: flex; }
 .logout-modal__card {
   width: min(420px, 100%);
   background: white;
@@ -435,7 +402,6 @@ html.preload-collapsed .logout .label {
   box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
   text-align: center;
 }
-
 .logout-modal__icon {
   width: 68px;
   height: 68px;
@@ -449,24 +415,9 @@ html.preload-collapsed .logout .label {
   font-size: 2rem;
   font-weight: 800;
 }
-
-.logout-modal__card h3 {
-  margin: 0 0 10px;
-  font-size: 1.3rem;
-  color: #0f172a;
-}
-
-.logout-modal__card p {
-  margin: 0 0 22px;
-  color: #475569;
-  line-height: 1.5;
-}
-
-.logout-modal__actions {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-}
+.logout-modal__card h3 { margin: 0 0 10px; font-size: 1.3rem; color: #0f172a; }
+.logout-modal__card p { margin: 0 0 22px; color: #475569; line-height: 1.5; }
+.logout-modal__actions { display: flex; justify-content: center; gap: 12px; }
 
 .btn {
   display: inline-flex;
@@ -481,46 +432,43 @@ html.preload-collapsed .logout .label {
   cursor: pointer;
   transition: all 0.2s ease;
 }
-
-.btn-secondary {
-  background: #e2e8f0;
-  color: #0f172a;
-}
-
+.btn-secondary { background: #e2e8f0; color: #0f172a; }
 .btn-secondary:hover { background: #cbd5e1; }
-
 .btn-danger {
   background: linear-gradient(135deg, #ef4444, #dc2626);
   color: white;
   box-shadow: 0 8px 18px -8px rgba(239,68,68,0.7);
 }
-
 .btn-danger:hover { filter: brightness(0.98); transform: translateY(-1px); }
 
-@media (max-width:900px) { .sidebar-wrapper { display:none; } }
+/* =========================================
+   RESPONSIVE KHUSUS HP (INI YANG DITAMBAH)
+   ========================================= */
+@media (max-width: 900px) { 
+  .sidebar-wrapper { 
+    display: none !important; 
+    width: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  } 
+}
 </style>
 
 <script>
-  // Fungsi utama yang dijalanin Astro (termasuk pas pindah halaman)
   function initSidebar() {
     const sidebarWrapper = document.getElementById('sidebarWrapper');
     if (!sidebarWrapper) return;
 
-    // 1. Tarik data dari memori
     const isSavedCollapsed = localStorage.getItem('admin-sidebar-collapsed') === 'true';
-    
-    // 2. Pasang class collapsed (buat ngecilin) ke wrapper
     if (isSavedCollapsed) {
       sidebarWrapper.classList.add('collapsed');
     }
 
-    // 3. Hapus class 'preload-collapsed' dari <html> biar animasi transisi normal lagi
-    // (Penting: dikasih setTimeout dikit biar browser sempet nge-render dulu)
     setTimeout(() => {
       document.documentElement.classList.remove('preload-collapsed');
     }, 50);
 
-    // 4. Logika Tombol Toggle
     const sidebarToggle = document.getElementById('sidebarToggle');
     sidebarToggle?.addEventListener('click', () => {
       sidebarWrapper.classList.toggle('collapsed');
@@ -529,13 +477,9 @@ html.preload-collapsed .logout .label {
     });
   }
 
-  // Jalanin saat pertama kali load
   document.addEventListener('DOMContentLoaded', initSidebar);
-  
-  // Jalanin lagi kalau pakai Astro View Transitions (pindah halaman)
   document.addEventListener('astro:page-load', initSidebar);
 
-  // Logika Modal Logout (Tetep sama)
   const logoutTrigger = document.getElementById('logout-trigger');
   const logoutModal = document.getElementById('logout-modal');
   const logoutCancel = document.getElementById('logout-cancel');

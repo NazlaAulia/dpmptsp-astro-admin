@@ -20,3 +20,37 @@
 		height: 100%;
 	}
 </style>
+
+<style is:inline>
+  @media (max-width: 900px) {
+    /* Hancurkan sidebar apapun bentuknya */
+    body .sidebar-wrapper, 
+    body aside, 
+    body [class*="sidebar"] { 
+      display: none !important; 
+      width: 0 !important; 
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    /* Paksa semua konten jadi full */
+    body, 
+    .admin-shell, 
+    .main-panel, 
+    main {
+      display: block !important;
+      width: 100% !important;
+      margin: 0 !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+
+    /* Tabel bisa digeser */
+    table {
+      display: block !important;
+      width: 100% !important;
+      overflow-x: auto !important;
+      white-space: nowrap !important;
+    }
+  }
+</style>

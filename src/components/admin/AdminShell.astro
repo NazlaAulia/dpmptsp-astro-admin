@@ -34,7 +34,7 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
 </div>
 
 <style>
-/* BACKGROUND UTAMA DIBUAT ABU-ABU LEMBUT SEPERTI GAMBAR 2 */
+/* BACKGROUND UTAMA */
 .admin-shell {
   display: flex;
   min-height: 100vh;
@@ -49,7 +49,7 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
   min-height: 0;
 }
 
-/* PADDING DIPERLEBAR AGAR KONTEN TENGAH */
+/* PADDING KONTEN */
 .content {
   flex: 1;
   min-height: 0;
@@ -123,15 +123,58 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
   transform: translateY(-2px);
 }
 
-/* MEMASTIKAN KOTAK TABEL MENGAMBIL TINGGI PENUH */
 :global(.content-body > .artikel-box) {
   flex: 1;
   min-height: 0;
 }
 
+/* =========================================
+   RESPONSIVE KHUSUS HP (SUDAH DIPERBAIKI)
+   ========================================= */
 @media (max-width: 900px) {
-  .admin-shell { flex-direction: column; }
-  .content { padding: 20px !important; }
-  .page-header { flex-direction: column; align-items: flex-start; gap: 20px; }
+  /* 1. Paksa shell jadi block biar gak ada sisa flex */
+  .admin-shell { 
+    display: block !important; 
+    min-height: 100vh !important;
+  }
+  
+  /* 2. Paksa konten utama full width */
+  .main-panel {
+    width: 100% !important;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    height: auto !important; 
+    min-height: 100vh !important;
+  }
+
+  .content { 
+    padding: 16px !important; 
+    overflow-y: visible !important; 
+    height: auto !important;
+  }
+
+  .page-header { 
+    flex-direction: column !important; 
+    align-items: flex-start !important; 
+    gap: 16px !important; 
+    padding: 20px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .page-actions {
+    width: 100% !important;
+  }
+  .page-actions a {
+    display: block !important;
+    text-align: center !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .content-body {
+    overflow-y: visible !important;
+    height: auto !important;
+  }
 }
 </style>
