@@ -14,7 +14,7 @@ if (Astro.request.method === "POST") {
     
     let foto = null;
     const file = data.get("foto");
-    if (file && file.size > 0) {
+    if (file && typeof file !== "string" && file.size > 0) {
       const ext = file.name.split(".").pop();
       const filename = `pemberitahuan_${Date.now()}.${ext}`;
       const uploadDir = path.join(process.cwd(), "public/uploads");
@@ -29,7 +29,6 @@ if (Astro.request.method === "POST") {
       console.log(`✓ File uploaded: ${filename}`);
     }
 
-    // ✅ PERBAIKAN: jumlah placeholder (5) sesuai kolom (5)
     await db.query(
       `INSERT INTO pemberitahuan (judul, foto, link_url, status_aktif, tipe)
        VALUES (?, ?, ?, ?, ?)`,
@@ -43,298 +42,354 @@ if (Astro.request.method === "POST") {
 }
 ---
 
-<AdminShell title="Tambah Pemberitahuan" subtitle="Buat pemberitahuan atau popup modal baru untuk website." actionLabel="Kembali" actionHref="/admin/pemberitahuan">
-  <div class="form-container">
-    <form method="POST" enctype="multipart/form-data" class="form">
-      <div class="form-group">
-        <label for="foto" class="label-with-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-          Upload Gambar (Opsional)
-        </label>
-        <div class="file-upload">
-          <input type="file" id="foto" name="foto" accept="image/*" />
-          <label for="foto" class="file-label">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-            <span class="upload-text">Klik di sini atau drag & drop gambar</span>
-            <span class="upload-hint">JPG, PNG, GIF (Max 5MB)</span>
+<AdminShell 
+  title="Tambah Pemberitahuan" 
+  subtitle="Buat pemberitahuan atau popup modal baru untuk website." 
+  actionLabel="Kembali" 
+  actionHref="/admin/pemberitahuan"
+  actionIcon={`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right: 6px;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>`}
+>
+  <div class="page-wrapper">
+    <div class="panel">
+      <form method="POST" enctype="multipart/form-data" class="form">
+        
+        <!-- UPLOAD GAMBAR -->
+        <div class="form-group">
+          <label for="foto" class="label-with-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+            Upload Gambar (Opsional)
           </label>
-          <div id="preview-container" class="preview-container"></div>
+          <div class="file-upload">
+            <input type="file" id="foto" name="foto" accept="image/*" />
+            <label for="foto" class="file-label">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              <span class="upload-text">Klik di sini atau drag & drop gambar</span>
+              <span class="upload-hint">JPG, PNG, GIF (Max 5MB)</span>
+            </label>
+            <div id="preview-container" class="preview-container"></div>
+          </div>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label for="judul">Judul *</label>
-        <input type="text" id="judul" name="judul" placeholder="Masukkan judul pemberitahuan" required />
-      </div>
-
-      <div class="form-row">
+        <!-- JUDUL -->
         <div class="form-group">
-          <label for="tipe">Tipe *</label>
-          <select id="tipe" name="tipe" required>
-             <option value="modal">Popup Modal</option>
-            <option value="notif">Notifikasi</option>
-          </select>
+          <label for="judul">Judul Pemberitahuan <span class="required">*</span></label>
+          <input type="text" id="judul" name="judul" placeholder="Masukkan judul pemberitahuan" required />
         </div>
 
+        <!-- BARIS TIPE & STATUS -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="tipe">Tipe <span class="required">*</span></label>
+            <select id="tipe" name="tipe" required>
+              <option value="modal">Popup Modal</option>
+              <option value="notif">Notifikasi</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="status_aktif">Status <span class="required">*</span></label>
+            <select id="status_aktif" name="status_aktif" required>
+              <option value="Y">Aktif</option>
+              <option value="N">Nonaktif</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- LINK URL -->
         <div class="form-group">
-          <label for="status_aktif">Status *</label>
-          <select id="status_aktif" name="status_aktif" required>
-            <option value="Y">Aktif</option>
-            <option value="N">Nonaktif</option>
-          </select>
+          <label for="link_url">Link URL (Opsional)</label>
+          <input type="url" id="link_url" name="link_url" placeholder="https://example.com" />
         </div>
-      </div>
 
-      <div class="form-group">
-        <label for="link_url">Link URL (Opsional)</label>
-        <input type="url" id="link_url" name="link_url" placeholder="https://example.com" />
-      </div>
-
-      <div class="form-actions">
-        <button type="submit" class="btn-submit">Simpan Pemberitahuan</button>
-        <a href="/admin/pemberitahuan" class="btn-cancel">Batal</a>
-      </div>
-    </form>
+        <!-- TOMBOL AKSI -->
+        <div class="form-actions">
+          <a href="/admin/pemberitahuan" class="btn-cancel">Batal</a>
+          <button type="submit" class="btn-submit">Simpan Pemberitahuan</button>
+        </div>
+      </form>
+    </div>
   </div>
 </AdminShell>
 
 <style>
-  .form-container {
-    background: white;
-    border-radius: 20px;
-    border: 1px solid #eef1f6;
-    box-shadow: 0 1px 2px rgba(15,23,42,.03), 0 20px 40px -18px rgba(15,23,42,.10);
-    padding: 32px;
-  }
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-  .form {
-    display: flex;
-    flex-direction: column;
-    gap: 22px;
-  }
+/* BONGKAR KURUNGAN ADMIN SHELL */
+:global(.admin-shell), :global(.main-panel), :global(.content), :global(.content-body) { 
+  height: auto !important; 
+  min-height: 100vh !important;
+  overflow: visible !important; 
+}
 
+.page-wrapper {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  margin-top: 24px;
+  width: 100%;
+  padding-bottom: 60px;
+}
+
+.panel {
+  background: white;
+  border-radius: 24px;
+  border: 1px solid #eef1f6;
+  box-shadow: 0 14px 35px rgba(15, 23, 42, 0.05);
+  padding: 32px 40px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 700;
+  font-size: 13.5px;
+  color: #334155;
+}
+
+.required {
+  color: #ef4444;
+}
+
+.label-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.label-with-icon svg {
+  color: #2563eb;
+  flex-shrink: 0;
+}
+
+.form-group input[type="text"],
+.form-group input[type="url"],
+.form-group select {
+  padding: 14px 16px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 12px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  background: #f8fafc;
+  color: #0f172a;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #2563eb;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+/* UPLOAD BOX */
+.file-upload {
+  border: 1.5px dashed #93c5fd;
+  border-radius: 12px;
+  padding: 32px;
+  text-align: center;
+  transition: all 0.2s ease;
+  background: #f8fafc;
+  cursor: pointer;
+}
+
+.file-upload:hover {
+  border-color: #2563eb;
+  background: #f1f5f9;
+}
+
+.file-upload input[type="file"] {
+  display: none;
+}
+
+.file-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  color: #64748b;
+}
+
+.file-label svg {
+  color: #2563eb;
+  width: 44px;
+  height: 44px;
+}
+
+.upload-text {
+  font-weight: 600;
+  font-size: 14px;
+  color: #0f172a;
+}
+
+.upload-hint {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.preview-container {
+  margin-top: 18px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.preview-image {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid #e2e8f0;
+  box-shadow: 0 6px 14px -8px rgba(15, 23, 42, 0.2);
+}
+
+.preview-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.preview-remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 28px;
+  height: 28px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  line-height: 1;
+  font-weight: bold;
+  transition: transform .15s ease, background .15s ease;
+  box-shadow: 0 4px 10px -4px rgba(239, 68, 68, 0.5);
+}
+
+.preview-remove:hover {
+  background: #dc2626;
+  transform: scale(1.08);
+}
+
+/* ACTIONS */
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding-top: 24px;
+  border-top: 1.5px solid #edf1f5;
+}
+
+.btn-submit {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+  display: inline-flex;
+  align-items: center;
+}
+
+.btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.35);
+}
+
+.btn-cancel {
+  padding: 12px 24px;
+  background: #f1f5f9;
+  color: #475569;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+@media (max-width: 640px) {
   .form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    grid-template-columns: 1fr;
   }
-
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+  .panel {
+    padding: 24px 20px;
   }
-
-  .form-group label {
-    font-weight: 600;
-    font-size: 13.5px;
-    color: #334155;
-  }
-
-  .label-with-icon {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .label-with-icon svg {
-    color: #2563eb;
-    flex-shrink: 0;
-  }
-
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
-    padding: 12px 14px;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 12px;
-    font-size: 14px;
-    font-family: inherit;
-    transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
-    background: #f8fafc;
-    color: #0f172a;
-  }
-
-  .form-group input:focus,
-  .form-group select:focus,
-  .form-group textarea:focus {
-    outline: none;
-    border-color: #2563eb;
-    background: #ffffff;
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, .12);
-  }
-
-  .form-group textarea {
-    resize: vertical;
-    min-height: 120px;
-  }
-
-  .file-upload {
-    border: 2px dashed #93c5fd;
-    border-radius: 16px;
-    padding: 32px;
-    text-align: center;
-    transition: all 0.2s ease;
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0.02) 100%);
-    cursor: pointer;
-  }
-
-  .file-upload:hover {
-    border-color: #2563eb;
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
-  }
-
-  .file-upload input[type="file"] {
-    display: none;
-  }
-
-  .file-label {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    cursor: pointer;
-    color: #64748b;
-  }
-
-  .file-label svg {
-    color: #2563eb;
-    width: 44px;
-    height: 44px;
-  }
-
-  .upload-text {
-    font-weight: 600;
-    font-size: 15px;
-    color: #0f172a;
-  }
-
-  .upload-hint {
-    font-size: 12.5px;
-    color: #94a3b8;
-  }
-
-  .preview-container {
-    margin-top: 18px;
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .preview-image {
-    position: relative;
-    width: 120px;
-    height: 120px;
-    border-radius: 12px;
-    overflow: hidden;
-    border: 2px solid #e2e8f0;
-    box-shadow: 0 6px 14px -8px rgba(15, 23, 42, 0.2);
-  }
-
-  .preview-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .preview-remove {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    width: 28px;
-    height: 28px;
-    background: #ef4444;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    line-height: 1;
-    font-weight: bold;
-    transition: transform .15s ease, background .15s ease;
-    box-shadow: 0 4px 10px -4px rgba(239, 68, 68, 0.5);
-  }
-
-  .preview-remove:hover {
-    background: #dc2626;
-    transform: scale(1.08);
-  }
-
   .form-actions {
-    display: flex;
-    gap: 12px;
-    justify-content: flex-end;
-    padding-top: 14px;
-    border-top: 1px solid #eef1f6;
+    flex-direction: column-reverse;
   }
-
-  .btn-submit {
-    padding: 12px 28px;
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: transform .15s ease, box-shadow .15s ease;
-    box-shadow: 0 8px 18px -8px rgba(37, 99, 235, .5);
-  }
-
-  .btn-submit:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 12px 22px -8px rgba(37, 99, 235, .55);
-  }
-
-  .btn-cancel {
-    padding: 12px 28px;
-    background: #f1f5f9;
-    color: #334155;
-    border: none;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
+  .btn-submit, .btn-cancel {
+    width: 100%;
     justify-content: center;
-    transition: background .15s ease;
   }
-
-  .btn-cancel:hover {
-    background: #e2e8f0;
-  }
+}
 </style>
 
 <script>
-  const fileInput = document.getElementById("foto");
+  // 1. Beri tahu TypeScript bahwa ini adalah elemen input file
+  const fileInput = document.getElementById("foto") as HTMLInputElement | null;
   const previewContainer = document.getElementById("preview-container");
 
-  if (fileInput) {
-    fileInput.addEventListener("change", (e) => {
+  if (fileInput && previewContainer) {
+    // 2. Beri tipe data Event yang benar
+    fileInput.addEventListener("change", (e: Event) => {
       previewContainer.innerHTML = "";
       
-      const files = e.target.files;
+      const target = e.target as HTMLInputElement; // Casting target
+      const files = target.files;
+      
       if (files && files.length > 0) {
         const file = files[0];
         const reader = new FileReader();
         
-        reader.onload = (event) => {
+        reader.onload = (event: ProgressEvent<FileReader>) => {
           const div = document.createElement("div");
           div.className = "preview-image";
           div.innerHTML = `
-            <img src="${event.target.result}" alt="preview" />
+            <img src="${event.target?.result}" alt="preview" />
             <button type="button" class="preview-remove" title="Hapus">×</button>
           `;
           
-          div.querySelector(".preview-remove").addEventListener("click", () => {
-            fileInput.value = "";
+          const removeBtn = div.querySelector(".preview-remove");
+          removeBtn?.addEventListener("click", () => {
+            fileInput.value = ""; // Sekarang TypeScript tahu ini input file
             previewContainer.innerHTML = "";
           });
           
@@ -346,26 +401,26 @@ if (Astro.request.method === "POST") {
     });
 
     // Drag & drop
-    const form = document.querySelector(".file-upload");
-    if (form) {
-      form.addEventListener("dragover", (e) => {
+    const dropZone = document.querySelector(".file-upload");
+    if (dropZone) {
+      dropZone.addEventListener("dragover", (e: Event) => {
         e.preventDefault();
-        form.style.borderColor = "#315eea";
-        form.style.background = "rgba(49, 94, 234, 0.1)";
+        dropZone.classList.add("dragover");
       });
 
-      form.addEventListener("dragleave", () => {
-        form.style.borderColor = "#e5eaf2";
-        form.style.background = "#f8fafc";
+      dropZone.addEventListener("dragleave", () => {
+        dropZone.classList.remove("dragover");
       });
 
-      form.addEventListener("drop", (e) => {
+      // 3. Gunakan DragEvent agar properti dataTransfer dikenali
+      dropZone.addEventListener("drop", (e: Event) => {
         e.preventDefault();
-        form.style.borderColor = "#e5eaf2";
-        form.style.background = "#f8fafc";
+        dropZone.classList.remove("dragover");
         
-        if (e.dataTransfer.files) {
-          fileInput.files = e.dataTransfer.files;
+        const dragEvent = e as DragEvent;
+        if (dragEvent.dataTransfer?.files && dragEvent.dataTransfer.files.length > 0) {
+          fileInput.files = dragEvent.dataTransfer.files; // Sekarang aman
+          
           const event = new Event("change", { bubbles: true });
           fileInput.dispatchEvent(event);
         }
