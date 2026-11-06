@@ -1,8 +1,40 @@
+diff --cc src/components/admin/AdminShell.astro
+index 55a27f8,66aadcd..0000000
+--- a/src/components/admin/AdminShell.astro
++++ b/src/components/admin/AdminShell.astro
+@@@ -14,13 -22,17 +22,25 @@@ const
+      <main class="content">
+        {showHeader && (
+          <section class="page-header">
+++<<<<<<< HEAD
+ +          <div class="page-title-group">
+++=======
++           <div class="header-info">
+++>>>>>>> a402539 (versi hp)
+              <p class="eyebrow">PANEL ADMINISTRASI</p>
+              <h1>{title}</h1>
+              <p class="subtitle">{subtitle}</p>
+            </div>
++ 
+            <div class="page-actions">
+++<<<<<<< HEAD
+ +            <a href={actionHref} class="primary-action"><Fragment set:html={actionIcon} /> {actionLabel}</a>
+++=======
++             <a href={actionHref} class="primary-action">
+PS C:\Users\Windows\dpmptsp-astro> Get-Content src/components/admin/AdminShell.astro
+
 ---
 import Sidebar from "./Sidebar.astro";
 import Navbar from "./Navbar.astro";
 
-const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih terarah.", actionLabel = "Tambah Artikel", actionHref = "/admin/tambah-artikel", actionIcon = "+", showHeader = true } = Astro.props;
+const {
+  title,
+  subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih terarah.",
+  actionLabel = "Tambah Artikel",
+  actionHref = "/admin/tambah-artikel",
+  actionIcon = "+",
+  showHeader = true
+} = Astro.props;
 ---
 
 <div class="admin-shell">
@@ -14,13 +46,25 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
     <main class="content">
       {showHeader && (
         <section class="page-header">
+<<<<<<< HEAD
           <div class="page-title-group">
+=======
+          <div class="header-info">
+>>>>>>> a402539 (versi hp)
             <p class="eyebrow">PANEL ADMINISTRASI</p>
             <h1>{title}</h1>
             <p class="subtitle">{subtitle}</p>
           </div>
+
           <div class="page-actions">
-            <a href={actionHref} class="primary-action"><Fragment set:html={actionIcon} /> {actionLabel}</a>
+<<<<<<< HEAD
+            <a href={actionHref} class="primary-action"><Fragment set:html={actionIcon}/> {actionLabel}</a>
+=======
+            <a href={actionHref} class="primary-action">
+              <Fragment set:html={actionIcon} />
+              {actionLabel}
+            </a>
+>>>>>>> a402539 (versi hp)
           </div>
         </section>
       )}
@@ -34,57 +78,97 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
 
 <style>
 /* =========================================
+<<<<<<< HEAD
    LAYOUT DESKTOP (ASLI)
    ========================================= */
+=======
+   1. LAYOUT UTAMA DESKTOP
+========================================= */
+
+>>>>>>> a402539 (versi hp)
 .admin-shell {
   display: flex;
+  width: 100%;
   min-height: 100vh;
-  background: #f4f7fb !important; 
+  background: #f4f7fb !important;
+  overflow-x: hidden;
 }
 
 .main-panel {
   flex: 1;
+  width: 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   height: 100vh;
   min-height: 0;
 }
 
+<<<<<<< HEAD
+=======
+/* =========================================
+   2. KONTEN UTAMA
+========================================= */
+
+>>>>>>> a402539 (versi hp)
 .content {
   flex: 1;
+  min-width: 0;
   min-height: 0;
   overflow: hidden;
-  padding: 32px 40px 0 !important; 
+  padding: 32px 40px 0 !important;
   display: flex;
   flex-direction: column;
   gap: 24px;
+  box-sizing: border-box;
 }
 
 .content-body {
   flex: 1;
-  min-height: 0; 
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
   overflow-y: auto;
+  overflow-x: hidden;
   padding-bottom: 40px;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
 }
 
-/* KARTU HEADER (JUDUL) */
+:global(.content-body > .artikel-box) {
+  flex: 1;
+  min-height: 0;
+}
+
+/* =========================================
+   3. HEADER HALAMAN
+========================================= */
+
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 24px;
   padding: 28px 32px !important;
-  border-radius: 24px !important; 
+  border-radius: 24px !important;
   background: white !important;
   border: none !important;
-  box-shadow: 0 10px 30px rgba(15,23,42,0.03) !important; 
+  box-shadow: 0 10px 30px rgba(15,23,42,0.03) !important;
   flex-shrink: 0;
+<<<<<<< HEAD
   gap: 20px; /* Tambahan agar teks dan tombol tidak dempet */
 }
 
 .page-title-group {
   flex: 1; /* Agar teks mengambil ruang yang tersedia */
+=======
+  box-sizing: border-box;
+}
+
+.header-info {
+  min-width: 0;
+>>>>>>> a402539 (versi hp)
 }
 
 .eyebrow {
@@ -100,12 +184,22 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
   font-size: 1.8rem !important;
   font-weight: 800;
   color: #0f172a;
+  line-height: 1.3;
 }
 
 .subtitle {
   margin: 8px 0 0;
   color: #64748b;
   font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* =========================================
+   4. TOMBOL HEADER
+========================================= */
+
+.page-actions {
+  flex-shrink: 0;
 }
 
 .page-actions {
@@ -114,7 +208,7 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
 
 .page-actions a {
   text-decoration: none;
-  border-radius: 12px; 
+  border-radius: 12px;
   padding: 12px 24px;
   font-size: 0.95rem;
   font-weight: 600;
@@ -126,6 +220,10 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
 }
 
 .primary-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   background: #2563eb;
   color: white;
   box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
@@ -136,12 +234,8 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
   transform: translateY(-2px);
 }
 
-:global(.content-body > .artikel-box) {
-  flex: 1;
-  min-height: 0;
-}
-
 /* =========================================
+<<<<<<< HEAD
    RESPONSIVE FINAL UNTUK LAYAR HP (MOBILE)
    ========================================= */
 @media (max-width: 900px) {
@@ -152,14 +246,31 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
   }
   
   /* 2. Main panel full width */
-  .main-panel {
-    width: 100% !important;
-    margin-left: 0 !important;
-    padding-left: 0 !important;
-    height: auto !important; 
-    min-height: 100vh !important;
+=======
+   5. RESPONSIVE TABLET
+========================================= */
+
+@media (max-width: 900px) {
+
+  .admin-shell {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
   }
 
+>>>>>>> a402539 (versi hp)
+  .main-panel {
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+  }
+
+<<<<<<< HEAD
   .content { 
     padding: 16px !important; 
     overflow-y: visible !important; 
@@ -168,7 +279,7 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
 
   /* 3. HEADER: Ubah jadi Atas-Bawah (Vertikal) */
   .page-header { 
-    flex-direction: column !important; 
+    flex-direction: column !important;
     align-items: stretch !important; /* Tarik full selebar layar */
     gap: 20px !important; 
     padding: 24px 20px !important;
@@ -196,19 +307,168 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
   .page-header h1 {
     font-size: 1.5rem !important;
     line-height: 1.3 !important;
+=======
+  .content {
+    width: 100%;
+    min-width: 0;
+    min-height: calc(100vh - 60px);
+    height: auto;
+    padding: 20px !important;
+    gap: 18px;
+    overflow: visible;
+>>>>>>> a402539 (versi hp)
   }
 
   .content-body {
-    overflow-y: visible !important;
-    height: auto !important;
+    width: 100%;
+    min-width: 0;
+    min-height: auto;
+    overflow: visible;
+    padding-bottom: 30px;
+  }
+
+  .page-header {
+    width: 100%;
+    padding: 22px !important;
+    border-radius: 18px !important;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 18px;
+  }
+
+  .page-header h1 {
+    font-size: 1.5rem !important;
+  }
+
+  .eyebrow {
+    font-size: 0.7rem;
+  }
+
+  .subtitle {
+    font-size: 0.88rem;
+  }
+
+  .page-actions {
+    width: 100%;
+  }
+
+  .page-actions a {
+    display: flex;
+    width: 100%;
+    min-height: 46px;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
   }
 }
 
+<<<<<<< HEAD
 /* Khusus HP: Sembunyikan Sidebar */
 @media (max-width: 768px) {
     /* Sembunyikan sidebar (pastikan di Sidebar.astro pakai tag <aside> atau class .sidebar) */
-    aside, .sidebar { 
-        display: none !important; 
+    aside, .sidebar {
+        display: none !important;
     }
 }
 </style>
+=======
+/* =========================================
+   6. RESPONSIVE HP
+========================================= */
+
+@media (max-width: 600px) {
+
+  .admin-shell {
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: clip;
+  }
+
+  .main-panel {
+    width: 100%;
+    min-width: 0;
+    min-height: 100vh;
+    height: auto;
+  }
+
+  .content {
+    width: 100%;
+    padding: 14px !important;
+    gap: 14px;
+  }
+
+  .content-body {
+    width: 100%;
+    padding-bottom: 24px;
+  }
+
+  /* HEADER */
+
+  .page-header {
+    padding: 18px !important;
+    border-radius: 16px !important;
+    gap: 16px;
+    box-shadow: 0 4px 16px rgba(15,23,42,0.04) !important;
+  }
+
+  .eyebrow {
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    margin-bottom: 7px;
+  }
+
+  .page-header h1 {
+    font-size: 1.3rem !important;
+    line-height: 1.35;
+  }
+
+  .subtitle {
+    font-size: 0.82rem;
+    line-height: 1.5;
+    margin-top: 6px;
+  }
+
+  /* TOMBOL */
+
+  .page-actions {
+    width: 100%;
+  }
+
+  .page-actions a {
+    width: 100%;
+    min-height: 44px;
+    padding: 11px 14px;
+    border-radius: 10px;
+    font-size: 0.83rem;
+  }
+
+  .primary-action:hover {
+    transform: none;
+  }
+}
+
+/* =========================================
+   7. HP KECIL
+========================================= */
+
+@media (max-width: 380px) {
+
+  .content {
+    padding: 10px !important;
+  }
+
+  .page-header {
+    padding: 15px !important;
+  }
+
+  .page-header h1 {
+    font-size: 1.2rem !important;
+  }
+
+  .subtitle {
+    font-size: 0.78rem;
+  }
+}
+</style>
+>>>>>>> a402539 (versi hp)
+PS C:\Users\Windows\dpmptsp-astro> 

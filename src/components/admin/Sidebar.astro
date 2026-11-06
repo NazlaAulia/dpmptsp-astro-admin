@@ -18,6 +18,28 @@ const isPemberitahuan = pathname.startsWith("/admin/pemberitahuan");
   }
 </script>
 
+<!-- Tombol Menu Mobile -->
+<button
+  type="button"
+  class="mobile-menu-trigger"
+  id="mobileMenuTrigger"
+  aria-label="Buka menu navigasi"
+  aria-expanded="false"
+>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="2.2" stroke-linecap="round">
+    <path d="M4 6h16M4 12h16M4 18h16"/>
+  </svg>
+</button>
+
+<!-- Background ketika menu terbuka -->
+<button
+  type="button"
+  class="sidebar-backdrop"
+  id="sidebarBackdrop"
+  aria-label="Tutup menu"
+></button>
+
 <div class="sidebar-wrapper" id="sidebarWrapper">
   <nav class="sidebar" id="sidebar">
     <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle Sidebar">
@@ -444,15 +466,147 @@ html.preload-collapsed .logout .label {
 /* =========================================
    RESPONSIVE KHUSUS HP (INI YANG DITAMBAH)
    ========================================= */
-@media (max-width: 900px) { 
-  .sidebar-wrapper { 
-    display: none !important; 
-    width: 0 !important;
-    height: 0 !important;
-    padding: 0 !important;
-    margin: 0 !important;
-  } 
+
+/* =========================================
+   MOBILE NAVIGATION - HAMBURGER DRAWER
+========================================= */
+
+/* Tombol hamburger hanya tampil di HP */
+.mobile-menu-trigger {
+  display: none;
 }
+
+.sidebar-backdrop {
+  display: none;
+}
+
+@media (max-width: 900px) {
+
+  /* Tombol hamburger */
+  .mobile-menu-trigger {
+    display: flex;
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    color: #111827;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(15,23,42,0.10);
+    cursor: pointer;
+    z-index: 1100;
+  }
+
+  .mobile-menu-trigger svg {
+    width: 23px;
+    height: 23px;
+  }
+
+  /* Background overlay */
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: none;
+    background: rgba(15,23,42,0.45);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+    z-index: 998;
+  }
+
+  .sidebar-backdrop.is-visible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Sidebar menjadi drawer */
+  .sidebar-wrapper {
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 280px !important;
+    height: 100dvh !important;
+    padding: 10px !important;
+    margin: 0 !important;
+    box-sizing: border-box;
+    z-index: 1000;
+    transform: translateX(-110%);
+    transition: transform 0.3s ease;
+    pointer-events: none;
+  }
+
+  .sidebar-wrapper.mobile-open {
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+
+  /* Paksa ukuran sidebar normal di HP */
+  .sidebar-wrapper .sidebar {
+    width: 100% !important;
+    height: calc(100dvh - 20px) !important;
+    padding: 20px 14px 16px !important;
+    border-radius: 18px;
+    overflow: hidden;
+  }
+
+  /* Batalkan kondisi collapsed desktop */
+  .sidebar-wrapper.collapsed {
+    width: 280px !important;
+  }
+
+  html.preload-collapsed .sidebar-wrapper {
+    width: 280px !important;
+  }
+
+  .sidebar-wrapper .brand {
+    justify-content: flex-start !important;
+  }
+
+  .sidebar-wrapper .brand-text {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    width: auto !important;
+    transform: none !important;
+  }
+
+  .sidebar-wrapper .sidebar-promo-card {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    width: auto !important;
+  }
+
+  .sidebar-wrapper .menu a .label,
+  .sidebar-wrapper .logout .label {
+    display: inline !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    width: auto !important;
+    transform: none !important;
+  }
+
+  /* Tombol collapse desktop tidak diperlukan */
+  .sidebar-wrapper .sidebar-toggle {
+    display: none !important;
+  }
+
+  .sidebar-wrapper .menu a,
+  .sidebar-wrapper .logout {
+    justify-content: flex-start !important;
+  }
+}
+
 </style>
 
 <script>

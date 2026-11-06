@@ -70,10 +70,6 @@ const dataKinerja = rows as Array<{
                         <td><span class="title-text">{item.tw_option}</span></td>
                         <td>
                             <div class="pdf-preview">
-                                <!-- 
-                                  Tambahan parameter #toolbar=0&navpanes=0&scrollbar=0 
-                                  untuk menghilangkan UI dan scrollbar bawaan PDF 
-                                -->
                                 <iframe src={`/pdf/${item.file_path}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`} title={`PDF Preview ${item.id}`}></iframe>
                             </div>
                         </td>
@@ -170,7 +166,7 @@ const dataKinerja = rows as Array<{
 </AdminShell>
 
 <style>
-/* --- TEMA DASHBOARD BIRU --- */
+/* --- TEMA DASHBOARD BIRU (ASLI) --- */
 :root {
     --bg-light: #f8fafc;
     --card-bg: #ffffff;
@@ -245,14 +241,9 @@ const dataKinerja = rows as Array<{
     border: 1px solid var(--border-color);
 }
 
-/* 
-  PERBAIKAN 1: 
-  Menghapus max-height di sini agar tabel tidak punya scrollbar sendiri. 
-  Scrollbar hanya akan mengikuti halaman utama (body).
-*/
 .table-responsive {
     width: 100%;
-    overflow-x: auto; /* Hanya scroll ke samping kalau layar kekecilan */
+    overflow-x: auto; 
     border-radius: 12px;
     border: 1px solid var(--border-color);
 }
@@ -263,7 +254,6 @@ table {
     text-align: left;
 }
 
-/* Lebar kolom via CSS */
 th:nth-child(1) { width: 5%; }
 th:nth-child(2) { width: 30%; }
 th:nth-child(3) { width: 45%; }
@@ -283,7 +273,7 @@ th {
 td {
     padding: 16px 20px;
     border-bottom: 1px solid var(--border-color);
-    vertical-align: middle; /* Konten sejajar tengah secara vertikal */
+    vertical-align: middle; 
 }
 
 tr:last-child td {
@@ -310,15 +300,10 @@ tr:hover td {
     font-size: 15px;
 }
 
-/* 
-  PERBAIKAN 2: 
-  Preview PDF dibuat ringkas (tinggi 140px), dengan border rapi.
-  Karena iframe pakai parameter #scrollbar=0, scrollbar PDF tidak akan muncul.
-*/
 .pdf-preview {
     width: 100%;
     max-width: 350px;
-    height: 140px; /* Tinggi pas, tidak makan tempat */
+    height: 140px; 
     border: 1px solid var(--border-color);
     border-radius: 8px;
     overflow: hidden;
@@ -522,6 +507,76 @@ tr:hover td {
     border-radius:10px;
     cursor:pointer;
     font-weight: 600;
+}
+
+/* =========================================
+   JURUS DARK MODE (DI DALAM STYLE)
+   ========================================= */
+html.dark {
+    --bg-light: #0B1120;
+    --card-bg: #151E32; 
+    --text-main: #F8FAFC; 
+    --text-muted: #94A3B8; 
+    --border-color: #1E293B; 
+}
+
+html.dark .table-card,
+html.dark .header-card {
+    background-color: var(--card-bg) !important;
+    border-color: var(--border-color) !important;
+}
+
+html.dark th {
+    background-color: #0B1120 !important;
+    color: #F8FAFC !important;
+}
+
+html.dark tr:hover td {
+    background-color: #1E293B !important; 
+}
+
+html.dark .title-text,
+html.dark h2 {
+    color: var(--text-main) !important;
+}
+
+html.dark .header-text p,
+html.dark .pagination-info {
+    color: var(--text-muted) !important;
+}
+
+html.dark .pdf-preview {
+    background-color: #0F172A !important;
+    border-color: var(--border-color) !important;
+}
+
+html.dark .page-btn {
+    background-color: #1E293B !important;
+    color: #F8FAFC !important;
+    border-color: #334155 !important;
+}
+html.dark .page-btn.active {
+    background-color: #2563eb !important; 
+    border-color: #2563eb !important;
+}
+html.dark .page-btn.disabled {
+    background-color: #0B1120 !important;
+    opacity: 0.5;
+}
+
+html.dark .modal-content {
+    background-color: #151E32 !important;
+    border: 1px solid #1E293B;
+}
+html.dark .modal-content h3 {
+    color: #F8FAFC !important;
+}
+html.dark .modal-content p {
+    color: #94A3B8 !important;
+}
+html.dark .cancel {
+    background-color: #334155 !important;
+    color: #F8FAFC !important;
 }
 </style>
 

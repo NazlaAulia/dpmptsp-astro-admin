@@ -9,7 +9,6 @@ const [semuaLayanan] = await db.query(
 
 <AdminShell title="Tempat Layanan" subtitle="Pantau layanan yang tersedia dan status operasional harian." actionLabel="Tambah Tempat Pelayanan" actionHref="/admin/tambah-layanan">
   <div class="table-container">
-    <!-- Class diubah agar scroll hanya ke samping jika layar kecil -->
     <div class="table-scroll-custom">
       <table class="data-table">
         <thead>
@@ -90,12 +89,12 @@ const [semuaLayanan] = await db.query(
     currentData.forEach(item => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td>${item.id}</td>
-        <td class="fw-bold">${item.judul}</td>
-        <td><a href="${item.lokasi}" target="_blank" class="map-link" title="${item.lokasi}">${item.lokasi}</a></td>
-        <td>${item.alamat}</td>
-        <td><img src="${item.gambar}" alt="${item.judul}" class="thumb-img" /></td>
-        <td>
+        <td data-label="ID">${item.id}</td>
+        <td data-label="Judul" class="fw-bold">${item.judul}</td>
+        <td data-label="Lokasi"><a href="${item.lokasi}" target="_blank" class="map-link" title="${item.lokasi}">${item.lokasi}</a></td>
+        <td data-label="Alamat">${item.alamat}</td>
+        <td data-label="Gambar"><img src="${item.gambar}" alt="${item.judul}" class="thumb-img" /></td>
+        <td data-label="">
           <div class="action-buttons">
             <button class="btn-icon btn-edit" title="Edit" data-id="${item.id}">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
@@ -121,45 +120,21 @@ const [semuaLayanan] = await db.query(
     const controls = document.getElementById("pagination-controls");
     controls.innerHTML = "";
 
-    // Style dasar Inline CSS (Paling kuat, anti ditimpa framework)
-    const baseStyle = "display: inline-flex; align-items: center; justify-content: center; min-width: 44px; height: 44px; padding: 0 12px; border-radius: 12px; font-size: 1rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; outline: none; margin: 0; box-sizing: border-box;";
+    const createBtn = (label, page, disabled, active) => {
+      const btn = document.createElement("button");
+      btn.className = "page-btn" + (active ? " active" : "") + (disabled ? " disabled" : "");
+      btn.innerHTML = label;
+      if (!disabled) btn.onclick = () => renderTable(page);
+      return btn;
+    };
 
-    // Tombol Prev (<)
-    const prevBtn = document.createElement("button");
-    prevBtn.innerHTML = "&lt;";
-    if (currentPage === 1) {
-      prevBtn.style.cssText = baseStyle + "background-color: #ffffff; color: #cbd5e1; border: 1px solid #e2e8f0; cursor: not-allowed;";
-    } else {
-      prevBtn.style.cssText = baseStyle + "background-color: #ffffff; color: #64748b; border: 1px solid #e2e8f0;";
-      prevBtn.onclick = () => renderTable(currentPage - 1);
-    }
-    controls.appendChild(prevBtn);
+    controls.appendChild(createBtn("&lt;", currentPage - 1, currentPage === 1, false));
 
-    // Tombol Angka (1, 2, 3...)
     for (let i = 1; i <= totalPages; i++) {
-      const pageBtn = document.createElement("button");
-      pageBtn.innerText = i;
-      if (currentPage === i) {
-        // Jika AKTIF (Warna BIRU)
-        pageBtn.style.cssText = baseStyle + "background-color: #2563eb; color: #ffffff; border: 1px solid #2563eb; font-weight: 700; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);";
-      } else {
-        // Jika TIDAK AKTIF
-        pageBtn.style.cssText = baseStyle + "background-color: #ffffff; color: #64748b; border: 1px solid #e2e8f0;";
-      }
-      pageBtn.onclick = () => renderTable(i);
-      controls.appendChild(pageBtn);
+      controls.appendChild(createBtn(i, i, false, currentPage === i));
     }
 
-    // Tombol Next (>)
-    const nextBtn = document.createElement("button");
-    nextBtn.innerHTML = "&gt;";
-    if (currentPage === totalPages) {
-      nextBtn.style.cssText = baseStyle + "background-color: #ffffff; color: #cbd5e1; border: 1px solid #e2e8f0; cursor: not-allowed;";
-    } else {
-      nextBtn.style.cssText = baseStyle + "background-color: #ffffff; color: #64748b; border: 1px solid #e2e8f0;";
-      nextBtn.onclick = () => renderTable(currentPage + 1);
-    }
-    controls.appendChild(nextBtn);
+    controls.appendChild(createBtn("&gt;", currentPage + 1, currentPage === totalPages, false));
   }
 
   function attachActionListeners() {
@@ -202,9 +177,7 @@ const [semuaLayanan] = await db.query(
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({
-            id: selectedId
-          })
+          body: JSON.stringify({ id: selectedId })
         });
 
         const result = await response.json();
@@ -228,7 +201,7 @@ const [semuaLayanan] = await db.query(
 
 <style>
 /* =========================================
-   1. STYLING TABEL (TETAP SEPERTI SEBELUMNYA)
+   1. STYLING TABEL (DESKTOP)
    ========================================= */
 .table-container {
   background: white;
@@ -241,7 +214,7 @@ const [semuaLayanan] = await db.query(
 
 .table-scroll-custom {
   width: 100%;
-  overflow-x: auto; 
+  overflow-x: auto;
   margin-bottom: 20px;
   border: 1px solid #e5eaf2;
   border-radius: 12px;
@@ -254,12 +227,18 @@ const [semuaLayanan] = await db.query(
   min-width: 900px;
 }
 
-:global(.data-table th:nth-child(1)), :global(.data-table td:nth-child(1)) { width: 60px; text-align: center; }
-:global(.data-table th:nth-child(2)), :global(.data-table td:nth-child(2)) { width: 15%; }
-:global(.data-table th:nth-child(3)), :global(.data-table td:nth-child(3)) { width: 25%; }
-:global(.data-table th:nth-child(4)), :global(.data-table td:nth-child(4)) { width: 20%; }
-:global(.data-table th:nth-child(5)), :global(.data-table td:nth-child(5)) { width: 130px; text-align: center; }
-:global(.data-table th:nth-child(6)), :global(.data-table td:nth-child(6)) { width: 120px; text-align: center; }
+:global(.data-table th:nth-child(1)),
+:global(.data-table td:nth-child(1)) { width: 60px; text-align: center; }
+:global(.data-table th:nth-child(2)),
+:global(.data-table td:nth-child(2)) { width: 15%; }
+:global(.data-table th:nth-child(3)),
+:global(.data-table td:nth-child(3)) { width: 25%; }
+:global(.data-table th:nth-child(4)),
+:global(.data-table td:nth-child(4)) { width: 20%; }
+:global(.data-table th:nth-child(5)),
+:global(.data-table td:nth-child(5)) { width: 130px; text-align: center; }
+:global(.data-table th:nth-child(6)),
+:global(.data-table td:nth-child(6)) { width: 120px; text-align: center; }
 
 :global(.data-table th),
 :global(.data-table td) {
@@ -329,7 +308,7 @@ const [semuaLayanan] = await db.query(
 :global(.btn-delete:hover) { background: #fecaca; }
 
 /* =========================================
-   STYLING PAGINATION (FIX TOTAL - GAMBAR 2)
+   2. STYLING PAGINATION (DESKTOP)
    ========================================= */
 .pagination-footer {
   display: flex;
@@ -342,58 +321,53 @@ const [semuaLayanan] = await db.query(
 
 .pagination-controls {
   display: flex;
-  gap: 8px; 
+  gap: 8px;
   align-items: center;
 }
 
-/* Trik: Panggil parent-nya dulu (.pagination-controls) baru button-nya. 
-   Ini bikin tingkat prioritasnya sangat tinggi, mengalahkan Tailwind. */
 .pagination-controls button.page-btn {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  min-width: 42px !important;
-  height: 42px !important;
-  padding: 0 14px !important;
-  background-color: #ffffff !important; /* Latar putih */
-  color: #64748b !important; /* Teks abu-abu */
-  border: 1px solid #e2e8f0 !important; /* Border tipis */
-  border-radius: 12px !important; /* Sudut membulat */
-  font-size: 0.95rem !important;
-  font-weight: 500 !important;
-  cursor: pointer !important;
-  box-shadow: none !important;
-  outline: none !important;
-  transition: all 0.2s ease !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  height: 42px;
+  padding: 0 14px;
+  background-color: #ffffff;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: none;
+  outline: none;
+  transition: all 0.2s ease;
 }
 
-/* Efek Hover (saat mouse diarahkan) */
 .pagination-controls button.page-btn:hover:not(.disabled):not(.active) {
-  background-color: #f8fafc !important;
-  border-color: #cbd5e1 !important;
-  color: #334155 !important;
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+  color: #334155;
 }
 
-/* TOMBOL AKTIF (ANGKA 1 WARNA BIRU) */
 .pagination-controls button.page-btn.active {
-  background-color: #2563eb !important; 
-  color: #ffffff !important;
-  border-color: #2563eb !important;
-  font-weight: 600 !important;
-  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25) !important;
+  background-color: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
 }
 
-/* TOMBOL PANAH DISABLED (< dan >) */
 .pagination-controls button.page-btn.disabled {
-  color: #cbd5e1 !important;
-  background-color: #ffffff !important;
-  border-color: #e2e8f0 !important;
-  cursor: not-allowed !important;
-  opacity: 0.7 !important;
+  color: #cbd5e1;
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 /* =========================================
-   3. STYLING MODAL (TETAP)
+   3. STYLING MODAL
    ========================================= */
 .modal-overlay {
   position: fixed;
@@ -436,4 +410,182 @@ const [semuaLayanan] = await db.query(
 .btn-ya-edit:hover { background: #1d4ed8; }
 .btn-hapus { background: #ef4444; color: white; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25); }
 .btn-hapus:hover { background: #dc2626; }
+
+/* =========================================
+   4. MOBILE RESPONSIVE (<= 768px)
+   ========================================= */
+@media (max-width: 768px) {
+  .table-container {
+    padding: 10px;
+    border-radius: 12px;
+    box-shadow: none;
+    background: transparent;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .table-scroll-custom {
+    border: none;
+    border-radius: 0;
+    margin-bottom: 12px;
+    overflow-x: visible;
+    width: 100%;
+  }
+
+  :global(.data-table) {
+    display: block;
+    min-width: 0;
+    width: 100%;
+    border: none;
+  }
+
+  :global(.data-table thead) {
+    display: none;
+  }
+
+  :global(.data-table tbody) {
+    display: block;
+    width: 100%;
+  }
+
+  :global(.data-table tbody tr) {
+    display: block;
+    width: 100%;
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+    margin-bottom: 12px;
+    padding: 16px;
+    border: 1px solid #eef2f7;
+    box-sizing: border-box;
+  }
+
+  :global(.data-table tbody td) {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px dashed #f1f5f9;
+    text-align: right;
+    font-size: 0.88rem;
+    width: 100%;
+    box-sizing: border-box;
+    word-break: break-word;
+  }
+
+  :global(.data-table tbody td:last-child) {
+    border-bottom: none;
+    padding-top: 12px;
+    padding-bottom: 0;
+    justify-content: flex-end;
+  }
+
+  :global(.data-table tbody td::before) {
+    content: attr(data-label);
+    font-weight: 700;
+    color: #64748b;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    flex-shrink: 0;
+    text-align: left;
+    padding-right: 8px;
+    white-space: nowrap;
+  }
+
+  :global(.data-table tbody td:nth-child(1)) {
+    display: none;
+  }
+
+  :global(.data-table tbody td:nth-child(2)) {
+    font-weight: 700;
+    color: #0f172a;
+    font-size: 1rem;
+  }
+
+  :global(.data-table tbody td:nth-child(5)) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  :global(.thumb-img) {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin: 0;
+  }
+
+  :global(.map-link) {
+    text-align: right;
+    font-size: 0.82rem;
+    max-width: 65%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  :global(.action-buttons) {
+    width: 100%;
+    gap: 10px;
+    display: flex;
+  }
+
+  :global(.btn-icon) {
+    flex: 1;
+    height: 44px;
+    width: auto;
+    border-radius: 12px;
+  }
+
+  .pagination-footer {
+    flex-direction: column;
+    gap: 14px;
+    align-items: stretch;
+    text-align: center;
+    padding-top: 8px;
+  }
+
+  .pagination-controls {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .pagination-controls button.page-btn {
+    min-width: 36px;
+    height: 36px;
+    padding: 0 8px;
+    font-size: 0.82rem;
+    border-radius: 10px;
+  }
+
+  .modal-card {
+    margin: 0 16px;
+    padding: 28px 20px;
+    border-radius: 18px;
+  }
+
+  .modal-icon-wrapper {
+    width: 64px;
+    height: 64px;
+  }
+
+  .modal-exclamation { font-size: 32px; }
+  .modal-card h2 { font-size: 1.2rem; }
+  .modal-card p { font-size: 0.88rem; }
+
+  .modal-actions {
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .modal-btn {
+    flex: 1;
+    padding: 12px 14px;
+    font-size: 0.88rem;
+  }
+}
 </style>
