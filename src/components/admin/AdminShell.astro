@@ -1,27 +1,3 @@
-diff --cc src/components/admin/AdminShell.astro
-index 55a27f8,66aadcd..0000000
---- a/src/components/admin/AdminShell.astro
-+++ b/src/components/admin/AdminShell.astro
-@@@ -14,13 -22,17 +22,25 @@@ const
-      <main class="content">
-        {showHeader && (
-          <section class="page-header">
-++<<<<<<< HEAD
- +          <div class="page-title-group">
-++=======
-+           <div class="header-info">
-++>>>>>>> a402539 (versi hp)
-              <p class="eyebrow">PANEL ADMINISTRASI</p>
-              <h1>{title}</h1>
-              <p class="subtitle">{subtitle}</p>
-            </div>
-+ 
-            <div class="page-actions">
-++<<<<<<< HEAD
- +            <a href={actionHref} class="primary-action"><Fragment set:html={actionIcon} /> {actionLabel}</a>
-++=======
-+             <a href={actionHref} class="primary-action">
-PS C:\Users\Windows\dpmptsp-astro> Get-Content src/components/admin/AdminShell.astro
 
 ---
 import Sidebar from "./Sidebar.astro";
@@ -46,25 +22,17 @@ const {
     <main class="content">
       {showHeader && (
         <section class="page-header">
-<<<<<<< HEAD
-          <div class="page-title-group">
-=======
           <div class="header-info">
->>>>>>> a402539 (versi hp)
             <p class="eyebrow">PANEL ADMINISTRASI</p>
             <h1>{title}</h1>
             <p class="subtitle">{subtitle}</p>
           </div>
 
           <div class="page-actions">
-<<<<<<< HEAD
-            <a href={actionHref} class="primary-action"><Fragment set:html={actionIcon}/> {actionLabel}</a>
-=======
             <a href={actionHref} class="primary-action">
               <Fragment set:html={actionIcon} />
               {actionLabel}
             </a>
->>>>>>> a402539 (versi hp)
           </div>
         </section>
       )}
@@ -78,14 +46,9 @@ const {
 
 <style>
 /* =========================================
-<<<<<<< HEAD
-   LAYOUT DESKTOP (ASLI)
-   ========================================= */
-=======
    1. LAYOUT UTAMA DESKTOP
 ========================================= */
 
->>>>>>> a402539 (versi hp)
 .admin-shell {
   display: flex;
   width: 100%;
@@ -104,13 +67,10 @@ const {
   min-height: 0;
 }
 
-<<<<<<< HEAD
-=======
 /* =========================================
    2. KONTEN UTAMA
 ========================================= */
 
->>>>>>> a402539 (versi hp)
 .content {
   flex: 1;
   min-width: 0;
@@ -156,19 +116,11 @@ const {
   border: none !important;
   box-shadow: 0 10px 30px rgba(15,23,42,0.03) !important;
   flex-shrink: 0;
-<<<<<<< HEAD
-  gap: 20px; /* Tambahan agar teks dan tombol tidak dempet */
-}
-
-.page-title-group {
-  flex: 1; /* Agar teks mengambil ruang yang tersedia */
-=======
   box-sizing: border-box;
 }
 
 .header-info {
   min-width: 0;
->>>>>>> a402539 (versi hp)
 }
 
 .eyebrow {
@@ -202,10 +154,6 @@ const {
   flex-shrink: 0;
 }
 
-.page-actions {
-  flex-shrink: 0; /* Mencegah tombol mengecil */
-}
-
 .page-actions a {
   text-decoration: none;
   border-radius: 12px;
@@ -213,10 +161,6 @@ const {
   font-size: 0.95rem;
   font-weight: 600;
   transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px; /* Jarak antara icon + dan teks */
 }
 
 .primary-action {
@@ -235,18 +179,6 @@ const {
 }
 
 /* =========================================
-<<<<<<< HEAD
-   RESPONSIVE FINAL UNTUK LAYAR HP (MOBILE)
-   ========================================= */
-@media (max-width: 900px) {
-  /* 1. Ubah shell jadi block agar full width */
-  .admin-shell { 
-    display: block !important; 
-    min-height: 100vh !important;
-  }
-  
-  /* 2. Main panel full width */
-=======
    5. RESPONSIVE TABLET
 ========================================= */
 
@@ -260,7 +192,6 @@ const {
     overflow-x: hidden;
   }
 
->>>>>>> a402539 (versi hp)
   .main-panel {
     width: 100%;
     min-width: 0;
@@ -270,44 +201,6 @@ const {
     padding: 0;
   }
 
-<<<<<<< HEAD
-  .content { 
-    padding: 16px !important; 
-    overflow-y: visible !important; 
-    height: auto !important;
-  }
-
-  /* 3. HEADER: Ubah jadi Atas-Bawah (Vertikal) */
-  .page-header { 
-    flex-direction: column !important;
-    align-items: stretch !important; /* Tarik full selebar layar */
-    gap: 20px !important; 
-    padding: 24px 20px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  /* 4. TOMBOL: Paksa turun ke bawah, selebar layar HP */
-  .page-actions {
-    width: 100% !important;
-    display: block !important;
-    margin-top: 8px !important;
-  }
-  
-  .page-actions a {
-    display: flex !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    padding: 14px 20px !important;
-    position: static !important; /* Anti melayang */
-    transform: none !important; /* Matikan efek geser */
-  }
-
-  /* 5. Sesuaikan ukuran font judul */
-  .page-header h1 {
-    font-size: 1.5rem !important;
-    line-height: 1.3 !important;
-=======
   .content {
     width: 100%;
     min-width: 0;
@@ -316,7 +209,6 @@ const {
     padding: 20px !important;
     gap: 18px;
     overflow: visible;
->>>>>>> a402539 (versi hp)
   }
 
   .content-body {
@@ -362,16 +254,6 @@ const {
   }
 }
 
-<<<<<<< HEAD
-/* Khusus HP: Sembunyikan Sidebar */
-@media (max-width: 768px) {
-    /* Sembunyikan sidebar (pastikan di Sidebar.astro pakai tag <aside> atau class .sidebar) */
-    aside, .sidebar {
-        display: none !important;
-    }
-}
-</style>
-=======
 /* =========================================
    6. RESPONSIVE HP
 ========================================= */
@@ -470,5 +352,3 @@ const {
   }
 }
 </style>
->>>>>>> a402539 (versi hp)
-PS C:\Users\Windows\dpmptsp-astro> 
