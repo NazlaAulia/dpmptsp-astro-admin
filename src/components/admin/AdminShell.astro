@@ -5,7 +5,6 @@ import Navbar from "./Navbar.astro";
 const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih terarah.", actionLabel = "Tambah Artikel", actionHref = "/admin/tambah-artikel", actionIcon = "+", showHeader = true } = Astro.props;
 ---
 
-
 <div class="admin-shell">
   <Sidebar />
 
@@ -15,13 +14,13 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
     <main class="content">
       {showHeader && (
         <section class="page-header">
-          <div>
+          <div class="page-title-group">
             <p class="eyebrow">PANEL ADMINISTRASI</p>
             <h1>{title}</h1>
             <p class="subtitle">{subtitle}</p>
           </div>
           <div class="page-actions">
-          <a href={actionHref} class="primary-action"><Fragment set:html={actionIcon} /> {actionLabel}</a>
+            <a href={actionHref} class="primary-action"><Fragment set:html={actionIcon} /> {actionLabel}</a>
           </div>
         </section>
       )}
@@ -34,7 +33,9 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
 </div>
 
 <style>
-/* BACKGROUND UTAMA */
+/* =========================================
+   LAYOUT DESKTOP (ASLI)
+   ========================================= */
 .admin-shell {
   display: flex;
   min-height: 100vh;
@@ -49,7 +50,6 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
   min-height: 0;
 }
 
-/* PADDING KONTEN */
 .content {
   flex: 1;
   min-height: 0;
@@ -80,6 +80,11 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
   border: none !important;
   box-shadow: 0 10px 30px rgba(15,23,42,0.03) !important; 
   flex-shrink: 0;
+  gap: 20px; /* Tambahan agar teks dan tombol tidak dempet */
+}
+
+.page-title-group {
+  flex: 1; /* Agar teks mengambil ruang yang tersedia */
 }
 
 .eyebrow {
@@ -103,6 +108,10 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
   font-size: 0.95rem;
 }
 
+.page-actions {
+  flex-shrink: 0; /* Mencegah tombol mengecil */
+}
+
 .page-actions a {
   text-decoration: none;
   border-radius: 12px; 
@@ -110,6 +119,10 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
   font-size: 0.95rem;
   font-weight: 600;
   transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* Jarak antara icon + dan teks */
 }
 
 .primary-action {
@@ -129,16 +142,16 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
 }
 
 /* =========================================
-   RESPONSIVE KHUSUS HP (SUDAH DIPERBAIKI)
+   RESPONSIVE FINAL UNTUK LAYAR HP (MOBILE)
    ========================================= */
 @media (max-width: 900px) {
-  /* 1. Paksa shell jadi block biar gak ada sisa flex */
+  /* 1. Ubah shell jadi block agar full width */
   .admin-shell { 
     display: block !important; 
     min-height: 100vh !important;
   }
   
-  /* 2. Paksa konten utama full width */
+  /* 2. Main panel full width */
   .main-panel {
     width: 100% !important;
     margin-left: 0 !important;
@@ -153,28 +166,49 @@ const { title, subtitle = "Kelola konten dan operasional DPM-PTSP dengan lebih t
     height: auto !important;
   }
 
+  /* 3. HEADER: Ubah jadi Atas-Bawah (Vertikal) */
   .page-header { 
     flex-direction: column !important; 
-    align-items: flex-start !important; 
-    gap: 16px !important; 
-    padding: 20px !important;
+    align-items: stretch !important; /* Tarik full selebar layar */
+    gap: 20px !important; 
+    padding: 24px 20px !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
 
+  /* 4. TOMBOL: Paksa turun ke bawah, selebar layar HP */
   .page-actions {
     width: 100% !important;
-  }
-  .page-actions a {
     display: block !important;
-    text-align: center !important;
+    margin-top: 8px !important;
+  }
+  
+  .page-actions a {
+    display: flex !important;
     width: 100% !important;
     box-sizing: border-box !important;
+    padding: 14px 20px !important;
+    position: static !important; /* Anti melayang */
+    transform: none !important; /* Matikan efek geser */
+  }
+
+  /* 5. Sesuaikan ukuran font judul */
+  .page-header h1 {
+    font-size: 1.5rem !important;
+    line-height: 1.3 !important;
   }
 
   .content-body {
     overflow-y: visible !important;
     height: auto !important;
   }
+}
+
+/* Khusus HP: Sembunyikan Sidebar */
+@media (max-width: 768px) {
+    /* Sembunyikan sidebar (pastikan di Sidebar.astro pakai tag <aside> atau class .sidebar) */
+    aside, .sidebar { 
+        display: none !important; 
+    }
 }
 </style>

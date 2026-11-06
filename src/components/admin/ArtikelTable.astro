@@ -77,14 +77,18 @@ body.dark .card-table,
 }
 
 /* =========================================
-   3. TERAPKAN VARIABEL KE DESAIN ASLI KAMU
+   3. DESAIN DESKTOP (TAMPILAN UTAMA)
    ========================================= */
 .top-controls { display: flex !important; justify-content: space-between !important; align-items: center !important; margin-bottom: 20px !important; }
 .entries { font-size: 14px !important; color: var(--text-light) !important; display: flex !important; align-items: center !important; gap: 8px !important; }
 .entries select { border: 1px solid var(--border-th) !important; border-radius: 6px !important; padding: 8px 12px !important; background: var(--input-bg) !important; color: var(--text-main) !important; outline: none !important; }
 .search-box input { border: 1px solid var(--border-th) !important; border-radius: 8px !important; padding: 10px 16px !important; font-size: 13px !important; background: var(--input-bg) !important; outline: none !important; color: var(--text-main) !important; width: 280px !important; }
 .table-wrapper { border: 1px solid var(--border-th) !important; border-radius: 8px !important; overflow: hidden !important; }
-table { width: 100% !important; border-collapse: collapse !important; table-layout: fixed !important; }
+
+/* Tabel Desktop */
+.desktop-table { display: table !important; width: 100% !important; border-collapse: collapse !important; table-layout: fixed !important; }
+.mobile-cards { display: none !important; }
+
 th { background: var(--bg-header) !important; color: var(--text-light) !important; font-weight: 700 !important; font-size: 12px !important; text-transform: uppercase !important; padding: 16px !important; text-align: left !important; border-bottom: 2px solid var(--border-th) !important; }
 td { padding: 16px !important; border-bottom: 1px solid var(--border-sub) !important; text-align: left !important; font-size: 13px !important; color: var(--text-light) !important; vertical-align: middle !important; background: var(--bg-card) !important; word-wrap: break-word !important; }
 tbody tr:hover td { background: var(--bg-hover) !important; }
@@ -135,45 +139,137 @@ img.thumbnail { width: 100% !important; max-width: 70px !important; height: auto
     }
     .search-box input {
         width: 100% !important;
+        box-sizing: border-box !important;
     }
 
-    /* 3. KUNCI UTAMA: Buat tabel bisa di-scroll ke samping */
+    /* 3. Sembunyikan Header Tabel (Karena kita akan ubah ke bentuk Card) */
+    thead {
+        display: none !important;
+    }
+
+    /* 4. Ubah struktur Tabel menjadi Block/Card */
+    table, tbody, tr, td {
+        display: block !important;
+        width: 100% !important;
+    }
+
     .table-wrapper {
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch !important; /* Scroll mulus di HP */
+        border: none !important;
+        overflow-x: hidden !important;
     }
 
-    /* Paksa tabel punya lebar minimum agar kolom tidak gepeng */
-    table {
-        min-width: 900px !important; 
-        table-layout: auto !important; /* Matikan fixed layout di HP */
+    /* Desain Card per baris data */
+    tbody tr {
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border-th) !important;
+        border-radius: 12px !important;
+        margin-bottom: 16px !important;
+        padding: 12px !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.02) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        position: relative !important;
     }
 
-    /* Kembalikan rasio lebar kolom normal (tidak pakai %) */
-    th:nth-child(1) { width: 50px !important; }
-    th:nth-child(2) { width: 200px !important; }
-    th:nth-child(3) { width: 250px !important; }
-    th:nth-child(4) { width: 120px !important; }
-    th:nth-child(5) { width: 150px !important; }
-    th:nth-child(6) { width: 100px !important; }
-    th:nth-child(7) { width: 80px !important; }
+    tbody tr:last-child {
+        margin-bottom: 0 !important;
+    }
 
-    /* 4. Rapikan pagination di HP */
+    /* Sembunyikan kolom yang kurang penting di HP (ID & Gambar) */
+    td:nth-child(1), 
+    td:nth-child(6) {
+        display: none !important;
+    }
+
+    /* Atur ulang setiap sel (td) menjadi baris data di dalam card */
+    td {
+        padding: 6px 0 !important;
+        border: none !important;
+        border-bottom: 1px dashed var(--border-sub) !important;
+        background: transparent !important;
+        word-break: break-word !important;
+    }
+    
+    td:last-child {
+        border-bottom: none !important;
+        padding-bottom: 0 !important;
+    }
+
+    /* Tambahkan Label kecil di setiap data agar user paham */
+    td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        font-size: 11px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    /* Mengatur Judul agar lebih menonjol */
+    td:nth-child(2)::before { display: none !important; } /* Sembunyikan label "JUDUL" */
+    .judul-cell {
+        font-size: 15px !important;
+        margin-bottom: 6px !important;
+        display: block !important;
+        line-height: 1.4 !important;
+    }
+
+    /* Atur Isi */
+    .isi-preview {
+        font-size: 12px !important;
+        -webkit-line-clamp: 3 !important; /* Tampilkan maks 3 baris di HP */
+    }
+
+    /* Badge Kategori & Tanggal */
+    .badge {
+        font-size: 10px !important;
+        padding: 4px 8px !important;
+    }
+    .tanggal-text {
+        font-size: 12px !important;
+    }
+
+    /* Tombol Aksi (Edit & Hapus) dipindah ke ujung bawah card */
+    td:last-child {
+        display: flex !important;
+        justify-content: flex-end !important;
+        padding-top: 12px !important;
+        margin-top: 4px !important;
+        border-top: 1px solid var(--border-sub) !important;
+    }
+
+    .aksi {
+        justify-content: flex-end !important;
+        width: 100% !important;
+    }
+
+    .aksi button {
+        width: 36px !important;
+        height: 36px !important;
+    }
+
+    /* 5. Rapikan pagination di HP */
     .pagination {
         flex-direction: column !important;
         gap: 16px !important;
         align-items: center !important;
+        text-align: center !important;
     }
     
-    /* 5. Pastikan modal tidak terlalu lebar di HP */
+    .pages {
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+    }
+
+    /* 6. Pastikan modal tidak terlalu lebar di HP */
     .modal-box {
         width: 90% !important;
         margin: 0 16px !important;
+        box-sizing: border-box !important;
     }
 }
-
 </style>
-
 
 <div class="card-table">
     <div class="top-controls">
@@ -191,7 +287,8 @@ img.thumbnail { width: 100% !important; max-width: 70px !important; height: auto
     </div>
 
     <div class="table-wrapper">
-        <table>
+        <!-- 1. TABEL UTAMA UNTUK DESKTOP -->
+        <table class="desktop-table">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -227,6 +324,37 @@ img.thumbnail { width: 100% !important; max-width: 70px !important; height: auto
                 ))}
             </tbody>
         </table>
+
+        <!-- 2. TAMPILAN KARTU KHUSUS UNTUK HP (MOBILE) -->
+        <div class="mobile-cards">
+            {dataArtikel.map((item)=>(
+                <div class="m-card">
+                    <div class="m-card-header">
+                        <span class="id-text">#{item.id_post}</span>
+                        <span class="badge">{item.kategori}</span>
+                    </div>
+                    <div class="m-card-body">
+                        {item.picture && (
+                            <img src={`/uploads/${item.picture}`} class="m-card-img" alt={item.title} onerror={`this.onerror=null; this.src='https://dpm-ptsp.surabaya.go.id/fileberita/${item.picture}'`} />
+                        )}
+                        <div class="m-card-content">
+                            <span class="m-card-title">{item.title}</span>
+                            <div class="m-card-snippet">{item.content ? item.content.substring(0,60) : ''}...</div>
+                        </div>
+                    </div>
+                    <div class="m-card-footer">
+                        <div>
+                            <div class="tanggal-text" style="font-size:11.5px;">{item.date}</div>
+                            <span class="status-text">{item.active === "Y" ? "Aktif":"Nonaktif"}</span>
+                        </div>
+                        <div class="aksi">
+                            <button type="button" class="edit" data-id={item.id_post}><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></button>
+                            <button type="button" class="hapus" data-id={item.id_post}><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v5"></path><path d="M14 11v5"></path></svg></button>
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
     </div>
 
     <div class="pagination">
@@ -241,7 +369,7 @@ img.thumbnail { width: 100% !important; max-width: 70px !important; height: auto
 
 <!-- MODALS -->
 <div class="modal-overlay" id="hapusModal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.6); z-index:9999; align-items:center; justify-content:center;">
-    <div class="modal-box" style="width:400px; background:#fff; border-radius:12px; padding:24px; text-align:center;">
+    <div class="modal-box" style="width:90%; max-width:400px; background:#fff; border-radius:12px; padding:24px; text-align:center;">
         <h2 style="margin:0 0 8px; font-size:18px; color:#0f172a;">Hapus Artikel?</h2>
         <p style="margin:0; color:#64748b; font-size:14px;">Data yang dihapus tidak dapat dikembalikan.</p>
         <div style="display:flex; justify-content:center; gap:12px; margin-top:24px;">
@@ -252,7 +380,7 @@ img.thumbnail { width: 100% !important; max-width: 70px !important; height: auto
 </div>
 
 <div class="modal-overlay" id="editModal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.6); z-index:9999; align-items:center; justify-content:center;">
-    <div class="modal-box" style="width:400px; background:#fff; border-radius:12px; padding:24px; text-align:center;">
+    <div class="modal-box" style="width:90%; max-width:400px; background:#fff; border-radius:12px; padding:24px; text-align:center;">
         <h2 style="margin:0 0 8px; font-size:18px; color:#0f172a;">Edit Artikel?</h2>
         <p style="margin:0; color:#64748b; font-size:14px;">Anda akan diarahkan ke halaman edit.</p>
         <div style="display:flex; justify-content:center; gap:12px; margin-top:24px;">
